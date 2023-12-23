@@ -1,18 +1,27 @@
 import { CACHE_DURATION } from '$lib';
 import { BACKEND_URL } from '$lib/server';
-import type { User } from '$lib/types';
+import type { Section, User } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
-	const response = await fetch(`${BACKEND_URL}/users?order_by=true`, { method: 'GET' });
+	const getUsers = async () => {
+		const response = await fetch(`${BACKEND_URL}/users?order_by=true`, { method: 'GET' });
+		const users: User[] = await response.json();
 
-	const users: User[] = await response.json();
+		return users;
+	};
 
-	console.log(users);
+	const getSections = async () => {
+		const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
+		const sections: Section[] = await response.json();
+
+		return sections;
+	};
 
 	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
 
 	return {
-		users
+		users: await getUsers(),
+		sections: await getSections()
 	};
 };

@@ -43,3 +43,18 @@ export const USER_ROUTES: Navigation = [
 		icon: Sword
 	}
 ];
+
+export const SKILLS = new Map([
+	['strikes', 'Strikes'],
+	['blocks', 'Blocks'],
+	['forward_sinawali', 'Forward Sinawali'],
+	['sideward_sinawali', 'Sideward Sinawali'],
+	['reversed_sinawali', 'Reversed Sinawali']
+]);
+
+export const FOOTWORKS = new Map([
+	['guerrero', 'Guerrero'],
+	['cabellero', 'Cabellero'],
+	['triangle', 'Triangle'],
+	['reversed_triangle', 'Reversed Triangle']
+]);

@@ -6,7 +6,9 @@
 </script>
 
 <div class="flex h-screen">
-	<Sidebar user={data.user} />
+	{#if data.user}
+		<Sidebar user={data.user} />
+	{/if}
 
 	<main class="flex-1">
 		<slot />

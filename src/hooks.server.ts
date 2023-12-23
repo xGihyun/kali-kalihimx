@@ -10,7 +10,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname !== '/login' && !session) {
 		console.log('Access Denied');
 
-		throw redirect(307, '/login');
+		redirect(307, '/login');
 	}
 
 	return await resolve(event);

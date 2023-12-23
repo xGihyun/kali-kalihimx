@@ -1,15 +1,19 @@
+import { LoginSchema } from '$lib/schemas';
 import { BACKEND_URL } from '$lib/server';
 import type { User } from '$lib/types';
 import { redirect, type Actions } from '@sveltejs/kit';
-import { email, object, string, parse, type Output } from 'valibot';
+import { parse } from 'valibot';
+import { APP_ENV } from '$env/static/private';
+import type { PageServerLoad } from './$types';
 
-const LoginSchema = object({
-	email: string([email()]),
-	password: string()
-});
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user_id) {
+		redirect(302, '/');
+	}
+};
 
 export const actions: Actions = {
-	default: async ({ request, locals, cookies }) => {
+	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
 		const formEntries = Object.fromEntries(formData.entries());
 
@@ -30,9 +34,15 @@ export const actions: Actions = {
 		console.log(user);
 
 		if (response.ok) {
-			cookies.set('session', user.id, { maxAge: 60 * 60 * 24 * 7, path: '/' });
+			cookies.set('session', user.id, {
+				maxAge: 60 * 60 * 24 * 7, // 1 week
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: APP_ENV === 'production'
+			});
 
-			throw redirect(302, '/');
+			redirect(303, '/');
 		}
 	}
 };

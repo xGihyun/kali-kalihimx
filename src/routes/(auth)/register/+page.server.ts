@@ -1,11 +1,16 @@
 import { BACKEND_URL } from '$lib/server';
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { Register, Section } from '$lib/types.ts';
+import type { Section } from '$lib/types.ts';
 import { CACHE_DURATION } from '$lib';
-import { email, number, object, parse, string } from 'valibot';
+import { parse } from 'valibot';
+import { RegisterSchema } from '$lib/schemas';
 
-export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, fetch, setHeaders }) => {
+	if (locals.user_id) {
+		redirect(302, '/');
+	}
+
 	const response = await fetch(`${BACKEND_URL}/sections`, {
 		method: 'GET'
 	});
@@ -19,19 +24,8 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	};
 };
 
-const RegisterSchema = object({
-	email: string([email()]),
-	password: string(),
-	section: string(),
-	first_name: string(),
-	last_name: string(),
-	age: number(),
-	contact_number: number(),
-	sex: number()
-});
-
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request }) => {
 		const formData = await request.formData();
 		const formEntries = Object.fromEntries(formData.entries());
 
@@ -53,7 +47,7 @@ export const actions: Actions = {
 		});
 
 		if (response.ok) {
-			redirect(302, '/login');
+			redirect(303, '/login');
 		}
 
 		if (response.status === 409) {
