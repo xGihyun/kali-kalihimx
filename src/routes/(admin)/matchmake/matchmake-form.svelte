@@ -15,7 +15,6 @@
 	let:config
 	method="POST"
 	class="w-full max-w-5xl flex items-center gap-4"
-	enhance="true"
 >
 	<div class="w-full flex items-center gap-2">
 		<Form.Field {config} name="section">

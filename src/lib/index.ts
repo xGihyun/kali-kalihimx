@@ -5,20 +5,20 @@ export const CACHE_DURATION = 600;
 
 export const ADMIN_ROUTES: Navigation = [
 	{
-		name: 'Queue',
+		name: 'Matchmake',
 		path: '/matchmake',
 		icon: ArrowClockwise
 	},
 	{
-		name: 'Matches',
-		path: '/pending-matches',
+		name: 'Match History',
+		path: '/match-history',
 		icon: History
-	},
-	{
-		name: 'Users',
-		path: '/manage-users',
-		icon: People
 	}
+	// {
+	// 	name: 'Users',
+	// 	path: '/manage-users',
+	// 	icon: People
+	// }
 ];
 
 export const USER_ROUTES: Navigation = [

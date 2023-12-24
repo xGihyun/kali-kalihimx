@@ -69,4 +69,10 @@ export type Matchmake = {
 	arnis_footwork: string;
 	card_deadline: string;
 	status: string;
+	set: number;
+};
+
+export type MaxSet = {
+	section: string;
+	max_set: number;
 };
