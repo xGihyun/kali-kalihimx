@@ -11,7 +11,9 @@
 	const initials = (user.first_name[0] + user.last_name[0]).toUpperCase();
 </script>
 
-<aside class="w-72 h-full p-4 justify-between flex flex-col text-base md:text-lg">
+<aside
+	class="w-72 h-full p-4 justify-between flex flex-col text-base md:text-lg fixed top-0 left-0"
+>
 	<div class="flex flex-col">
 		<a href="/" class="py-4 px-2 flex gap-2 items-center">
 			<Arnis styles="w-10 h-10 text-rose-500" />

@@ -10,8 +10,6 @@
 	export let users: User[];
 	export let sections: Section[];
 
-	console.log(sections);
-
 	const table = createTable(readable(users), {
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())

@@ -70,9 +70,48 @@ export type Matchmake = {
 	card_deadline: string;
 	status: string;
 	set: number;
+	user1_total_damage?: number;
+	user2_total_damage?: number;
 };
 
 export type MaxSet = {
 	section: string;
 	max_set: number;
+};
+
+export type CardBattle = {
+	user1_id: string;
+	user2_id: string;
+	user1_total_damage: number;
+	user2_total_damage: number;
+};
+
+export type StrikeCard = {
+	damage: number;
+	accuracy: number;
+	effect: string;
+};
+
+export type BlockCard = {
+	damage_reduction: number;
+	strike_to_cancel: string;
+	effect: string;
+};
+
+// Data to pass as payload
+export type BattleCardData = {
+	id: string;
+	name: string;
+	skill: 'strike' | 'block';
+};
+
+export type BattleCard =
+	| { data: BattleCardData; type: StrikeCard }
+	| { data: BattleCardData; type: BlockCard };
+
+export type UpdateScore = {
+	user_id: string;
+	score: number;
+	difference: number;
+	is_winner: boolean;
 };

@@ -10,7 +10,7 @@
 		<Sidebar user={data.user} />
 	{/if}
 
-	<main class="flex-1">
+	<main class="flex-1 pl-72">
 		<slot />
 	</main>
 </div>

@@ -1,13 +1,17 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table';
 	import * as Select from '$lib/components/ui/select';
+	import { Button } from '$lib/components/ui/button';
 	import { AlertCircle } from 'lucide-svelte';
 	import * as Alert from '$lib/components/ui/alert';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
+	import { MATCH_TYPES } from '$lib';
+	import ArnisTable from './arnis-table.svelte';
+	import CardBattleTable from './card-battle-table.svelte';
+	import type { PageData } from './$types';
 
-	export let data;
+	export let data: PageData;
 
-	$: ({ selectedSet, selectedSection } = data);
+	$: ({ selectedSet, selectedSection, selectedMatchType } = data);
 
 	function getSectionName(id: string): string | undefined {
 		if (!data.sections) return;
@@ -15,6 +19,21 @@
 		const section = data.sections.find((sec) => sec.id === id);
 
 		return section ? section.name : undefined;
+	}
+
+	async function runCardBattle() {
+		console.log('Set ', selectedSet);
+		console.log('Section ', selectedSection);
+		console.log('Running card battle...');
+
+		const response = await fetch(`/api/card_battle?set=${selectedSet}&section=${selectedSection}`, {
+			method: 'GET'
+		});
+
+		if (response.ok) {
+			console.log('Success card battle');
+			invalidate('card-battle:damage');
+		}
 	}
 </script>
 
@@ -26,7 +45,9 @@
 				onSelectedChange={(e) => {
 					if (e) {
 						selectedSection = `${e.value}`;
-						goto(`/match-history?set=${selectedSet}&section=${selectedSection}`);
+						goto(
+							`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
+						);
 					}
 				}}
 			>
@@ -57,7 +78,9 @@
 				onSelectedChange={(e) => {
 					if (e) {
 						selectedSet = Number(e.value) || 1;
-						goto(`/match-history?set=${selectedSet}&section=${selectedSection}`);
+						goto(
+							`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
+						);
 					}
 				}}
 			>
@@ -85,46 +108,47 @@
 				>
 			</Alert.Root>
 		{/if}
+
+		<Select.Root
+			selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}
+			onSelectedChange={(e) => {
+				if (e) {
+					selectedMatchType = `${e.value}`;
+					goto(
+						`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
+					);
+				}
+			}}
+		>
+			<Select.Trigger class="w-[180px]">
+				<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
+			</Select.Trigger>
+			<Select.Content>
+				{#each MATCH_TYPES as [key, value] (key)}
+					<Select.Item value={key} class="text-base md:text-lg">
+						{value}
+					</Select.Item>
+				{/each}
+			</Select.Content>
+		</Select.Root>
+
+		{#if selectedMatchType === 'card_battle'}
+			<Button class="text-base md:text-lg" on:click={runCardBattle}>Run Card Battle</Button>
+		{/if}
 	</div>
 
 	{#if data.matches}
-		<Table.Root>
-			<Table.Header>
-				<Table.Row class="text-base md:text-lg">
-					<Table.Head>Player 1</Table.Head>
-					<Table.Head>VS</Table.Head>
-					<Table.Head>Player 2</Table.Head>
-					<Table.Head>Skill</Table.Head>
-					<Table.Head>Footwork</Table.Head>
-					<Table.Head>Status</Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each data.matches as match (match.id)}
-					{@const user1 = `${match.user1_first_name} ${match.user1_last_name}`}
-					{@const user2 = `${match.user2_first_name} ${match.user2_last_name}`}
-
-					<Table.Row class="text-base md:text-lg">
-						<Table.Cell>
-							{user1}
-						</Table.Cell>
-						<Table.Cell>
-							<span class="text-red-400">VS</span>
-						</Table.Cell>
-						<Table.Cell>{user2}</Table.Cell>
-						<Table.Cell>
-							{match.arnis_skill}
-						</Table.Cell>
-						<Table.Cell>
-							{match.arnis_footwork}
-						</Table.Cell>
-						<Table.Cell>
-							{match.status}
-						</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
+		{#if selectedMatchType === 'arnis'}
+			<ArnisTable matches={data.matches} />
+		{:else if selectedMatchType === 'card_battle'}
+			<CardBattleTable matches={data.matches} />
+		{:else}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Not Found</Alert.Title>
+				<Alert.Description>Unknown match type.</Alert.Description>
+			</Alert.Root>
+		{/if}
 	{:else}
 		<Alert.Root variant="destructive">
 			<AlertCircle class="h-4 w-4" />

@@ -30,3 +30,10 @@ export const arnisMatchSchema = z.object({
 });
 
 export type ArnisMatchSchema = typeof arnisMatchSchema;
+
+export const UpdateScoreSchema = z.object({
+	user_id: z.string(),
+	score: z.number(),
+	difference: z.number(),
+	is_winner: z.boolean()
+});
