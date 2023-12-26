@@ -1,5 +1,4 @@
 import { BACKEND_URL } from '$lib/server';
-import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import type { User } from '$lib/types';
 

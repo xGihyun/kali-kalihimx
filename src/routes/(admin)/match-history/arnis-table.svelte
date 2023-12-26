@@ -1,14 +1,15 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
 	import type { Matchmake } from '$lib/types';
-	import { enhance } from '$app/forms';
+	import ScoresForm from './scores-form.svelte';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SubmitScoreSchema } from '$lib/schemas';
 
+	export let formAction: boolean = false;
+	export let form: SuperValidated<typeof SubmitScoreSchema>;
 	export let matches: Matchmake[];
 
-	let dialogOpen = false;
 	let clickedRow: number | null = null;
 
 	function toggleRow(idx: number) {
@@ -16,7 +17,7 @@
 	}
 </script>
 
-<Table.Root>
+<Table.Root class="border ">
 	<Table.Header>
 		<Table.Row class="text-base md:text-lg">
 			<Table.Head>Player 1</Table.Head>
@@ -57,36 +58,15 @@
 						<Dialog.Title>Score Submission</Dialog.Title>
 						<Dialog.Description>Enter your scores for each player.</Dialog.Description>
 					</Dialog.Header>
-					<!-- Use shadcn form instead -->
-					<form
-						method="post"
-						action="/match-history?/submit_score"
-						use:enhance={({ formData }) => {
-							formData.set('user1', match.user1_id);
-							formData.set('user2', match.user2_id);
-						}}
-					>
-						<div>{user1}</div>
-						<Input
-							type="text"
-							placeholder="Enter score..."
-							class="text-base md:text-lg h-auto"
-							name="user1_score"
-							required
-						/>
 
-						<div>{user2}</div>
-						<Input
-							type="text"
-							placeholder="Enter score..."
-							class="text-base md:text-lg h-auto"
-							name="user2_score"
-							required
-						/>
-						<Dialog.Footer>
-							<Button type="submit">Submit</Button>
-						</Dialog.Footer>
-					</form>
+					<ScoresForm
+						{form}
+						{formAction}
+						user1_id={match.user1_id}
+						user2_id={match.user2_id}
+						user1_name={user1}
+						user2_name={user2}
+					/>
 				</Dialog.Content>
 			</Dialog.Root>
 		{/each}

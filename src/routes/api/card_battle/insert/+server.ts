@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	// @ts-ignore
 	const payload: { name: string; skill: string; user_id: string }[] = cards.map((card) => {
 		return {
-			name: card.name,
+			name: card.id,
 			skill: card.skill,
 			user_id
 		};

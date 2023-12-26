@@ -1,0 +1,31 @@
+import { CACHE_DURATION } from '$lib';
+import { BACKEND_URL } from '$lib/server';
+import type { CardBattleTurn } from '$lib/types';
+import type { PageServerLoad } from '../$types';
+
+export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
+	const { match_set_id } = params;
+
+	const response = await fetch(`${BACKEND_URL}/card_battle/${match_set_id}`, {
+		method: 'GET'
+	});
+
+	const result: CardBattleTurn[] = await response.json();
+
+	const user1_id = result[0].user_id;
+	const user2_id = result[result.length - 1].user_id;
+
+	const user1Turns = result.filter((card) => card.user_id === user1_id);
+	const user2Turns = result.filter((card) => card.user_id === user2_id);
+
+	console.log(result);
+
+	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+
+	return {
+		turns: {
+			user1: user1Turns,
+			user2: user2Turns
+		}
+	};
+};

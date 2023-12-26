@@ -1,10 +1,9 @@
-import { CACHE_DURATION } from '$lib';
 import { BACKEND_URL } from '$lib/server';
-import type { Matchmake, MaxSet, Section, UpdateScore, User } from '$lib/types';
+import type { Matchmake, MaxSet, Section, UpdateScore } from '$lib/types';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import z from 'zod';
-import { UpdateScoreSchema } from '$lib/schemas';
+import { SubmitScoreSchema } from '$lib/schemas';
+import { superValidate } from 'sveltekit-superforms/server';
 
 export const load: PageServerLoad = async ({ fetch, url, setHeaders, depends }) => {
 	const section = url.searchParams.get('section');
@@ -55,56 +54,60 @@ export const load: PageServerLoad = async ({ fetch, url, setHeaders, depends }) 
 	return {
 		matches: await getMatches(),
 		sections: await getSections(),
-		maxSets: await getMaxSets()
+		maxSets: await getMaxSets(),
+		form: await superValidate(SubmitScoreSchema),
+		selectedSection: section,
+		selectedSet: set,
+		selectedMatchType: matchType
 	};
 };
 
+// This is pretty bad
 export const actions: Actions = {
-	submit_score: async ({ fetch, request }) => {
-		try {
-			const formData = await request.formData();
+	submit_score: async (event) => {
+		const form = await superValidate(event, SubmitScoreSchema);
 
-			const user1_score = Number(formData.get('user1_score'));
-			const user2_score = Number(formData.get('user2_score'));
-			const difference = Math.abs(user1_score - user2_score);
-
-			const data1: UpdateScore = {
-				user_id: formData.get('user1') as string,
-				score: user1_score,
-				is_winner: user1_score > user2_score,
-				difference
-			};
-
-			const data2: UpdateScore = {
-				user_id: formData.get('user2') as string,
-				score: user2_score,
-				is_winner: user1_score < user2_score,
-				difference
-			};
-
-			const parsedData1 = UpdateScoreSchema.parse(data1);
-			const parsedData2 = UpdateScoreSchema.parse(data2);
-
-			await submitScore(parsedData1, fetch);
-			await submitScore(parsedData2, fetch);
-
-			return {
-				success: true
-			};
-		} catch (err) {
-			console.log('Failed to submit score:');
-			console.log(err);
-
-			return {
+		if (!form.valid) {
+			return fail(400, {
+				form,
 				success: false
-			};
+			});
 		}
+
+		const { user1_id, user2_id, user1_score, user2_score } = form.data;
+		const difference = Math.abs(user1_score - user2_score);
+
+		const data1: UpdateScore = {
+			user_id: user1_id,
+			score: user1_score,
+			is_winner: user1_score > user2_score,
+			difference
+		};
+
+		const data2: UpdateScore = {
+			user_id: user2_id,
+			score: user2_score,
+			is_winner: user1_score < user2_score,
+			difference
+		};
+
+		await submitScore(data1, event.fetch);
+		await submitScore(data2, event.fetch);
+
+		return {
+			form,
+			success: true
+		};
 	}
 };
 
-async function submitScore(data: UpdateScore, fetch: any) {
+async function submitScore(
+	data: UpdateScore,
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>
+) {
 	try {
 		console.log('Submitting...');
+
 		const response = await fetch(`${BACKEND_URL}/scores/update`, {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -115,9 +118,10 @@ async function submitScore(data: UpdateScore, fetch: any) {
 
 		if (response.ok) {
 			console.log('Successfully submitted score.');
+		} else {
+			throw new Error('Failed to submit score.');
 		}
 	} catch (err) {
-		console.log('Failed to submit score:');
-		console.log(err);
+		console.error(err);
 	}
 }

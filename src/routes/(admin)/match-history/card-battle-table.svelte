@@ -5,12 +5,12 @@
 	export let matches: Matchmake[];
 </script>
 
-<Table.Root>
+<Table.Root class="border">
 	<Table.Header>
 		<Table.Row class="text-base md:text-lg">
 			<Table.Head>Player 1</Table.Head>
 			<Table.Head>Damage</Table.Head>
-			<Table.Head>VS</Table.Head>
+			<Table.Head class="font-jost-medium">VS</Table.Head>
 			<Table.Head>Player 2</Table.Head>
 			<Table.Head>Damage</Table.Head>
 		</Table.Row>
@@ -24,12 +24,18 @@
 				<Table.Cell>
 					{user1}
 				</Table.Cell>
-				<Table.Cell>{match.user1_total_damage}</Table.Cell>
+				<Table.Cell
+					class={`${match.user1_total_damage ? 'text-foreground' : 'text-muted-foreground italic'}`}
+					>{match.user1_total_damage}</Table.Cell
+				>
 				<Table.Cell>
-					<span class="text-red-400">VS</span>
+					<span class="text-red-400 font-jost-medium">VS</span>
 				</Table.Cell>
 				<Table.Cell>{user2}</Table.Cell>
-				<Table.Cell>{match.user2_total_damage}</Table.Cell>
+				<Table.Cell
+					class={`${match.user2_total_damage ? 'text-foreground' : 'text-muted-foreground italic'}`}
+					>{match.user2_total_damage}</Table.Cell
+				>
 			</Table.Row>
 		{/each}
 	</Table.Body>

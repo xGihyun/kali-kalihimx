@@ -37,3 +37,10 @@ export const UpdateScoreSchema = z.object({
 	difference: z.number(),
 	is_winner: z.boolean()
 });
+
+export const SubmitScoreSchema = z.object({
+	user1_id: z.string(),
+	user2_id: z.string(),
+	user1_score: z.coerce.number(),
+	user2_score: z.coerce.number()
+});

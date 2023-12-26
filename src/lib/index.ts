@@ -1,5 +1,13 @@
-import { ArrowClockwise, Guide, History, Home, People, Sword, Trophy } from './assets/icons';
+import { ArrowClockwise, Guide, History, Home, Sword, Trophy } from './assets/icons';
 import type { BattleCard, Navigation } from './types';
+import {
+	ancients_protection,
+	double_edged_sword,
+	extra_wind,
+	twist_of_fate,
+	viral_x_rival,
+	warlords_domain
+} from './assets/images/cards';
 
 export const CACHE_DURATION = 600;
 
@@ -43,6 +51,42 @@ export const USER_ROUTES: Navigation = [
 		icon: Sword
 	}
 ];
+
+// export const POWER_CARDS: { name: string; image_url: string }[] = [
+// 	{
+// 		name: "Ancient's Protection",
+// 		image_url: ancients_protection
+// 	},
+// 	{
+// 		name: 'Double-edged Sword',
+// 		image_url: double_edged_sword
+// 	},
+// 	{
+// 		name: 'Extra Wind',
+// 		image_url: extra_wind
+// 	}
+// {
+// 	name: 'Twist of Fate',
+// 	image_url: twist_of_fate
+// },
+// {
+// 	name: 'Viral x Rival',
+// 	image_url: viral_x_rival
+// },
+// {
+// 	name: "Warlord's Domain",
+// 	image_url: warlords_domain
+// }
+// ];
+
+export const POWER_CARDS = new Map([
+	["Ancient's Protection", ancients_protection],
+	['Double-edged Sword', double_edged_sword],
+	['Extra Wind', extra_wind],
+	['Twist of Fate', twist_of_fate],
+	['Viral x Rival', viral_x_rival],
+	["Warlord's Domain", warlords_domain]
+]);
 
 export const SKILLS = new Map([
 	['strikes', 'Strikes'],
@@ -237,3 +281,59 @@ export const BLOCK_CARDS: BattleCard[] = [
 		}
 	}
 ];
+
+export function getRankTitle(score: number): string | null {
+	let rankTitle: string | null = null;
+
+	if (score >= 100 && score < 200) {
+		rankTitle = 'likas';
+	} else if (score >= 200 && score < 250) {
+		rankTitle = 'likha';
+	} else if (score >= 250 && score < 300) {
+		rankTitle = 'lakan';
+	} else {
+		rankTitle = 'grandmaster';
+	}
+
+	return rankTitle;
+}
+
+export function snakeCaseToTitleCase(input: string | null): string | undefined {
+	if (!input) return;
+
+	// Split the input string into words
+	const words = input.split('_');
+
+	// Capitalize the first letter of each word and join them with a space
+	const titleCase = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+	return titleCase;
+}
+
+export function getOpponent(
+	userId: string,
+	match: Matchmake,
+	original?: boolean
+): { id: string; name: string; totalDamage: number | undefined } {
+	// if (original) {
+	// 	if (userId === match.og_user1_id) {
+	// 		return {
+	// 			id: match.og_user2_id,
+	// 			name: `${match.og_user2_first_name} ${match.og_user2_last_name}`
+	// 		};
+	// 	}
+	// }
+	if (userId === match.user1_id) {
+		return {
+			id: match.user2_id,
+			name: `${match.user2_first_name} ${match.user2_last_name}`,
+			totalDamage: match.user1_total_damage
+		};
+	}
+
+	return {
+		id: match.user1_id,
+		name: `${match.user1_first_name} ${match.user1_last_name}`,
+		totalDamage: match.user1_total_damage
+	};
+}

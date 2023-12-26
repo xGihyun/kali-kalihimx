@@ -1,6 +1,6 @@
 import { CACHE_DURATION } from '$lib';
 import { BACKEND_URL } from '$lib/server';
-import type { ArnisMatch, Matchmake, Section } from '$lib/types';
+import type { Matchmake, Section } from '$lib/types';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';

@@ -3,23 +3,23 @@
 	import { Button } from '$lib/components/ui/button';
 	import { AlertCircle } from 'lucide-svelte';
 	import * as Alert from '$lib/components/ui/alert';
-	import { goto, invalidate } from '$app/navigation';
-	import { MATCH_TYPES } from '$lib';
+	import { invalidate } from '$app/navigation';
+	import { MATCH_TYPES, snakeCaseToTitleCase } from '$lib';
 	import ArnisTable from './arnis-table.svelte';
 	import CardBattleTable from './card-battle-table.svelte';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
+	export let form;
 
 	$: ({ selectedSet, selectedSection, selectedMatchType } = data);
 
-	function getSectionName(id: string): string | undefined {
-		if (!data.sections) return;
-
-		const section = data.sections.find((sec) => sec.id === id);
-
-		return section ? section.name : undefined;
-	}
+	// function getSectionName(id: string): string | undefined {
+	// 	if (!data.sections) return;
+	//
+	// 	const section = data.sections.find((sec) => sec.id === id);
+	//
+	// 	return section ? section.name : undefined;
+	// }
 
 	async function runCardBattle() {
 		console.log('Set ', selectedSet);
@@ -41,14 +41,9 @@
 	<div class="flex gap-2">
 		{#if data.sections}
 			<Select.Root
-				selected={{ value: selectedSection, label: getSectionName(`${selectedSection}`) }}
-				onSelectedChange={(e) => {
-					if (e) {
-						selectedSection = `${e.value}`;
-						goto(
-							`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
-						);
-					}
+				selected={{
+					value: selectedSection,
+					label: snakeCaseToTitleCase(selectedSection)
 				}}
 			>
 				<Select.Trigger class="w-[180px]">
@@ -56,9 +51,14 @@
 				</Select.Trigger>
 				<Select.Content>
 					{#each data.sections as section (section.id)}
-						<Select.Item value={section.id} class="text-base md:text-lg">
-							{section.name}
-						</Select.Item>
+						<a
+							class="contents"
+							href={`/match-history?set=${selectedSet}&section=${section.id}&match_type=${selectedMatchType}`}
+						>
+							<Select.Item value={section.id} class="text-base md:text-lg">
+								{section.name}
+							</Select.Item>
+						</a>
 					{/each}
 				</Select.Content>
 			</Select.Root>
@@ -73,17 +73,7 @@
 		{/if}
 
 		{#if data.maxSets}
-			<Select.Root
-				selected={{ value: selectedSet, label: `Match ${selectedSet}` }}
-				onSelectedChange={(e) => {
-					if (e) {
-						selectedSet = Number(e.value) || 1;
-						goto(
-							`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
-						);
-					}
-				}}
-			>
+			<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
 				<Select.Trigger class="w-[180px]">
 					<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 				</Select.Trigger>
@@ -91,9 +81,16 @@
 					{#each data.maxSets as maxSet (maxSet.section)}
 						{#if maxSet.section === selectedSection}
 							{#each Array(maxSet.max_set) as _, idx (idx)}
-								<Select.Item value={idx + 1} class="text-base md:text-lg">
-									{idx + 1}
-								</Select.Item>
+								<a
+									class="contents"
+									href={`/match-history?set=${
+										idx + 1
+									}&section=${selectedSection}&match_type=${selectedMatchType}`}
+								>
+									<Select.Item value={idx + 1} class="text-base md:text-lg">
+										{idx + 1}
+									</Select.Item>
+								</a>
 							{/each}
 						{/if}
 					{/each}
@@ -113,10 +110,10 @@
 			selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}
 			onSelectedChange={(e) => {
 				if (e) {
-					selectedMatchType = `${e.value}`;
-					goto(
-						`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
-					);
+					// selectedMatchType = `${e.value}`;
+					// goto(
+					// 	`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
+					// );
 				}
 			}}
 		>
@@ -125,9 +122,14 @@
 			</Select.Trigger>
 			<Select.Content>
 				{#each MATCH_TYPES as [key, value] (key)}
-					<Select.Item value={key} class="text-base md:text-lg">
-						{value}
-					</Select.Item>
+					<a
+						class="contents"
+						href={`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${key}`}
+					>
+						<Select.Item value={key} class="text-base md:text-lg">
+							{value}
+						</Select.Item>
+					</a>
 				{/each}
 			</Select.Content>
 		</Select.Root>
@@ -139,7 +141,7 @@
 
 	{#if data.matches}
 		{#if selectedMatchType === 'arnis'}
-			<ArnisTable matches={data.matches} />
+			<ArnisTable form={data.form} matches={data.matches} formAction={form?.success} />
 		{:else if selectedMatchType === 'card_battle'}
 			<CardBattleTable matches={data.matches} />
 		{:else}

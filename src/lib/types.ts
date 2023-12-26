@@ -115,3 +115,22 @@ export type UpdateScore = {
 	difference: number;
 	is_winner: boolean;
 };
+
+export type PowerCard = {
+	id: string;
+	name: string;
+	is_used: boolean;
+	is_active: boolean;
+	user_id: string;
+};
+
+export type CardBattleTurn = {
+	id: string;
+	card_name: string;
+	card_effect?: string;
+	damage: number;
+	is_cancelled: boolean;
+	turn_number: number;
+	match_set_id: string;
+	user_id: string;
+};

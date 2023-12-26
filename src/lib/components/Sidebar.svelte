@@ -12,7 +12,7 @@
 </script>
 
 <aside
-	class="w-72 h-full p-4 justify-between flex flex-col text-base md:text-lg fixed top-0 left-0"
+	class="w-72 h-full p-4 justify-between flex-col text-base md:text-lg fixed top-0 left-0 hidden lg:flex"
 >
 	<div class="flex flex-col">
 		<a href="/" class="py-4 px-2 flex gap-2 items-center">
