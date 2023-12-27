@@ -7,6 +7,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.locals.user_id = session;
 	}
 
+	if (event.url.pathname === '/register' && !session) {
+		return await resolve(event);
+	}
+
 	if (event.url.pathname !== '/login' && !session) {
 		console.log('Access Denied');
 

@@ -80,12 +80,49 @@ export const USER_ROUTES: Navigation = [
 // ];
 
 export const POWER_CARDS = new Map([
-	["Ancient's Protection", ancients_protection],
-	['Double-edged Sword', double_edged_sword],
-	['Extra Wind', extra_wind],
-	['Twist of Fate', twist_of_fate],
-	['Viral x Rival', viral_x_rival],
-	["Warlord's Domain", warlords_domain]
+	[
+		"Ancient's Protection",
+		{
+			image_url: ancients_protection,
+			description: 'Immunity to deduction upon losing the Arnis match.'
+		}
+	],
+	[
+		'Double-edged Sword',
+		{
+			image_url: double_edged_sword,
+			description:
+				'Receive double the points after winning the Arnis match. Deduct double the points otherwise.'
+		}
+	],
+	[
+		'Extra Wind',
+		{
+			image_url: extra_wind,
+			description: 'Select a brand new Power Card.'
+		}
+	],
+	[
+		'Twist of Fate',
+		{
+			image_url: twist_of_fate,
+			description: 'Switch opponents for the upcoming Arnis match.'
+		}
+	],
+	[
+		'Viral x Rival',
+		{
+			image_url: viral_x_rival,
+			description: 'Current opponent will also be their opponent for the next Arnis match.'
+		}
+	],
+	[
+		"Warlord's Domain",
+		{
+			image_url: warlords_domain,
+			description: 'Change the skill to perform for the upcoming Arnis match.'
+		}
+	]
 ]);
 
 export const SKILLS = new Map([
@@ -285,7 +322,9 @@ export const BLOCK_CARDS: BattleCard[] = [
 export function getRankTitle(score: number): string | null {
 	let rankTitle: string | null = null;
 
-	if (score >= 100 && score < 200) {
+	if (score < 100) {
+		rankTitle = 'unranked';
+	} else if (score >= 100 && score < 200) {
 		rankTitle = 'likas';
 	} else if (score >= 200 && score < 250) {
 		rankTitle = 'likha';
@@ -311,10 +350,18 @@ export function snakeCaseToTitleCase(input: string | null): string | undefined {
 }
 
 export function getOpponent(
-	userId: string,
-	match: Matchmake,
+	userId: string | undefined,
+	match: Matchmake | undefined,
 	original?: boolean
-): { id: string; name: string; totalDamage: number | undefined } {
+): { id: string | undefined; name: string; totalDamage: number | undefined } {
+	// if (!match || userId) {
+	// 	return {
+	// 		id: undefined,
+	// 		name: 'Unknown',
+	// 		totalDamage: undefined
+	// 	};
+	// }
+
 	// if (original) {
 	// 	if (userId === match.og_user1_id) {
 	// 		return {

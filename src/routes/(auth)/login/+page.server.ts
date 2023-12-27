@@ -1,29 +1,48 @@
 import { LoginSchema } from '$lib/schemas';
 import { BACKEND_URL } from '$lib/server';
 import type { User } from '$lib/types';
-import { redirect, type Actions } from '@sveltejs/kit';
-import { parse } from 'valibot';
+import { redirect, type Actions, fail } from '@sveltejs/kit';
 import { APP_ENV } from '$env/static/private';
 import type { PageServerLoad } from './$types';
+import { superValidate } from 'sveltekit-superforms/server';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user_id) {
 		redirect(302, '/');
 	}
+
+	return {
+		form: await superValidate(LoginSchema)
+	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
-		const formData = await request.formData();
-		const formEntries = Object.fromEntries(formData.entries());
+	default: async (event) => {
+		const form = await superValidate(event, LoginSchema);
 
-		const userData = parse(LoginSchema, formEntries);
+		console.log(form.data);
 
-		console.log(userData);
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
 
-		const response = await fetch(`${BACKEND_URL}/login`, {
+		const { error } = await supabase.auth.signInWithPassword({
+			email: form.data.email,
+			password: form.data.password
+		});
+
+		if (error) {
+			return fail(400, {
+				form,
+				success: false
+			});
+		}
+
+		const response = await event.fetch(`${BACKEND_URL}/login`, {
 			method: 'POST',
-			body: JSON.stringify(userData),
+			body: JSON.stringify(form.data),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -34,7 +53,7 @@ export const actions: Actions = {
 		console.log(user);
 
 		if (response.ok) {
-			cookies.set('session', user.id, {
+			event.cookies.set('session', user.id, {
 				maxAge: 60 * 60 * 24 * 7, // 1 week
 				path: '/',
 				httpOnly: true,
@@ -43,6 +62,10 @@ export const actions: Actions = {
 			});
 
 			redirect(303, '/');
+		} else {
+			return fail(500, {
+				form
+			});
 		}
 	}
 };

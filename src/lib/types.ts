@@ -68,7 +68,7 @@ export type Matchmake = {
 	arnis_skill: string;
 	arnis_footwork: string;
 	card_deadline: string;
-	status: string;
+	status: 'pending' | 'done';
 	set: number;
 	user1_total_damage?: number;
 	user2_total_damage?: number;
@@ -133,4 +133,11 @@ export type CardBattleTurn = {
 	turn_number: number;
 	match_set_id: string;
 	user_id: string;
+};
+
+export type UpdatePowerCard = {
+	card_id: string;
+	user_id: string;
+	is_activated: boolean;
+	is_used: boolean;
 };

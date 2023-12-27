@@ -41,8 +41,6 @@ export const actions: Actions = {
 		if (response.ok) {
 			const matches: Matchmake[] = await response.json();
 
-			console.log(matches);
-
 			return {
 				form,
 				result: matches,

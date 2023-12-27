@@ -6,15 +6,48 @@
 	import * as Table from '$lib/components/ui/table';
 	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import { goto, preloadData, pushState } from '$app/navigation';
+	import CardBattle from '../../routes/card-battle/[match_set_id]/+page.svelte';
+	import { page } from '$app/stores';
 
 	export let matches: Matchmake[];
 	export let userId: string;
 
-	// pushState('hi', {uwu: 'nya'})
+	let isOpen = false;
+
+	async function showModal(e: MouseEvent, match: Matchmake) {
+		const { href } = e.currentTarget as HTMLAnchorElement;
+
+		const result = await preloadData(href);
+
+		if (result.type === 'loaded' && result.status === 200) {
+			pushState(href, { selected: { ...result.data, match } });
+
+			isOpen = true;
+		} else {
+			goto(href);
+		}
+	}
 </script>
 
-<!-- Use shadcn tabs to switch between Arnis and Card Battle matches -->
-<!-- The match history itself will be displayed with a table -->
+<Dialog.Root
+	open={isOpen}
+	onOpenChange={(open) => {
+		isOpen = open;
+		history.back();
+	}}
+>
+	<Dialog.Content class="max-w-6xl">
+		<Dialog.Header>
+			<Dialog.Title>Card Battle</Dialog.Title>
+			<Dialog.Description>See how the match went</Dialog.Description>
+		</Dialog.Header>
+
+		{#if $page.state.selected}
+			<CardBattle data={$page.state.selected} />
+		{/if}
+	</Dialog.Content>
+</Dialog.Root>
 
 <Card.Root>
 	<Card.Header>
@@ -46,6 +79,7 @@
 					</Table.Body>
 				</Table.Root>
 			</Tabs.Content>
+
 			<Tabs.Content value="card_battle">
 				<Table.Root>
 					<Table.Header>
@@ -57,23 +91,33 @@
 					</Table.Header>
 					<Table.Body>
 						{#each matches as match (match.id)}
-							<Table.Row class="text-base md:text-lg">
-								<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
-								<Table.Cell class="w-1/4">
-									{#if match.og_user1_id === userId}
-										{match.user1_total_damage}
-									{:else}
-										{match.user2_total_damage}
-									{/if}
-								</Table.Cell>
-								<Table.Cell class="w-1/4">
-									{#if match.og_user1_id === userId}
-										{match.user2_total_damage}
-									{:else}
-										{match.user1_total_damage}
-									{/if}
-								</Table.Cell>
-							</Table.Row>
+							<a
+								class="contents"
+								href="/card-battle/{match.id}"
+								on:click|preventDefault={(e) => showModal(e, match)}
+							>
+								<Table.Row class="text-base md:text-lg">
+									<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
+									<Table.Cell class="w-1/4">
+										{#if match.og_user1_id === userId}
+											{match.user1_total_damage}
+										{:else}
+											{match.user2_total_damage}
+										{/if}
+									</Table.Cell>
+									<Table.Cell
+										class={`w-1/4 ${
+											match.user1_total_damage ? 'text-foreground' : 'text-muted-foreground italic'
+										}`}
+									>
+										{#if match.og_user1_id === userId}
+											{match.user2_total_damage}
+										{:else}
+											{match.user1_total_damage}
+										{/if}
+									</Table.Cell>
+								</Table.Row>
+							</a>
 						{/each}
 					</Table.Body>
 				</Table.Root>
@@ -81,12 +125,3 @@
 		</Tabs.Root>
 	</Card.Content>
 </Card.Root>
-
-<!-- <Dialog.Root> -->
-<!-- 	<Dialog.Content> -->
-<!-- 		<Dialog.Header> -->
-<!-- 			<Dialog.Title>Score Submission</Dialog.Title> -->
-<!-- 			<Dialog.Description>Enter your scores for each player.</Dialog.Description> -->
-<!-- 		</Dialog.Header> -->
-<!-- 	</Dialog.Content> -->
-<!-- </Dialog.Root> -->

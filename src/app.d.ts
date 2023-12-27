@@ -1,4 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
+
+import type { CardBattleTurn, Matchmake, User } from '$lib/types';
+
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -7,7 +10,16 @@ declare global {
 			user_id: string | undefined;
 		}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			selected: {
+				turns: {
+					user1: CardBattleTurn[];
+					user2: CardBattleTurn[];
+				};
+				user: User | undefined;
+				// match: Matchmake | undefined;
+			};
+		}
 		// interface Platform {}
 	}
 }

@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import LoginForm from './login-form.svelte';
+
+	export let data;
 </script>
 
-<form method="post" use:enhance>
-	<input type="email" name="email" required />
-	<input type="password" name="password" required />
-
-	<button type="submit">Submit</button>
-</form>
+<div class="max-w-sm m-auto">
+	<LoginForm form={data.form} />
+</div>

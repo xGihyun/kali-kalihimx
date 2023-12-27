@@ -11,6 +11,7 @@
 	export let user2_id: string;
 	export let user1_name: string = 'N/A';
 	export let user2_name: string = 'N/A';
+	export let match_set_id: string;
 
 	let loadingStatus = 'none' as 'none' | 'pending' | 'success' | 'error';
 
@@ -33,6 +34,7 @@
 >
 	<input type="text" name="user1_id" value={user1_id} hidden required />
 	<input type="text" name="user2_id" value={user2_id} hidden required />
+	<input type="text" name="match_set_id" value={match_set_id} hidden required />
 
 	<Form.Field {config} name="user1_score">
 		<Form.Item class="text-base md:text-lg">

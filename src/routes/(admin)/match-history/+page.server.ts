@@ -1,11 +1,11 @@
 import { BACKEND_URL } from '$lib/server';
 import type { Matchmake, MaxSet, Section, UpdateScore } from '$lib/types';
-import type { Actions } from '@sveltejs/kit';
+import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SubmitScoreSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 
-export const load: PageServerLoad = async ({ fetch, url, setHeaders, depends }) => {
+export const load: PageServerLoad = async ({ fetch, url, depends }) => {
 	const section = url.searchParams.get('section');
 	const set = Number(url.searchParams.get('set')) || 1;
 	const matchType = url.searchParams.get('match_type') || 'arnis';
@@ -74,7 +74,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const { user1_id, user2_id, user1_score, user2_score } = form.data;
+		const { user1_id, user2_id, user1_score, user2_score, match_set_id } = form.data;
 		const difference = Math.abs(user1_score - user2_score);
 
 		const data1: UpdateScore = {
@@ -93,6 +93,7 @@ export const actions: Actions = {
 
 		await submitScore(data1, event.fetch);
 		await submitScore(data2, event.fetch);
+		await updateMatchStatus(event.fetch, match_set_id, 'done');
 
 		return {
 			form,
@@ -123,5 +124,28 @@ async function submitScore(
 		}
 	} catch (err) {
 		console.error(err);
+	}
+}
+
+async function updateMatchStatus(
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+	match_set_id: string,
+	status: 'pending' | 'done'
+) {
+	console.log('Updating status...');
+
+	const response = await fetch(`${BACKEND_URL}/matches/update`, {
+		method: 'POST',
+		body: JSON.stringify({
+			match_set_id,
+			status
+		}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (response.ok) {
+		console.log('Successfully updated match status to: ', status);
 	}
 }

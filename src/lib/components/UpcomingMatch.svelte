@@ -2,7 +2,7 @@
 	import type { Matchmake } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 
-	export let match: Matchmake;
+	export let match: Matchmake | undefined;
 	export let userId: string;
 
 	function getOpponent(match: Matchmake): { id: string; name: string } {
@@ -24,9 +24,14 @@
 	<Card.Header>
 		<Card.Title class="text-4xl font-normal font-jost-bold">Upcoming Match</Card.Title>
 	</Card.Header>
-	<Card.Content>
-		Opponent: {getOpponent(match).name}
-		Skill: {match.arnis_skill}
-		Footwork: {match.arnis_footwork}
-	</Card.Content>
+
+	{#if match}
+		<Card.Content>
+			Opponent: {getOpponent(match).name}
+			Skill: {match.arnis_skill}
+			Footwork: {match.arnis_footwork}
+		</Card.Content>
+	{:else}
+		<Card.Content>No match</Card.Content>
+	{/if}
 </Card.Root>

@@ -37,6 +37,8 @@
 	}
 </script>
 
+<h1 class="font-jost-bold text-6xl">Match History</h1>
+
 <div class="w-full max-w-5xl">
 	<div class="flex gap-2">
 		{#if data.sections}
@@ -106,17 +108,7 @@
 			</Alert.Root>
 		{/if}
 
-		<Select.Root
-			selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}
-			onSelectedChange={(e) => {
-				if (e) {
-					// selectedMatchType = `${e.value}`;
-					// goto(
-					// 	`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${selectedMatchType}`
-					// );
-				}
-			}}
-		>
+		<Select.Root selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}>
 			<Select.Trigger class="w-[180px]">
 				<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 			</Select.Trigger>
@@ -155,7 +147,9 @@
 		<Alert.Root variant="destructive">
 			<AlertCircle class="h-4 w-4" />
 			<Alert.Title>Error</Alert.Title>
-			<Alert.Description>Failed to fetch matches. Please check your connection.</Alert.Description>
+			<Alert.Description
+				>Failed to fetch matches. Please check your connection or try again later.</Alert.Description
+			>
 		</Alert.Root>
 	{/if}
 </div>
