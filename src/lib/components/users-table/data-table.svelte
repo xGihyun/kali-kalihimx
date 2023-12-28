@@ -92,13 +92,15 @@
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
 						<Table.Row {...rowAttrs}>
 							{#each row.cells as cell (cell.id)}
+								{@const user = cell.row.original}
+
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs} class="text-base md:text-lg">
 										{#if cell.id === 'Name'}
-											<p>
-												<span class="text-red-400 font-jost-medium">#{idx + 1}</span>
+											<span class="text-red-400 font-jost-medium">#{idx + 1}</span>
+											<a href={`/leaderboards/${user.id}`} class="hover:underline">
 												<Render of={cell.render()} />
-											</p>
+											</a>
 										{:else}
 											<Render of={cell.render()} />
 										{/if}

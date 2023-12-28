@@ -6,6 +6,7 @@
 	import { crop } from '$lib/pkg/my_package';
 
 	export let user: User;
+	export let isCurrentUser: boolean = false;
 
 	let selectedAvatar: File | null = null;
 	let uploadAvatarEl: HTMLInputElement;
@@ -52,25 +53,38 @@
 	}
 </script>
 
-<input
-	type="file"
-	accept="image/*"
-	name="photo"
-	on:change={handleSelectedAvatar}
-	hidden
-	bind:this={uploadAvatarEl}
-/>
+{#if isCurrentUser}
+	<input
+		type="file"
+		accept="image/*"
+		name="photo"
+		on:change={handleSelectedAvatar}
+		hidden
+		bind:this={uploadAvatarEl}
+	/>
+{/if}
 
 <div class="border rounded-b-lg bg-card flex h-28 w-full items-center gap-4 px-[5%] lg:h-32">
-	<button
-		class="flex h-16 w-16 rounded-full lg:mb-10 lg:h-40 lg:w-40 lg:flex-none lg:self-end"
-		on:click={() => uploadAvatarEl.click()}
-	>
-		<Avatar.Root class="w-20 h-20 text-3xl lg:text-6xl lg:w-40 lg:h-40">
-			<Avatar.Image src={user.avatar_url} alt="Avatar" />
-			<Avatar.Fallback>{initials}</Avatar.Fallback>
-		</Avatar.Root>
-	</button>
+	{#if isCurrentUser}
+		<button
+			class="flex h-16 w-16 rounded-full lg:mb-10 lg:h-40 lg:w-40 lg:flex-none lg:self-end"
+			on:click={() => uploadAvatarEl.click()}
+		>
+			<Avatar.Root class="w-20 h-20 text-3xl lg:text-6xl lg:w-40 lg:h-40">
+				<Avatar.Image src={user.avatar_url} alt="Avatar" />
+				<Avatar.Fallback>{initials}</Avatar.Fallback>
+			</Avatar.Root>
+		</button>
+	{:else}
+		<div
+			class="flex h-16 w-16 rounded-full lg:mb-10 lg:h-40 lg:w-40 lg:flex-none lg:self-end pointer-events-none"
+		>
+			<Avatar.Root class="w-20 h-20 text-3xl lg:text-6xl lg:w-40 lg:h-40">
+				<Avatar.Image src={user.avatar_url} alt="Avatar" />
+				<Avatar.Fallback>{initials}</Avatar.Fallback>
+			</Avatar.Root>
+		</div>
+	{/if}
 
 	<div class="flex h-full flex-col justify-center">
 		<span class="text-base lg:text-2xl">

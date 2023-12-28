@@ -16,7 +16,7 @@
 >
 	<div class="flex flex-col">
 		<a href="/" class="py-4 px-2 flex gap-2 items-center">
-			<Arnis styles="w-10 h-10 text-rose-500" />
+			<Arnis styles="w-10 h-10 text-red-500" />
 			<h1 class="font-jost-medium text-2xl md:text-3xl">Kali Kalihim</h1>
 		</a>
 

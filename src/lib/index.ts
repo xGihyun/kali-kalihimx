@@ -1,5 +1,5 @@
 import { ArrowClockwise, Guide, History, Home, Sword, Trophy } from './assets/icons';
-import type { BattleCard, Navigation } from './types';
+import type { BlockData, Matchmake, Navigation, StrikeData } from './types';
 import {
 	ancients_protection,
 	double_edged_sword,
@@ -8,6 +8,13 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
+
+export const RANK_LOGO_COLORS: Map<string, string> = new Map([
+	['likas', 'border-white bg-gradient-to-l from-red-900 to-red-600'],
+	['likha', 'border-white bg-gradient-to-l from-orange-900 to-orange-500'],
+	['lakan', 'border-black bg-gradient-to-l from-amber-900 to-amber-500'],
+	['grandmaster', 'border-red-800 bg-gradient-to-l from-red-900 to-red-600']
+]);
 
 export const CACHE_DURATION = 600;
 
@@ -51,33 +58,6 @@ export const USER_ROUTES: Navigation = [
 		icon: Sword
 	}
 ];
-
-// export const POWER_CARDS: { name: string; image_url: string }[] = [
-// 	{
-// 		name: "Ancient's Protection",
-// 		image_url: ancients_protection
-// 	},
-// 	{
-// 		name: 'Double-edged Sword',
-// 		image_url: double_edged_sword
-// 	},
-// 	{
-// 		name: 'Extra Wind',
-// 		image_url: extra_wind
-// 	}
-// {
-// 	name: 'Twist of Fate',
-// 	image_url: twist_of_fate
-// },
-// {
-// 	name: 'Viral x Rival',
-// 	image_url: viral_x_rival
-// },
-// {
-// 	name: "Warlord's Domain",
-// 	image_url: warlords_domain
-// }
-// ];
 
 export const POWER_CARDS = new Map([
 	[
@@ -145,7 +125,7 @@ export const MATCH_TYPES = new Map([
 	['card_battle', 'Card Battle']
 ]);
 
-export const STRIKE_CARDS: BattleCard[] = [
+export const STRIKE_CARDS: StrikeData[] = [
 	{
 		data: {
 			id: 'leg_strike',
@@ -232,7 +212,7 @@ export const STRIKE_CARDS: BattleCard[] = [
 	}
 ];
 
-export const BLOCK_CARDS: BattleCard[] = [
+export const BLOCK_CARDS: BlockData[] = [
 	{
 		data: {
 			id: 'leg_strike',

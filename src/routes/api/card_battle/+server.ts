@@ -1,4 +1,4 @@
-import { BACKEND_URL } from '$lib/server';
+import { BACKEND_URL } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {

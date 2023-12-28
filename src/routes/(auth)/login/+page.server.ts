@@ -1,10 +1,10 @@
 import { LoginSchema } from '$lib/schemas';
-import { BACKEND_URL } from '$lib/server';
 import type { User } from '$lib/types';
 import { redirect, type Actions, fail } from '@sveltejs/kit';
-import { APP_ENV } from '$env/static/private';
+import { APP_ENV, BACKEND_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
+import { supabase } from '$lib/supabase';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user_id) {

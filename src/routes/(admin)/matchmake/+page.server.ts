@@ -1,10 +1,10 @@
 import { CACHE_DURATION } from '$lib';
-import { BACKEND_URL } from '$lib/server';
 import type { Matchmake, Section } from '$lib/types';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { arnisMatchSchema } from '$lib/schemas';
+import { BACKEND_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });

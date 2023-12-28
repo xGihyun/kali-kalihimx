@@ -1,3 +1,3 @@
-import { IP_ADDRESS, PORT } from '$env/static/private';
+// import { IP_ADDRESS, PORT } from '$env/static/private';
 
-export const BACKEND_URL = `http://${IP_ADDRESS}:${PORT}`;
+// export const BACKEND_URL = `http://${IP_ADDRESS}:${PORT}`;

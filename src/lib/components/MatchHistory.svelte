@@ -1,6 +1,6 @@
 <script lang="ts">
 	// import { pushState } from '$app/navigation';
-	import { getOpponent } from '$lib';
+	import { getOpponent, snakeCaseToTitleCase } from '$lib';
 	import type { Matchmake } from '$lib/types';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Table from '$lib/components/ui/table';
@@ -36,11 +36,12 @@
 		isOpen = open;
 		history.back();
 	}}
+	closeOnOutsideClick={false}
 >
 	<Dialog.Content class="max-w-6xl">
 		<Dialog.Header>
-			<Dialog.Title>Card Battle</Dialog.Title>
-			<Dialog.Description>See how the match went</Dialog.Description>
+			<Dialog.Title class="text-2xl">Card Battle</Dialog.Title>
+			<!-- <Dialog.Description class="text-base">See how the match went</Dialog.Description> -->
 		</Dialog.Header>
 
 		{#if $page.state.selected}
@@ -72,8 +73,8 @@
 						{#each matches as match (match.id)}
 							<Table.Row class="text-base md:text-lg">
 								<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
-								<Table.Cell class="w-1/4">{match.arnis_skill}</Table.Cell>
-								<Table.Cell class="w-1/4">{match.arnis_footwork}</Table.Cell>
+								<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
+								<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell>
 							</Table.Row>
 						{/each}
 					</Table.Body>
@@ -85,8 +86,8 @@
 					<Table.Header>
 						<Table.Row class="text-base md:text-lg">
 							<Table.Head>Opponent</Table.Head>
-							<Table.Head>Damage Given</Table.Head>
-							<Table.Head>Damage Received</Table.Head>
+							<Table.Head>DMG Dealt</Table.Head>
+							<Table.Head>DMG Taken</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>

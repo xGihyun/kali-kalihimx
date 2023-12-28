@@ -74,6 +74,14 @@ export type Matchmake = {
 	user2_total_damage?: number;
 };
 
+export type LatestOpponent = {
+	first_name: string;
+	last_name: string;
+	score: number;
+	avatar_url: string;
+	banner_url: string;
+};
+
 export type MaxSet = {
 	section: string;
 	max_set: number;
@@ -105,9 +113,25 @@ export type BattleCardData = {
 	skill: 'strike' | 'block';
 };
 
-export type BattleCard =
-	| { data: BattleCardData; type: StrikeCard }
-	| { data: BattleCardData; type: BlockCard };
+export type StrikeData = {
+	data: {
+		id: string;
+		name: string;
+		skill: 'strike';
+	};
+	type: StrikeCard;
+};
+
+export type BlockData = {
+	data: {
+		id: string;
+		name: string;
+		skill: 'block';
+	};
+	type: BlockCard;
+};
+
+export type BattleCard = StrikeData | BlockData;
 
 export type UpdateScore = {
 	user_id: string;
@@ -141,3 +165,5 @@ export type UpdatePowerCard = {
 	is_activated: boolean;
 	is_used: boolean;
 };
+
+export type LoadingStatus = 'none' | 'pending' | 'success' | 'error';

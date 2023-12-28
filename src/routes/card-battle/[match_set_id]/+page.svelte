@@ -7,6 +7,10 @@
 	export let data;
 
 	$: ({ turns } = data);
+
+	function roundToTwoDecimals(num: number) {
+		return Math.round(num * 100) / 100;
+	}
 </script>
 
 {#if turns}
@@ -25,7 +29,9 @@
 	<Table.Root>
 		<Table.Header>
 			<Table.Row class="text-base md:text-lg">
-				<Table.Head>{data.user?.first_name} {data.user?.last_name} (You)</Table.Head>
+				<Table.Head class="text-primary/80 font-jost-semibold"
+					>{data.user?.first_name} {data.user?.last_name} (You)</Table.Head
+				>
 				<Table.Head>Damage</Table.Head>
 				<Table.Head>{getOpponent(data.user?.id, data.match).name}</Table.Head>
 				<Table.Head>Damage</Table.Head>
@@ -66,7 +72,7 @@
 											  !turns.user1[idx].card_name.includes('block')
 											? 'text-destructive'
 											: 'text-foreground'
-								}`}>{turns.user1[idx].damage}</Table.Cell
+								}`}>{roundToTwoDecimals(turns.user1[idx].damage)}</Table.Cell
 							>
 						{:else}
 							<Table.Cell class="text-muted-foreground italic">Null</Table.Cell>
@@ -103,7 +109,7 @@
 											  !turns.user2[idx].card_name.includes('block')
 											? 'text-destructive'
 											: 'text-foreground'
-								}`}>{turns.user2[idx].damage}</Table.Cell
+								}`}>{roundToTwoDecimals(turns.user2[idx].damage)}</Table.Cell
 							>
 						{:else}
 							<Table.Cell class="text-muted-foreground italic">Null</Table.Cell>
@@ -136,7 +142,7 @@
 											  !turns.user2[idx].card_name.includes('block')
 											? 'text-destructive'
 											: 'text-foreground'
-								}`}>{turns.user2[idx].damage}</Table.Cell
+								}`}>{roundToTwoDecimals(turns.user2[idx].damage)}</Table.Cell
 							>
 						{:else}
 							<Table.Cell class="text-muted-foreground italic">Null</Table.Cell>
@@ -170,7 +176,7 @@
 											  !turns.user1[idx].card_name.includes('block')
 											? 'text-destructive'
 											: 'text-foreground'
-								}`}>{turns.user1[idx].damage}</Table.Cell
+								}`}>{roundToTwoDecimals(turns.user1[idx].damage)}</Table.Cell
 							>
 						{:else}
 							<Table.Cell class="text-muted-foreground italic">Null</Table.Cell>

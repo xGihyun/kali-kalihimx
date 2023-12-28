@@ -1,6 +1,5 @@
-import { SERVICE_ROLE } from '$env/static/private';
+import { BACKEND_URL, SERVICE_ROLE } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { BACKEND_URL } from '$lib/server';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {

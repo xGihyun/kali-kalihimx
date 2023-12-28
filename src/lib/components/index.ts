@@ -6,5 +6,16 @@ import UpcomingMatch from './UpcomingMatch.svelte';
 import PowerCards from './PowerCards.svelte';
 import MatchHistory from './MatchHistory.svelte';
 import Banner from './Banner.svelte';
+import RankLogo from './RankLogo.svelte';
 
-export { Navbar, Sidebar, UserAvatar, Rank, UpcomingMatch, PowerCards, MatchHistory, Banner };
+export {
+	Navbar,
+	Sidebar,
+	UserAvatar,
+	Rank,
+	UpcomingMatch,
+	PowerCards,
+	MatchHistory,
+	Banner,
+	RankLogo
+};

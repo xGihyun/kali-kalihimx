@@ -1,6 +1,6 @@
-import { BACKEND_URL } from '$lib/server';
 import type { LayoutServerLoad } from './$types';
 import type { User } from '$lib/types';
+import { BACKEND_URL } from '$env/static/private';
 
 export const load: LayoutServerLoad = async ({ fetch, locals, depends }) => {
 	const { user_id } = locals;

@@ -1,7 +1,7 @@
+import { BACKEND_URL } from '$env/static/private';
 import { CACHE_DURATION } from '$lib';
-import { BACKEND_URL } from '$lib/server';
 import type { CardBattleTurn } from '$lib/types';
-import type { PageServerLoad } from '../$types';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	const { match_set_id } = params;

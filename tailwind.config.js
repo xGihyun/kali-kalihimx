@@ -1,4 +1,4 @@
-import { fontFamily } from 'tailwindcss/defaultTheme';
+import { fontFamily, screens } from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
@@ -6,6 +6,10 @@ const config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	safelist: ['dark'],
 	theme: {
+		screens: {
+			xs: '475px',
+			...screens
+		},
 		container: {
 			center: true,
 			padding: '2rem',
@@ -14,6 +18,19 @@ const config = {
 			}
 		},
 		extend: {
+			keyframes: {
+				'gradient-x': {
+					'0%': {
+						'background-position': '0 0'
+					},
+					'100%': {
+						'background-position': '100% 0'
+					}
+				}
+			},
+			animation: {
+				'gradient-x': 'gradient-x 5s infinite alternate'
+			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',
 				input: 'hsl(var(--input) / <alpha-value>)',
@@ -58,6 +75,7 @@ const config = {
 				sans: [...fontFamily.sans],
 				jost: 'jost, sans-serif',
 				'jost-medium': 'jost-medium, sans-serif',
+				'jost-semibold': 'jost-semibold, sans-serif',
 				'jost-bold': 'jost-bold, sans-serif'
 			}
 		}

@@ -7,9 +7,11 @@
 	export let form;
 </script>
 
-<h1 class="font-jost-bold text-6xl">Matchmake</h1>
+<h1 class="font-jost-bold text-6xl mb-10">Matchmake</h1>
 
-<MatchmakeForm form={data.form} sections={data.sections} />
+<div class="mb-5">
+	<MatchmakeForm form={data.form} sections={data.sections} />
+</div>
 
 {#if form?.success && form.result}
 	<div class="w-full max-w-5xl">

@@ -13,14 +13,6 @@
 
 	$: ({ selectedSet, selectedSection, selectedMatchType } = data);
 
-	// function getSectionName(id: string): string | undefined {
-	// 	if (!data.sections) return;
-	//
-	// 	const section = data.sections.find((sec) => sec.id === id);
-	//
-	// 	return section ? section.name : undefined;
-	// }
-
 	async function runCardBattle() {
 		console.log('Set ', selectedSet);
 		console.log('Section ', selectedSection);
@@ -33,14 +25,16 @@
 		if (response.ok) {
 			console.log('Success card battle');
 			invalidate('card-battle:damage');
+		} else {
+			console.error('Failed to run card battle.');
 		}
 	}
 </script>
 
-<h1 class="font-jost-bold text-6xl">Match History</h1>
+<h1 class="font-jost-bold text-6xl mb-10">Match History</h1>
 
-<div class="w-full max-w-5xl">
-	<div class="flex gap-2">
+<div class="w-full mx-auto">
+	<div class="flex gap-2 mb-5">
 		{#if data.sections}
 			<Select.Root
 				selected={{
@@ -48,7 +42,7 @@
 					label: snakeCaseToTitleCase(selectedSection)
 				}}
 			>
-				<Select.Trigger class="w-[180px]">
+				<Select.Trigger class="w-80">
 					<Select.Value placeholder="Section" class="text-base md:text-lg" />
 				</Select.Trigger>
 				<Select.Content>
@@ -76,7 +70,7 @@
 
 		{#if data.maxSets}
 			<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
-				<Select.Trigger class="w-[180px]">
+				<Select.Trigger class="w-60">
 					<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 				</Select.Trigger>
 				<Select.Content>
@@ -109,7 +103,7 @@
 		{/if}
 
 		<Select.Root selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}>
-			<Select.Trigger class="w-[180px]">
+			<Select.Trigger class="w-60">
 				<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 			</Select.Trigger>
 			<Select.Content>

@@ -6,6 +6,7 @@
 	import { PenSquare } from 'lucide-svelte';
 
 	export let user: User;
+	export let isCurrentUser: boolean = false;
 
 	let selectedBanner: File | null = null;
 	let uploadBannerEl: HTMLInputElement;
@@ -51,14 +52,16 @@
 	}
 </script>
 
-<input
-	type="file"
-	accept="image/*"
-	name="photo"
-	on:change={handleSelectedAvatar}
-	hidden
-	bind:this={uploadBannerEl}
-/>
+{#if isCurrentUser}
+	<input
+		type="file"
+		accept="image/*"
+		name="photo"
+		on:change={handleSelectedAvatar}
+		hidden
+		bind:this={uploadBannerEl}
+	/>
+{/if}
 
 <div class="relative h-40 w-full lg:h-80 rounded-t-lg overflow-hidden">
 	{#if user.banner_url}
@@ -67,10 +70,12 @@
 		<div class="bg-slate-700 w-full h-full" />
 	{/if}
 
-	<button
-		class="absolute right-5 bottom-5 bg-background rounded-full p-2"
-		on:click|preventDefault={() => uploadBannerEl.click()}
-	>
-		<PenSquare class="w-5 h-5" />
-	</button>
+	{#if isCurrentUser}
+		<button
+			class="absolute right-5 bottom-5 bg-background rounded-full p-2"
+			on:click|preventDefault={() => uploadBannerEl.click()}
+		>
+			<PenSquare class="w-5 h-5" />
+		</button>
+	{/if}
 </div>

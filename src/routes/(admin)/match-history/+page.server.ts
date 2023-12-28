@@ -1,11 +1,11 @@
-import { BACKEND_URL } from '$lib/server';
 import type { Matchmake, MaxSet, Section, UpdateScore } from '$lib/types';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SubmitScoreSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
+import { BACKEND_URL } from '$env/static/private';
 
-export const load: PageServerLoad = async ({ fetch, url, depends }) => {
+export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders }) => {
 	const section = url.searchParams.get('section');
 	const set = Number(url.searchParams.get('set')) || 1;
 	const matchType = url.searchParams.get('match_type') || 'arnis';
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ fetch, url, depends }) => {
 	depends('card-battle:damage');
 
 	// TODO: CACHE INVALIDATION
-	// setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
 
 	return {
 		matches: await getMatches(),
@@ -106,24 +106,23 @@ async function submitScore(
 	data: UpdateScore,
 	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>
 ) {
-	try {
-		console.log('Submitting...');
+	console.log('Submitting...');
 
-		const response = await fetch(`${BACKEND_URL}/scores/update`, {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-
-		if (response.ok) {
-			console.log('Successfully submitted score.');
-		} else {
-			throw new Error('Failed to submit score.');
+	const response = await fetch(`${BACKEND_URL}/scores/update`, {
+		method: 'POST',
+		body: JSON.stringify(data),
+		headers: {
+			'Content-Type': 'application/json'
 		}
-	} catch (err) {
-		console.error(err);
+	});
+
+	if (response.ok) {
+		console.log('Successfully submitted score.');
+	} else {
+		return fail(response.status, {
+			success: false,
+			error: 'Failed to submit score.'
+		});
 	}
 }
 

@@ -12,11 +12,18 @@
 	{/if}
 
 	<main
-		class="flex-1 ml-0 px-[5%] py-10 {$page.url.pathname === '/login' ||
-		$page.url.pathname === 'register'
-			? 'lg:ml-0'
-			: 'lg:ml-72'}"
+		class={`flex-1 ml-0 px-[5%] py-10 ${
+			$page.url.pathname === '/login' || $page.url.pathname === 'register' ? 'lg:ml-0' : 'lg:ml-72'
+		}`}
 	>
-		<slot />
+		<div
+			class={`${
+				$page.url.pathname === '/' || $page.route.id === '/leaderboards/[user_id]'
+					? 'max-w-none'
+					: 'max-w-5xl'
+			} mx-auto`}
+		>
+			<slot />
+		</div>
 	</main>
 </div>

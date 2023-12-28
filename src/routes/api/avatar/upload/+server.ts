@@ -1,13 +1,10 @@
-import { SERVICE_ROLE } from '$env/static/private';
+import { BACKEND_URL, SERVICE_ROLE } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { BACKEND_URL } from '$lib/server';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	const { user_id } = locals;
 	const formData = await request.formData();
-
-	console.log(formData);
 
 	const photoName = formData.get('filename') as string;
 	const file = formData.get('file') as Blob;
@@ -16,8 +13,6 @@ export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	await uploadAvatar(fetch, file, fileName);
 
 	const url = `${PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${fileName}`;
-
-	console.log(url);
 
 	await updateAvatarUrl(fetch, user_id, url);
 

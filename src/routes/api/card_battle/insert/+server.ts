@@ -1,24 +1,21 @@
-import { BACKEND_URL } from '$lib/server';
+import { BACKEND_URL } from '$env/static/private';
 import type { BattleCardData } from '$lib/types';
-import type { RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 // Optimize later
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	const { user_id } = locals;
 
-	// if (!user_id) return new Response();
-
-	console.log(user_id);
 	const cards: BattleCardData[] = await request.json();
 
-	// @ts-ignore
-	const payload: { name: string; skill: string; user_id: string }[] = cards.map((card) => {
-		return {
-			name: card.id,
-			skill: card.skill,
-			user_id
-		};
-	});
+	const payload: { name: string; skill: 'strike' | 'block'; user_id: string | undefined }[] =
+		cards.map((card) => {
+			return {
+				name: card.id,
+				skill: card.skill,
+				user_id
+			};
+		});
 
 	console.log(payload);
 
@@ -33,7 +30,7 @@ export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	if (response.ok) {
 		console.log('Battle Cards submitted!');
 	} else {
-		console.log('Failed to submit battle cards.');
+		error(500, await response.text());
 	}
 
 	return new Response();

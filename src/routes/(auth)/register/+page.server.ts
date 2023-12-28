@@ -1,4 +1,3 @@
-import { BACKEND_URL } from '$lib/server';
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { Section } from '$lib/types.ts';
@@ -6,6 +5,7 @@ import { CACHE_DURATION } from '$lib';
 import { RegisterSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { supabase } from '$lib/supabase';
+import { BACKEND_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ locals, fetch, setHeaders }) => {
 	if (locals.user_id) {
@@ -39,12 +39,12 @@ export const actions: Actions = {
 			});
 		}
 
-		const { user, error } = await supabase.auth.signUp({
+		const { error, data } = await supabase.auth.signUp({
 			email: form.data.email,
 			password: form.data.password
 		});
 
-		console.log(user);
+		console.log(data);
 
 		if (error) {
 			return fail(400, {
