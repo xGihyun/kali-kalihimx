@@ -55,74 +55,83 @@
 		<Card.Title class="text-4xl font-normal font-jost-bold">Match History</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<Tabs.Root value="arnis">
-			<Tabs.List>
-				<Tabs.Trigger value="arnis">Arnis</Tabs.Trigger>
-				<Tabs.Trigger value="card_battle">Card Battle</Tabs.Trigger>
-			</Tabs.List>
-			<Tabs.Content value="arnis">
-				<Table.Root>
-					<Table.Header>
-						<Table.Row class="text-base md:text-lg">
-							<Table.Head>Opponent</Table.Head>
-							<Table.Head>Skill</Table.Head>
-							<Table.Head>Footwork</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each matches as match (match.id)}
+		{#if matches.length < 1}
+			<p class="text-muted-foreground italic">
+				History is empty. You will see your previous matches here.
+			</p>
+		{:else}
+			<Tabs.Root value="arnis">
+				<Tabs.List>
+					<Tabs.Trigger value="arnis">Arnis</Tabs.Trigger>
+					<Tabs.Trigger value="card_battle">Card Battle</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content value="arnis">
+					<Table.Root>
+						<Table.Header>
 							<Table.Row class="text-base md:text-lg">
-								<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
-								<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
-								<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell>
+								<Table.Head>Opponent</Table.Head>
+								<Table.Head>Skill</Table.Head>
+								<Table.Head>Footwork</Table.Head>
 							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			</Tabs.Content>
-
-			<Tabs.Content value="card_battle">
-				<Table.Root>
-					<Table.Header>
-						<Table.Row class="text-base md:text-lg">
-							<Table.Head>Opponent</Table.Head>
-							<Table.Head>DMG Dealt</Table.Head>
-							<Table.Head>DMG Taken</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each matches as match (match.id)}
-							<a
-								class="contents"
-								href="/card-battle/{match.id}"
-								on:click|preventDefault={(e) => showModal(e, match)}
-							>
+						</Table.Header>
+						<Table.Body>
+							{#each matches as match (match.id)}
 								<Table.Row class="text-base md:text-lg">
 									<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
-									<Table.Cell class="w-1/4">
-										{#if match.og_user1_id === userId}
-											{match.user1_total_damage}
-										{:else}
-											{match.user2_total_damage}
-										{/if}
-									</Table.Cell>
-									<Table.Cell
-										class={`w-1/4 ${
-											match.user1_total_damage ? 'text-foreground' : 'text-muted-foreground italic'
-										}`}
+									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
+									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
 									>
-										{#if match.og_user1_id === userId}
-											{match.user2_total_damage}
-										{:else}
-											{match.user1_total_damage}
-										{/if}
-									</Table.Cell>
 								</Table.Row>
-							</a>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			</Tabs.Content>
-		</Tabs.Root>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</Tabs.Content>
+
+				<Tabs.Content value="card_battle">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row class="text-base md:text-lg">
+								<Table.Head>Opponent</Table.Head>
+								<Table.Head>DMG Dealt</Table.Head>
+								<Table.Head>DMG Taken</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each matches as match (match.id)}
+								<a
+									class="contents"
+									href="/card-battle/{match.id}"
+									on:click|preventDefault={(e) => showModal(e, match)}
+								>
+									<Table.Row class="text-base md:text-lg">
+										<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
+										<Table.Cell class="w-1/4">
+											{#if match.og_user1_id === userId}
+												{match.user1_total_damage}
+											{:else}
+												{match.user2_total_damage}
+											{/if}
+										</Table.Cell>
+										<Table.Cell
+											class={`w-1/4 ${
+												match.user1_total_damage
+													? 'text-foreground'
+													: 'text-muted-foreground italic'
+											}`}
+										>
+											{#if match.og_user1_id === userId}
+												{match.user2_total_damage}
+											{:else}
+												{match.user1_total_damage}
+											{/if}
+										</Table.Cell>
+									</Table.Row>
+								</a>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</Tabs.Content>
+			</Tabs.Root>
+		{/if}
 	</Card.Content>
 </Card.Root>

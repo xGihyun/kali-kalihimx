@@ -1,6 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { CardBattleTurn, Matchmake, User } from '$lib/types';
+import type { CardBattleTurn, User } from '$lib/types';
+import type { Session, SupabaseClient } from '@supabase/supabase-js';
 
 // for information about these interfaces
 declare global {
@@ -8,6 +9,8 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			user_id: string | undefined;
+			supabase: SupabaseClient;
+			getSession: () => Promise<Session | null>;
 		}
 		// interface PageData {}
 		interface PageState {
@@ -17,7 +20,6 @@ declare global {
 					user2: CardBattleTurn[];
 				};
 				user: User | undefined;
-				// match: Matchmake | undefined;
 			};
 		}
 		// interface Platform {}

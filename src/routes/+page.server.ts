@@ -2,11 +2,16 @@ import type { Matchmake, PowerCard, UpdatePowerCard, LatestOpponent } from '$lib
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
+import { LoginSchema } from '$lib/schemas';
+import { superValidate } from 'sveltekit-superforms/server';
 
 export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends }) => {
-	const { user_id } = locals;
+	const session = await locals.getSession();
+	const user_id = session?.user.id;
 
 	const getLatestMatches = async () => {
+		if (!user_id) return [];
+
 		const response = await fetch(`${BACKEND_URL}/matches/latest`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -23,11 +28,10 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 	};
 
 	const getPowerCards = async () => {
-		const response = await fetch(`${BACKEND_URL}/power_cards`, {
-			method: 'POST',
-			body: JSON.stringify({
-				user_id
-			}),
+		if (!user_id) return [];
+
+		const response = await fetch(`${BACKEND_URL}/power_cards?user_id=${user_id}`, {
+			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -39,11 +43,13 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 	};
 
 	const getLatestOpponentDetails = async () => {
+		if (!user_id) return null;
+
 		const response = await fetch(`${BACKEND_URL}/matches/latest/${user_id}`, {
 			method: 'GET'
 		});
 
-		const latestOpponent: LatestOpponent = await response.json();
+		const latestOpponent: LatestOpponent | null = await response.json();
 
 		return latestOpponent;
 	};
@@ -55,13 +61,15 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 	return {
 		powerCards: await getPowerCards(),
 		matches: await getLatestMatches(),
-		opponentDetails: await getLatestOpponentDetails()
+		opponentDetails: await getLatestOpponentDetails(),
+		form: await superValidate(LoginSchema)
 	};
 };
 
 export const actions: Actions = {
 	power_card: async ({ fetch, request, locals }) => {
-		const { user_id } = locals;
+		const session = await locals.getSession();
+		const user_id = session?.user.id;
 
 		if (!user_id) return;
 
@@ -77,8 +85,8 @@ export const actions: Actions = {
 
 		console.log('Activating power card...');
 
-		const response = await fetch(`${BACKEND_URL}/power_cards/update`, {
-			method: 'POST',
+		const response = await fetch(`${BACKEND_URL}/power_cards`, {
+			method: 'PATCH',
 			body: JSON.stringify(payload),
 			headers: {
 				'Content-Type': 'application/json'

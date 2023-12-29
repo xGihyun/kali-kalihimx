@@ -1,9 +1,10 @@
 import type { ComponentType, SvelteComponent } from 'svelte';
+import type { RegisterSchema } from './schemas';
+import z from 'zod';
 
 export type User = {
 	id: string;
 	email: string;
-	password: string;
 	section: string;
 	first_name: string;
 	last_name: string;
@@ -19,21 +20,7 @@ export type User = {
 	banner_url?: string;
 };
 
-export type Register = {
-	email: string;
-	password: string;
-	section: string;
-	first_name: string;
-	last_name: string;
-	age: number;
-	contact_number: number;
-	sex: number;
-};
-
-export type Login = {
-	email: string;
-	password: string;
-};
+export type Register = Omit<z.infer<typeof RegisterSchema>, 'password'>;
 
 export type Section = {
 	id: string;
@@ -167,3 +154,13 @@ export type UpdatePowerCard = {
 };
 
 export type LoadingStatus = 'none' | 'pending' | 'success' | 'error';
+
+export type RequestStatus = {
+	type: 'none' | 'pending' | 'success' | 'error';
+	code?: number;
+};
+
+export type Video = {
+	title: string;
+	url: string;
+};

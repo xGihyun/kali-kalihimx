@@ -4,9 +4,9 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { getRankTitle, snakeCaseToTitleCase } from '$lib';
 
-	export let match: Matchmake | undefined;
+	export let match: Matchmake | null;
 	export let userId: string;
-	export let opponentDetails: LatestOpponent;
+	export let opponentDetails: LatestOpponent | null;
 
 	function getOpponent(match: Matchmake | undefined): {
 		id: string | undefined;
@@ -30,8 +30,6 @@
 			name: `${match.user1_first_name} ${match.user1_last_name}`
 		};
 	}
-
-	const initials = (opponentDetails.first_name[0] + opponentDetails.last_name[0]).toUpperCase();
 </script>
 
 <Card.Root>
@@ -39,7 +37,10 @@
 		<Card.Title class="text-4xl font-normal font-jost-bold">Upcoming Match</Card.Title>
 	</Card.Header>
 
-	{#if match}
+	{#if match && opponentDetails}
+		{@const initials = (
+			opponentDetails?.first_name[0] + opponentDetails?.last_name[0]
+		).toUpperCase()}
 		<Card.Content class="px-0 flex flex-col sm:flex-row w-full relative flex-wrap">
 			<div class="relative px-6 py-6 flex-1">
 				<img
@@ -102,6 +103,10 @@
 			</div>
 		</Card.Content>
 	{:else}
-		<Card.Content>No match</Card.Content>
+		<Card.Content>
+			<p class="text-muted-foreground italic">
+				No upcoming match yet, please wait for the admin to queue.
+			</p>
+		</Card.Content>
 	{/if}
 </Card.Root>

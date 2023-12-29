@@ -1,22 +1,16 @@
-import { supabase } from '$lib/supabase';
-import { fail, redirect, type RequestHandler } from '@sveltejs/kit';
+import { redirect, type RequestHandler } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-export const POST: RequestHandler = async ({ cookies, locals }) => {
-	if (!locals.user_id) {
-		redirect(303, '/login');
+export const POST: RequestHandler = async ({ locals: { supabase } }) => {
+	const { error: err } = await supabase.auth.signOut();
+
+	if (err) {
+		error(500, {
+			message: 'Failed to log out.'
+		});
 	}
 
-	const { error } = await supabase.auth.signOut();
+	console.log('Successfully logged out.');
 
-	if (error) {
-		return fail(500);
-	}
-
-	cookies.delete('session', { path: '/' });
-
-	locals.user_id = undefined;
-
-	console.log('Deleted cookies.');
-
-	redirect(303, '/login');
+	throw redirect(303, '/');
 };

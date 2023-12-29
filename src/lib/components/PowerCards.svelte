@@ -12,12 +12,6 @@
 	export let isCurrentUser: boolean = false;
 
 	let loadingStatus = Array.from({ length: powerCards.length }).fill('none') as LoadingStatus[];
-
-	// function getPowerCardImage(card: string): string {
-	// 	const imageUrl = POWER_CARDS.get(card);
-	//
-	// 	return imageUrl;
-	// }
 </script>
 
 <Card.Root>
@@ -45,7 +39,7 @@
 			</div>
 		</Card.Title>
 	</Card.Header>
-	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))]">
+	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-4">
 		{#each powerCards as card, idx (idx)}
 			{@const powerCardDetails = POWER_CARDS.get(card.name)}
 

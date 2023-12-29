@@ -1,21 +1,38 @@
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
 import { redirect, type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const session = event.cookies.get('session');
+	event.locals.supabase = createSupabaseServerClient({
+		supabaseUrl: PUBLIC_SUPABASE_URL,
+		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+		event
+	});
 
-	if (session) {
-		event.locals.user_id = session;
+	event.locals.getSession = async () => {
+		const {
+			data: { session }
+		} = await event.locals.supabase.auth.getSession();
+		return session;
+	};
+
+	const session = await event.locals.getSession();
+
+	if (!session) {
+		if (!event.route.id?.startsWith('/(auth)') && event.url.pathname !== '/') {
+			console.log('Access denied');
+			redirect(307, '/');
+		}
+	} else {
+		if (event.url.pathname === '/register') {
+			console.log('User session available');
+			redirect(302, '/');
+		}
 	}
 
-	if (event.url.pathname === '/register' && !session) {
-		return await resolve(event);
-	}
-
-	if (event.url.pathname !== '/login' && !session) {
-		console.log('Access Denied');
-
-		redirect(307, '/login');
-	}
-
-	return await resolve(event);
+	return resolve(event, {
+		filterSerializedResponseHeaders(name) {
+			return name === 'content-range';
+		}
+	});
 };

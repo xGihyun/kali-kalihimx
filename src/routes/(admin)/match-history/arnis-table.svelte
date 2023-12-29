@@ -5,17 +5,17 @@
 	import ScoresForm from './scores-form.svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { SubmitScoreSchema } from '$lib/schemas';
-	import { Check, CheckCircled, Clock } from 'radix-icons-svelte';
+	import { CheckCircled, Clock } from 'radix-icons-svelte';
 	import { snakeCaseToTitleCase } from '$lib';
 
 	export let formAction: boolean = false;
 	export let form: SuperValidated<typeof SubmitScoreSchema>;
 	export let matches: Matchmake[];
 
-	let clickedRow: number | null = null;
+	let clickedRow: string | null = null;
 
-	function toggleRow(idx: number) {
-		clickedRow = clickedRow === idx ? null : idx;
+	function toggleRow(id: string) {
+		clickedRow = clickedRow === id ? null : id;
 	}
 </script>
 
@@ -31,7 +31,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each matches as match, idx (match.id)}
+		{#each matches as match (match.id)}
 			{@const user1 = `${match.user1_first_name} ${match.user1_last_name}`}
 			{@const user2 = `${match.user2_first_name} ${match.user2_last_name}`}
 
@@ -39,7 +39,7 @@
 				class="text-base md:text-lg cursor-pointer {match.status === 'done'
 					? 'opacity-50 pointer-events-none'
 					: 'opacity-100'}"
-				on:click={() => toggleRow(idx)}
+				on:click={() => toggleRow(match.id)}
 			>
 				<Table.Cell>
 					{user1}
@@ -62,7 +62,7 @@
 				</Table.Cell>
 			</Table.Row>
 
-			<Dialog.Root open={clickedRow === idx} closeOnOutsideClick={false}>
+			<Dialog.Root open={clickedRow === match.id} closeOnOutsideClick={false}>
 				<Dialog.Content>
 					<Dialog.Header>
 						<Dialog.Title>Score Submission</Dialog.Title>

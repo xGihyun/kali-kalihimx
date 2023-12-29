@@ -3,7 +3,13 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {
-	const { user_id } = locals;
+	const session = await locals.getSession();
+	const user_id = session?.user.id;
+
+	if (!user_id) {
+		throw new Error('Failed to update avatar.');
+	}
+
 	const formData = await request.formData();
 
 	const photoName = formData.get('filename') as string;

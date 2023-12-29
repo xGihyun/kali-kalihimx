@@ -59,7 +59,7 @@
 		<Popover.Content asChild>
 			<Card.Root class="fixed bottom-24 right-[5%]">
 				<Card.Header>
-					<Card.Title class="font-semibold text-xl">Selected Cards</Card.Title>
+					<Card.Title class="font-jost-semibold text-xl">Selected Cards</Card.Title>
 					<Card.Description>The cards you selected will be listed here</Card.Description>
 				</Card.Header>
 				<Card.Content class="flex flex-col gap-2">

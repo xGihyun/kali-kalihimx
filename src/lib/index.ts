@@ -1,5 +1,5 @@
 import { ArrowClockwise, Guide, History, Home, Sword, Trophy } from './assets/icons';
-import type { BlockData, Matchmake, Navigation, StrikeData } from './types';
+import type { BlockData, Matchmake, Navigation, StrikeData, Video } from './types';
 import {
 	ancients_protection,
 	double_edged_sword,
@@ -9,11 +9,54 @@ import {
 	warlords_domain
 } from './assets/images/cards';
 
+export const ARNIS_STRIKES_VIDEOS: Video[] = [
+	{
+		title: 'Strikes',
+		url: 'https://youtu.be/9ImJFGii6lg'
+	},
+	{
+		title: 'Blocks',
+		url: 'https://youtu.be/vsTbagtEiyA'
+	},
+	{
+		title: 'Forward Sinawali',
+		url: 'https://youtu.be/0VTyA7fAoNg'
+	},
+	{
+		title: 'Sideward Sinawali',
+		url: 'https://youtu.be/GbHiKTmVgJw?t=85'
+	},
+	{
+		title: 'Reverse Sinawali',
+		url: 'https://youtu.be/GbHiKTmVgJw?t=343'
+	}
+];
+
+export const ARNIS_FOOTWORKS_VIDEOS: Video[] = [
+	{
+		title: 'Caballero',
+		url: 'https://youtu.be/jrXYbouUFR8?t=312'
+	},
+	{
+		title: 'Triangle',
+		url: 'https://youtu.be/jrXYbouUFR8?t=457'
+	},
+	{
+		title: 'Reversed Triangle',
+		url: 'https://youtu.be/jrXYbouUFR8?t=591'
+	},
+	{
+		title: 'Star Reach',
+		url: 'https://youtu.be/jrXYbouUFR8?t=694'
+	}
+];
+
 export const RANK_LOGO_COLORS: Map<string, string> = new Map([
 	['likas', 'border-white bg-gradient-to-l from-red-900 to-red-600'],
 	['likha', 'border-white bg-gradient-to-l from-orange-900 to-orange-500'],
 	['lakan', 'border-black bg-gradient-to-l from-amber-900 to-amber-500'],
-	['grandmaster', 'border-red-800 bg-gradient-to-l from-red-900 to-red-600']
+	['grandmaster', 'border-red-800 bg-gradient-to-l from-red-900 to-red-600'],
+	['unranked', 'border-border bg-background']
 ]);
 
 export const CACHE_DURATION = 600;
