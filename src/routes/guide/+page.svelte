@@ -4,7 +4,7 @@
 	import { Video } from 'radix-icons-svelte';
 </script>
 
-<h1 class="text-6xl font-jost-bold mb-10">Guide</h1>
+<h1 class="text-4xl md:text-6xl font-jost-bold mb-10">Guide</h1>
 
 <h2 class="font-jost-semibold text-4xl mb-5">Strikes</h2>
 

@@ -1,27 +1,47 @@
 <script lang="ts">
-	import { POWER_CARDS } from '$lib';
-	import type { LoadingStatus, PowerCard } from '$lib/types';
+	import { POWER_CARDS, SKILLS } from '$lib';
+	import type { LoadingStatus, Matchmake, PowerCard, User } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { enhance } from '$app/forms';
 	import { invalidate } from '$app/navigation';
-	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
+	import { CardStackPlus, CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	export let powerCards: PowerCard[] = [];
 	export let isCurrentUser: boolean = false;
+	export let user: User | undefined;
+	export let matches: Promise<Matchmake[]>;
+
+	let selectedUser: string | undefined;
+	let selectedCard: string | undefined;
+	let selectedSkill: string | undefined;
 
 	let loadingStatus = Array.from({ length: powerCards.length }).fill('none') as LoadingStatus[];
+
+	async function getUsersInSection(): Promise<User[] | undefined> {
+		if (!user) return;
+
+		const response = await fetch(`/api/users?section=${user.section}`, {
+			method: 'GET'
+		});
+
+		const users: User[] = await response.json();
+
+		return users;
+	}
 </script>
 
 <Card.Root>
 	<Card.Header>
 		<Card.Title
-			class="text-3xl md:text-4xl font-normal font-jost-bold flex justify-between flex-wrap gap-2"
+			class="text-2xl md:text-4xl font-normal font-jost-bold flex justify-between flex-wrap gap-2"
 		>
 			Power Cards
 
-			<div class="flex gap-8 items-center mb-2 text-base">
+			<div class="flex gap-8 items-center mb-2 text-base flex-wrap">
 				<div class="flex items-center gap-2">
 					<div class="bg-muted-foreground w-4 h-4 rounded-full"></div>
 					<span class="font-jost-medium">Available</span>
@@ -58,23 +78,81 @@
 							}`}
 						/>
 					</Dialog.Trigger>
-					<Dialog.Content class="max-w-2xl">
+					<Dialog.Content class="max-w-2xl w-full sm:w-auto md:w-auto">
 						<Dialog.Header>
-							<Dialog.Title class="font-normal font-jost-medium text-xl"
-								>Activate
-								<span class="font-jost-bold">{card.name}</span>
-								?
-							</Dialog.Title>
+							<Dialog.Title class="font-normal font-jost-bold text-xl">{card.name}</Dialog.Title>
+							<Dialog.Description>
+								{powerCardDetails?.description}
+							</Dialog.Description>
 						</Dialog.Header>
 
-						<div class="flex gap-8">
+						<div class="flex gap-8 flex-col sm:flex-row items-center justify-center">
 							<img src={powerCardDetails?.image_url} alt={card.name} class="max-w-60" />
-							<div>
-								<h3 class="font-jost-bold text-3xl mb-4">
-									{card.name}
-								</h3>
-								<p class="text-base md:text-lg">{powerCardDetails?.description}</p>
-							</div>
+							{#if card.name === 'Twist of Fate' || card.name === 'Extra Wind' || card.name === "Warlord's Domain"}
+								<div class="flex flex-col gap-8">
+									{#if card.name === 'Twist of Fate'}
+										{#await getUsersInSection()}
+											<Skeleton class="w-60 h-10" />
+										{:then users}
+											{#if users}
+												<Select.Root
+													preventScroll={false}
+													required
+													onSelectedChange={(e) => (selectedUser = `${e?.value}`)}
+												>
+													<Select.Trigger class="w-60">
+														<Select.Value placeholder="Users" />
+													</Select.Trigger>
+													<Select.Content class="overflow-auto max-h-60">
+														{#each users as user (user.id)}
+															<Select.Item value={user.id}
+																>{user.first_name}
+																{user.last_name}</Select.Item
+															>
+														{/each}
+													</Select.Content>
+												</Select.Root>
+											{/if}
+										{/await}
+									{:else if card.name === 'Extra Wind'}
+										<div
+											class="grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(5rem,1fr))] gap-4"
+										>
+											{#each POWER_CARDS as [key, value], idx (idx)}
+												{#if key !== 'Extra Wind'}
+													<button on:click={() => (selectedCard = key)}>
+														<img
+															src={value.image_url}
+															alt={key}
+															title={key}
+															class={`
+                          hover:-translate-y-2 hover:brightness-100
+                          ${
+														selectedCard === key ? 'animate-pulse' : 'brightness-50'
+													} transition-[filter,transform] duration-300`}
+														/>
+													</button>
+												{/if}
+											{/each}
+										</div>
+									{:else if card.name === "Warlord's Domain"}
+										<Select.Root
+											preventScroll={false}
+											required
+											onSelectedChange={(e) => (selectedSkill = `${e?.value}`)}
+										>
+											<Select.Trigger class="w-60">
+												<Select.Value placeholder="Skills" />
+											</Select.Trigger>
+											<Select.Content class="overflow-auto max-h-60">
+												{#each SKILLS as [key, value] (key)}
+													<Select.Item value={key}>{value}</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+									{/if}
+								</div>
+							{/if}
 						</div>
 
 						<Dialog.Description class="text-center">
@@ -83,19 +161,41 @@
 
 						<Dialog.Footer>
 							<form
-								class="flex items-center"
+								class="flex items-center justify-end"
 								method="POST"
 								action="/?/power_card"
-								use:enhance={() => {
-									console.log('Activating power card.');
+								use:enhance={async ({ formData }) => {
+									console.log('Activating power card: ', card.name);
+
+									if (card.name === "Warlord's Domain") {
+										selectedCard = undefined;
+										selectedUser = undefined;
+									} else if (card.name === 'Twist of Fate') {
+										selectedSkill = undefined;
+										selectedCard = undefined;
+									} else if (card.name === 'Extra Wind') {
+										selectedSkill = undefined;
+										selectedUser = undefined;
+									}
 
 									loadingStatus[idx] = 'pending';
 
+									if (selectedUser) {
+										formData.append('new_opponent_id', selectedUser);
+									}
+									if (selectedCard) {
+										formData.append('new_power_card', selectedCard);
+									}
+									if (selectedSkill) {
+										formData.append('new_skill', selectedSkill);
+										formData.append('match_set_id', (await matches)[0].id);
+									}
+
 									return async ({ result }) => {
 										if (result.type === 'success') {
-											invalidate('user:power_cards');
 											loadingStatus[idx] = 'success';
 											console.log('Successfully activated power card.');
+											invalidate('user:power_cards');
 										} else {
 											loadingStatus[idx] = 'error';
 											console.error('Failed to activate power card.');
@@ -123,12 +223,13 @@
 											<Reload class="h-5 w-5 animate-spin" />
 											<span class="text-base md:text-lg">Activating...</span>
 										{:else if loadingStatus[idx] === 'success'}
-											<CheckCircled class="h-5 w-5 " />
+											<CheckCircled class="h-5 w-5" />
 											<span class="text-base md:text-lg">Success</span>
 										{:else if loadingStatus[idx] === 'error'}
-											<CrossCircled class="h-5 w-5 " />
-											<span class="text-base md:text-lg">Error, please try again</span>
+											<CrossCircled class="h-5 w-5" />
+											<span class="text-base md:text-lg">Error, please try again.</span>
 										{:else}
+											<CardStackPlus class="h-5 w-5" />
 											<span class="text-base md:text-lg">Activate</span>
 										{/if}
 									</div>

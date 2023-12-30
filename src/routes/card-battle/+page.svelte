@@ -118,9 +118,11 @@
 	</Popover.Root>
 </div>
 
-<h1 class="text-6xl font-jost-bold mb-10">Card Battle</h1>
+<h1 class="text-4xl md:text-6xl font-jost-bold mb-10">Card Battle</h1>
 
-<h2 class="font-jost-semibold text-4xl mb-5">Strikes</h2>
+<h2 class="font-jost-semibold text-3xl md:text-4xl mb-5 text-muted-foreground uppercase">
+	Strikes
+</h2>
 
 <div
 	class="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-3 gap-2 place-items-center text-sm md:text-base mb-10"
@@ -131,7 +133,7 @@
 		<Card.Root class="w-full h-full flex flex-col justify-between">
 			<div>
 				<Card.Header>
-					<Card.Title class="font-normal font-jost-semibold text-xl">{strike.data.name}</Card.Title>
+					<Card.Title class="font-normal font-jost-medium text-xl">{strike.data.name}</Card.Title>
 					<Card.Description class="italic text-base">{strike.type.effect}</Card.Description>
 				</Card.Header>
 				<Card.Content class="space-y-1">
@@ -159,7 +161,7 @@
 	{/each}
 </div>
 
-<h2 class="font-jost-semibold text-4xl mb-5">Blocks</h2>
+<h2 class="font-jost-semibold text-3xl md:text-4xl mb-5 text-muted-foreground uppercase">Blocks</h2>
 
 <div
 	class="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-3 gap-2 place-items-center text-sm md:text-base mb-40"

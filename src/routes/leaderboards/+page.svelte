@@ -4,6 +4,10 @@
 	export let data;
 </script>
 
-<h1 class="font-jost-bold text-6xl mb-10">Leaderboards</h1>
+<h1 class="font-jost-bold text-4xl md:text-6xl mb-10">Leaderboards</h1>
 
-<UserTable users={data.users} sections={data.sections} />
+{#await data.users}
+	Loading...
+{:then users}
+	<UserTable {users} sections={data.sections} />
+{/await}

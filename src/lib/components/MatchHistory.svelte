@@ -21,7 +21,7 @@
 		const result = await preloadData(href);
 
 		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { selected: { ...result.data, match } });
+			pushState(href, { selected: { turns: result.data.turns, user: result.data.user, match } });
 
 			isOpen = true;
 		} else {
@@ -52,10 +52,10 @@
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title class="text-4xl font-normal font-jost-bold">Match History</Card.Title>
+		<Card.Title class="text-2xl md:text-4xl font-normal font-jost-bold">Match History</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		{#if matches.length < 1}
+		{#if matches.length < 2}
 			<p class="text-muted-foreground italic">
 				History is empty. You will see your previous matches here.
 			</p>
@@ -100,7 +100,7 @@
 							{#each matches as match (match.id)}
 								<a
 									class="contents"
-									href="/card-battle/{match.id}"
+									href={`/card-battle/${match.id}`}
 									on:click|preventDefault={(e) => showModal(e, match)}
 								>
 									<Table.Row class="text-base md:text-lg">

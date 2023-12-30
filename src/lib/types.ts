@@ -1,5 +1,5 @@
 import type { ComponentType, SvelteComponent } from 'svelte';
-import type { RegisterSchema } from './schemas';
+import type { RegisterSchema, arnisMatchSchema } from './schemas';
 import z from 'zod';
 
 export type User = {
@@ -147,7 +147,6 @@ export type CardBattleTurn = {
 };
 
 export type UpdatePowerCard = {
-	card_id: string;
 	user_id: string;
 	is_activated: boolean;
 	is_used: boolean;
@@ -164,3 +163,5 @@ export type Video = {
 	title: string;
 	url: string;
 };
+
+export type ArnisMatch = z.infer<typeof arnisMatchSchema>;

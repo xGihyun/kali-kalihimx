@@ -49,33 +49,5 @@ export const actions: Actions = {
 		console.log(data);
 
 		throw redirect(303, '/');
-
-		// const response = await event.fetch(`${BACKEND_URL}/login`, {
-		// 	method: 'POST',
-		// 	body: JSON.stringify(form.data),
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	}
-		// });
-		//
-		// const user: User = await response.json();
-		//
-		// console.log(user);
-
-		// if (response.ok) {
-		// 	event.cookies.set('session', user.id, {
-		// 		maxAge: 60 * 60 * 24 * 7, // 1 week
-		// 		path: '/',
-		// 		httpOnly: true,
-		// 		sameSite: 'strict',
-		// 		secure: APP_ENV === 'production'
-		// 	});
-		//
-		// 	redirect(303, '/');
-		// } else {
-		// 	return fail(500, {
-		// 		form
-		// 	});
-		// }
 	}
 };

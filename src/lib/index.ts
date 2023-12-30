@@ -59,7 +59,7 @@ export const RANK_LOGO_COLORS: Map<string, string> = new Map([
 	['unranked', 'border-border bg-background']
 ]);
 
-export const CACHE_DURATION = 600;
+export const CACHE_DURATION = 60 * 60;
 
 export const ADMIN_ROUTES: Navigation = [
 	{
@@ -122,7 +122,7 @@ export const POWER_CARDS = new Map([
 		'Extra Wind',
 		{
 			image_url: extra_wind,
-			description: 'Select a brand new Power Card.'
+			description: 'Select a new power card (excluding Extra Wind).'
 		}
 	],
 	[

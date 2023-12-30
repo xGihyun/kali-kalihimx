@@ -1,11 +1,12 @@
 import { BACKEND_URL } from '$env/static/private';
-import { CACHE_DURATION } from '$lib';
 import type { Section, User } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const getUsers = async () => {
-		const response = await fetch(`${BACKEND_URL}/users?order_by=true`, { method: 'GET' });
+		const response = await fetch(`${BACKEND_URL}/users?order_by=score&order=desc`, {
+			method: 'GET'
+		});
 		const users: User[] = await response.json();
 
 		return users;
@@ -18,10 +19,10 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 		return sections;
 	};
 
-	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=120, proxy-revalidate` });
 
 	return {
-		users: await getUsers(),
+		users: getUsers(),
 		sections: await getSections()
 	};
 };

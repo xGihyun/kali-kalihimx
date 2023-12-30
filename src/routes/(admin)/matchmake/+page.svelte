@@ -44,7 +44,6 @@
 						</Table.Cell>
 						<Table.Cell>
 							{FOOTWORKS.get(match.arnis_footwork)}
-							{match.arnis_footwork}
 						</Table.Cell>
 						<Table.Cell>
 							{match.status}

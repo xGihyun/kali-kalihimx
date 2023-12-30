@@ -70,7 +70,7 @@
 			class="flex h-16 w-16 rounded-full lg:mb-10 lg:h-40 lg:w-40 lg:flex-none lg:self-end"
 			on:click={() => uploadAvatarEl.click()}
 		>
-			<Avatar.Root class="w-20 h-20 text-3xl lg:text-6xl lg:w-40 lg:h-40">
+			<Avatar.Root class="text-3xl lg:text-6xl w-full h-full">
 				<Avatar.Image src={user.avatar_url} alt="Avatar" />
 				<Avatar.Fallback>{initials}</Avatar.Fallback>
 			</Avatar.Root>

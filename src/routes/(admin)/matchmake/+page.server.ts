@@ -1,5 +1,4 @@
-import { CACHE_DURATION } from '$lib';
-import type { Matchmake, Section } from '$lib/types';
+import type { ArnisMatch, Matchmake, Section } from '$lib/types';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
@@ -10,7 +9,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=120, must-revalidate` });
 
 	return {
 		sections,
@@ -26,32 +25,50 @@ export const actions: Actions = {
 			return fail(400, {
 				form,
 				result: null,
-				success: false
+				success: false,
+				message: 'Invalid form data'
 			});
 		}
 
-		const response = await event.fetch(`${BACKEND_URL}/matchmake`, {
-			method: 'POST',
-			body: JSON.stringify(form.data),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+		const matches = await matchmake(event.fetch, form.data);
 
-		if (response.ok) {
-			const matches: Matchmake[] = await response.json();
-
+		if (!matches) {
 			return {
 				form,
-				result: matches,
-				success: true
+				result: null,
+				success: false,
+				message: 'Server error. Try again.'
 			};
 		}
 
 		return {
 			form,
-			result: null,
-			success: false
+			result: matches,
+			success: true,
+			message: 'Success'
 		};
 	}
 };
+
+async function matchmake(
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+	payload: ArnisMatch
+) {
+	const response = await fetch(`${BACKEND_URL}/matchmake`, {
+		method: 'POST',
+		body: JSON.stringify(payload),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		console.log(await response.text());
+
+		return;
+	}
+
+	const matches: Matchmake[] = await response.json();
+
+	return matches;
+}

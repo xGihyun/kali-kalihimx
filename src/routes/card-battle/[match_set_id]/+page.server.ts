@@ -1,5 +1,4 @@
 import { BACKEND_URL } from '$env/static/private';
-import { CACHE_DURATION } from '$lib';
 import type { CardBattleTurn } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
@@ -33,7 +32,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	const user1Turns = user1_id ? result.filter((card) => card.user_id === user1_id) : undefined;
 	const user2Turns = user2_id ? result.filter((card) => card.user_id === user2_id) : undefined;
 
-	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 10}, must-revalidate` });
 
 	return {
 		turns: {

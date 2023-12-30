@@ -4,16 +4,44 @@
 	import type { RequestStatus } from '$lib/types';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { ActionData } from './$types';
+	import { enhance as formEnhance } from '$app/forms';
+	import { LogIn } from 'lucide-svelte';
 
 	export let form: SuperValidated<typeof LoginSchema>;
+	export let formAction: ActionData;
 
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
 </script>
 
-<Form.Root {form} asChild schema={LoginSchema} let:config>
-	<form method="POST" action="/login" class="space-y-4">
+<Form.Root {form} asChild schema={LoginSchema} let:config let:enhance>
+	<form
+		method="POST"
+		action="?/login"
+		class="space-y-4"
+		use:enhance
+		use:formEnhance={() => {
+			console.log('Logging in...');
+			requestStatus = {
+				type: 'pending'
+			};
+
+			return async ({ result }) => {
+				if (result.type === 'success' || result.type === 'redirect') {
+					console.log('Successfully registered.');
+					requestStatus.type = 'success';
+				} else {
+					console.error('Error');
+					requestStatus = {
+						type: 'error',
+						code: result.status
+					};
+				}
+			};
+		}}
+	>
 		<Form.Field {config} name="email">
 			<Form.Item>
 				<Form.Label class="text-base md:text-lg">Email</Form.Label>
@@ -52,18 +80,15 @@
 						<Reload class="h-5 w-5 animate-spin" />
 						<span class="text-base md:text-lg">Logging in...</span>
 					{:else if requestStatus.type === 'success'}
-						<CheckCircled class="h-5 w-5 " />
+						<CheckCircled class="h-5 w-5" />
 						<span class="text-base md:text-lg">Success</span>
 					{:else if requestStatus.type === 'error'}
-						<CrossCircled class="h-5 w-5 " />
+						<CrossCircled class="h-5 w-5" />
 						<span class="text-base md:text-lg">
-							{#if requestStatus.code === 400}
-								Invalid credentials
-							{:else}
-								Server error. Please try again.
-							{/if}
+							{formAction?.message}
 						</span>
 					{:else}
+						<LogIn class="h-5 w-5" />
 						<span class="text-base md:text-lg">Log in</span>
 					{/if}
 				</div>

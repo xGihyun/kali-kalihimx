@@ -1,22 +1,47 @@
 <script lang="ts">
+	import { enhance as foo } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { FOOTWORKS, SKILLS } from '$lib';
 	import * as Form from '$lib/components/ui/form';
 	import { arnisMatchSchema, type ArnisMatchSchema } from '$lib/schemas';
-	import type { Section } from '$lib/types';
+	import type { RequestStatus, Section } from '$lib/types';
+	import { Swords } from 'lucide-svelte';
+	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 
 	export let form: SuperValidated<ArnisMatchSchema>;
 	export let sections: Section[];
+
+	let requestStatus: RequestStatus = {
+		type: 'none'
+	};
 </script>
 
-<Form.Root
-	{form}
-	schema={arnisMatchSchema}
-	let:config
-	method="POST"
-	class="w-full max-w-5xl flex items-center gap-4"
->
-	<div class="w-full flex items-center gap-2">
+<Form.Root {form} schema={arnisMatchSchema} let:config asChild let:attrs let:enhance>
+	<form
+		class="w-full max-w-5xl flex items-center gap-2"
+		method="post"
+		{...attrs}
+		use:enhance
+		use:foo={() => {
+			console.log('Matchmaking...');
+			requestStatus.type = 'pending';
+
+			return async ({ result }) => {
+				if (result.type === 'success' || result.type === 'redirect') {
+					console.log('Matchmaking successful');
+					requestStatus.type = 'success';
+					invalidateAll();
+				} else {
+					console.error('Matchmaking error');
+					requestStatus = {
+						type: 'error',
+						code: result.status
+					};
+				}
+			};
+		}}
+	>
 		<Form.Field {config} name="section">
 			<Form.Item class="space-y-0 flex-[2]">
 				<Form.Select>
@@ -64,7 +89,31 @@
 				<Form.Validation />
 			</Form.Item>
 		</Form.Field>
-	</div>
 
-	<Form.Button class="text-base md:text-lg h-auto">Matchmake</Form.Button>
+		<Form.Button
+			class={`text-base md:text-lg h-auto ${
+				requestStatus.type === 'success'
+					? 'bg-green-500 pointer-events-none'
+					: requestStatus.type === 'error'
+						? 'bg-red-500 hover:bg-red-600'
+						: requestStatus.type === 'pending'
+							? 'bg-yellow-500 pointer-events-none'
+							: 'bg-primary'
+			}`}
+		>
+			<div class="flex items-center gap-1">
+				{#if requestStatus.type === 'pending'}
+					<Reload class="h-5 w-5 animate-spin" />
+				{:else if requestStatus.type === 'success'}
+					<CheckCircled class="h-5 w-5" />
+				{:else if requestStatus.type === 'error'}
+					<CrossCircled class="h-5 w-5" />
+				{:else}
+					<Swords class="h-5 w-5" />
+				{/if}
+
+				<span class="text-base md:text-lg">Matchmake</span>
+			</div>
+		</Form.Button>
+	</form>
 </Form.Root>
