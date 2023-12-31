@@ -18,6 +18,7 @@ export type User = {
 	role: string;
 	avatar_url?: string;
 	banner_url?: string;
+	is_private: boolean;
 };
 
 export type Register = Omit<z.infer<typeof RegisterSchema>, 'password'>;
@@ -33,12 +34,6 @@ export type Navigation = {
 	path: string;
 	icon?: ComponentType<SvelteComponent>;
 }[];
-
-export type ArnisMatch = {
-	section: string;
-	skill: string;
-	footwork: string;
-};
 
 export type Matchmake = {
 	id: string;

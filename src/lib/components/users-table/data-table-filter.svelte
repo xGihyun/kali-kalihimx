@@ -7,10 +7,12 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { cn } from '$lib/utils';
 	import type { Section } from '$lib/types';
+	import { snakeCaseToTitleCase } from '$lib';
 
 	export let filterValues: string[] = [];
 	export let title: string;
 	export let options: Section[] = [];
+	export let sectionsQuery: string | null;
 
 	let open = false;
 
@@ -20,6 +22,10 @@
 		} else {
 			filterValues = [...(Array.isArray(filterValues) ? filterValues : []), currentValue];
 		}
+
+		sectionsQuery = filterValues.join(',');
+
+		console.log(sectionsQuery);
 	};
 </script>
 
@@ -49,7 +55,7 @@
 					{:else}
 						{#each filterValues as option}
 							<Badge variant="secondary" class="rounded-sm px-1 font-normal text-base md:text-lg">
-								{option}
+								{snakeCaseToTitleCase(option)}
 							</Badge>
 						{/each}
 					{/if}
@@ -69,12 +75,13 @@
 							value={option.id}
 							onSelect={(currentValue) => {
 								handleSelect(currentValue);
+								console.log(filterValues);
 							}}
 						>
 							<div
 								class={cn(
 									'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-									filterValues.includes(option.id)
+									sectionsQuery?.includes(option.id)
 										? 'bg-primary text-primary-foreground'
 										: 'opacity-50 [&_svg]:invisible'
 								)}

@@ -41,7 +41,7 @@ export const RegisterSchema = z.object({
 
 export const arnisMatchSchema = z.object({
 	section: z.string(),
-	skill: z.string(),
+	skill: z.string().optional(),
 	footwork: z.string()
 });
 
@@ -60,4 +60,16 @@ export const SubmitScoreSchema = z.object({
 	user1_score: z.coerce.number(),
 	user2_score: z.coerce.number(),
 	match_set_id: z.string()
+});
+
+export const UpdateUserSchema = z.object({
+	email: z.string().email().nullable(),
+	section: z.string().nullable(),
+	first_name: z.string().nullable(),
+	last_name: z.string().nullable(),
+	age: z.coerce.number().nullable(),
+	contact_number: z.coerce.number().nullable(),
+	sex: z.string().nullable(),
+	score: z.coerce.number().nullable(),
+	role: z.string().nullable()
 });

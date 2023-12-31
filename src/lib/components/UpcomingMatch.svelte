@@ -50,14 +50,14 @@
 						class="absolute left-0 top-0 object-cover w-full h-full brightness-[.25]"
 					/>
 				{:else}
-					<div class="absolute left-0 top-0 w-full h-full bg-card"></div>
+					<div class="absolute left-0 top-0 w-full h-full bg-slate-900"></div>
 				{/if}
 
 				<div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-card"></div>
 
 				<div class="flex items-center gap-4 justify-between">
 					<div class="relative flex items-center gap-4 z-20">
-						<Avatar.Root class="text-xl md:text-2xl w-16 h-16 lg:w-20 lg:h-20">
+						<Avatar.Root class="text-xl md:text-2xl w-16 h-16 lg:w-20 lg:h-20 shadow-light">
 							<Avatar.Image src={opponentDetails.avatar_url} alt="Avatar" />
 							<Avatar.Fallback>{initials}</Avatar.Fallback>
 						</Avatar.Root>

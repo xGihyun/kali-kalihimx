@@ -1,15 +1,34 @@
 import { BACKEND_URL } from '$env/static/private';
+import { CACHE_DURATION } from '$lib';
 import type { Section, User } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
+export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
+	const limit = url.searchParams.get('limit') || 5;
+	const skip = Number(url.searchParams.get('skip')) || 0;
+	const sections = url.searchParams.get('sections');
+
 	const getUsers = async () => {
-		const response = await fetch(`${BACKEND_URL}/users?order_by=score&order=desc`, {
-			method: 'GET'
-		});
+		const response = await fetch(
+			`${BACKEND_URL}/users?order_by=score&order=desc&limit=${limit}&skip=${skip}${
+				sections ? `&section=${sections}` : ''
+			}`,
+			{
+				method: 'GET'
+			}
+		);
 		const users: User[] = await response.json();
 
 		return users;
+	};
+
+	const getUserCount = async () => {
+		const response = await fetch(`${BACKEND_URL}/users/count`, {
+			method: 'GET'
+		});
+		const { total } = await response.json();
+
+		return (total as number) || 0;
 	};
 
 	const getSections = async () => {
@@ -19,10 +38,13 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 		return sections;
 	};
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=120, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${CACHE_DURATION}, proxy-revalidate` });
 
 	return {
 		users: getUsers(),
-		sections: await getSections()
+		sections: await getSections(),
+		total: await getUserCount(),
+		skip,
+		filteredSections: sections
 	};
 };

@@ -12,6 +12,7 @@
 
 	export let sections: Section[] = [];
 	export let tableModel: TableViewModel<User, AnyPlugins>;
+	export let sectionsQuery: string | null;
 
 	const { pluginStates } = tableModel;
 	const {
@@ -40,7 +41,12 @@
 			bind:value={$filterValue}
 		/>
 
-		<UserTableFilter bind:filterValues={$filterValues.section} title="Section" options={sections} />
+		<UserTableFilter
+			bind:filterValues={$filterValues.section}
+			title="Section"
+			options={sections}
+			{sectionsQuery}
+		/>
 
 		{#if showReset}
 			<Button

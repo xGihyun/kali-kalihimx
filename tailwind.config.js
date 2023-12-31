@@ -18,6 +18,10 @@ const config = {
 			}
 		},
 		extend: {
+			boxShadow: {
+				dark: 'rgba(0, 0, 0, 0.6) 0px 5px 10px',
+				light: 'rgba(0, 0, 0, 0.25) 0px 5px 10px'
+			},
 			keyframes: {
 				'gradient-x': {
 					'0%': {

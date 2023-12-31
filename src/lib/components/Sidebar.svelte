@@ -21,7 +21,7 @@
 >
 	<div class="relative flex flex-col justify-between h-full p-4">
 		<button
-			class="fixed top-1/2 -translate-y-1/2 -right-8 w-10 h-10 bg-primary flex items-center justify-center rounded-r-full"
+			class="fixed top-1/2 -translate-y-1/2 -right-8 w-10 h-10 bg-primary flex items-center justify-center rounded-r-full lg:hidden"
 			on:click={() => (isOpen = !isOpen)}
 		>
 			<ChevronRight
@@ -65,7 +65,7 @@
 					</div>
 				</Button>
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-64">
+			<DropdownMenu.Content class="w-64 z-[600]">
 				<DropdownMenu.Group>
 					<DropdownMenu.Item>
 						<form action="/logout" method="post" class="w-full">

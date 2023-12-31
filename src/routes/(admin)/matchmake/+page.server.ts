@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=120, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 5}, proxy-revalidate` });
 
 	return {
 		sections,

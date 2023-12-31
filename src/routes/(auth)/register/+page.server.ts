@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, fetch, setHeaders }) => {
 
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=${CACHE_DURATION}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${CACHE_DURATION}, proxy-revalidate` });
 
 	return {
 		sections,

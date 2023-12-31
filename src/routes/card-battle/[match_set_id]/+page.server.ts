@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	const user1Turns = user1_id ? result.filter((card) => card.user_id === user1_id) : undefined;
 	const user2Turns = user2_id ? result.filter((card) => card.user_id === user2_id) : undefined;
 
-	setHeaders({ 'cache-control': `max-age=${60 * 10}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 10}, proxy-revalidate` });
 
 	return {
 		turns: {

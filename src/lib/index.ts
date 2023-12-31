@@ -59,7 +59,7 @@ export const RANK_LOGO_COLORS: Map<string, string> = new Map([
 	['unranked', 'border-border bg-background']
 ]);
 
-export const CACHE_DURATION = 60 * 60;
+export const CACHE_DURATION = 60 * 10;
 
 export const ADMIN_ROUTES: Navigation = [
 	{

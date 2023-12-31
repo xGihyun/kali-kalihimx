@@ -6,9 +6,19 @@
 	import { get, readable } from 'svelte/store';
 	import * as Table from '$lib/components/ui/table';
 	import { UserTableSectionCell, UserTableToolbar } from '.';
+	import { Button } from '$lib/components/ui/button';
 
 	export let users: User[];
 	export let sections: Section[];
+	export let total: number;
+	export let skip: number;
+	export let sectionsQuery: string | null;
+
+	$: pageSize = 5;
+	$: currentPage = skip / pageSize;
+	$: totalPages = Math.ceil(total / pageSize);
+	$: hasPreviousPage = pageSize * currentPage < 1;
+	$: hasNextPage = currentPage + 1 >= totalPages;
 
 	const table = createTable(readable(users), {
 		filter: addTableFilter({
@@ -65,10 +75,11 @@
 
 	const tableModel = table.createViewModel(columns);
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+	// const { hasNextPage, hasPreviousPage } = pluginStates.page;
 </script>
 
 <div class="space-y-4">
-	<UserTableToolbar {tableModel} {sections} />
+	<UserTableToolbar {tableModel} {sections} {sectionsQuery} />
 
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
@@ -97,7 +108,7 @@
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs} class="text-base md:text-lg">
 										{#if cell.id === 'Name'}
-											<span class="text-red-400 font-jost-medium">#{idx + 1}</span>
+											<span class="text-red-500 font-jost-medium">#{user.rank_overall}</span>
 											<a href={`/leaderboards/${user.id}`} class="hover:underline">
 												<Render of={cell.render()} />
 											</a>
@@ -112,5 +123,28 @@
 				{/each}
 			</Table.Body>
 		</Table.Root>
+	</div>
+
+	<div class="flex items-center justify-end space-x-2 py-4">
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => {
+				currentPage -= 1;
+			}}
+			disabled={hasPreviousPage}
+		>
+			<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Previous</a>
+		</Button>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={hasNextPage}
+			on:click={() => {
+				currentPage += 1;
+			}}
+		>
+			<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Next</a>
+		</Button>
 	</div>
 </div>

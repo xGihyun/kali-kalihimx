@@ -49,12 +49,12 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders }) 
 	depends('card-battle:damage');
 
 	// TODO: CACHE INVALIDATION
-	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=120, proxy-revalidate` });
 
 	return {
-		matches: await getMatches(),
-		sections: await getSections(),
-		maxSets: await getMaxSets(),
+		matches: getMatches(),
+		sections: getSections(),
+		maxSets: getMaxSets(),
 		form: await superValidate(SubmitScoreSchema),
 		selectedSection: section,
 		selectedSet: set,
