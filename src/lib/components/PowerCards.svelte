@@ -13,7 +13,7 @@
 	export let powerCards: PowerCard[] = [];
 	export let isCurrentUser: boolean = false;
 	export let user: User | undefined;
-	export let matches: Promise<Matchmake[]>;
+	export let matches: Matchmake[];
 
 	let selectedUser: string | undefined;
 	let selectedCard: string | undefined;
@@ -191,7 +191,7 @@
 										}
 										if (selectedSkill) {
 											formData.append('new_skill', selectedSkill);
-											formData.append('match_set_id', (await matches)[0].id);
+											formData.append('match_set_id', matches[0].id);
 										}
 
 										return async ({ result }) => {

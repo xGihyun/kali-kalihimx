@@ -12,7 +12,7 @@
 	export let sections: Section[];
 	export let total: number;
 	export let skip: number;
-	export let sectionsQuery: string | null;
+	export let filteredSections: string | null;
 
 	$: pageSize = 5;
 	$: currentPage = skip / pageSize;
@@ -79,7 +79,7 @@
 </script>
 
 <div class="space-y-4">
-	<UserTableToolbar {tableModel} {sections} {sectionsQuery} />
+	<UserTableToolbar {tableModel} {sections} />
 
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
@@ -99,7 +99,7 @@
 				{/each}
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
-				{#each $pageRows as row, idx (row.id)}
+				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
 						<Table.Row {...rowAttrs}>
 							{#each row.cells as cell (cell.id)}
@@ -132,14 +132,14 @@
 			on:click={() => {
 				currentPage -= 1;
 			}}
-			disabled={hasPreviousPage}
+			disabled={hasPreviousPage || filteredSections}
 		>
 			<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Previous</a>
 		</Button>
 		<Button
 			variant="outline"
 			size="sm"
-			disabled={hasNextPage}
+			disabled={hasNextPage || filteredSections}
 			on:click={() => {
 				currentPage += 1;
 			}}

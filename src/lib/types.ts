@@ -27,6 +27,7 @@ export type Section = {
 	id: string;
 	name: string;
 	user_limit: number;
+	user_count?: number;
 };
 
 export type Navigation = {

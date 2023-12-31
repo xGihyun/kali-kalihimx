@@ -13,7 +13,7 @@
 	export let data;
 	export let form;
 
-	$: ({ session, user, matches, opponentDetails, powerCards } = data);
+	$: ({ session, user } = data);
 </script>
 
 {#if session && user}
@@ -22,25 +22,14 @@
 
 	<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
 		<Rank {user} />
-
-		{#await matches}
+		{#await data.lazy.data}
 			<Skeleton class="min-h-20" />
-		{:then matches}
-			<UpcomingMatch match={matches[0]} userId={user.id} {opponentDetails} />
-		{/await}
-
-		{#await powerCards}
 			<Skeleton class="min-h-20" />
-		{:then powerCards}
-			{#if powerCards}
-				<PowerCards {powerCards} isCurrentUser={true} {user} {matches} />
-			{/if}
-		{/await}
-
-		{#await matches}
 			<Skeleton class="min-h-20" />
-		{:then matches}
-			<MatchHistory {matches} userId={user.id} />
+		{:then lazyData}
+			<UpcomingMatch match={lazyData[1][0]} userId={user.id} opponentDetails={lazyData[2]} />
+			<PowerCards powerCards={lazyData[0]} isCurrentUser={true} {user} matches={lazyData[1]} />
+			<MatchHistory matches={lazyData[1]} userId={user.id} />
 		{/await}
 	</div>
 {:else}

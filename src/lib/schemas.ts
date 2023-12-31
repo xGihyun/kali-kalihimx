@@ -73,3 +73,8 @@ export const UpdateUserSchema = z.object({
 	score: z.coerce.number().nullable(),
 	role: z.string().nullable()
 });
+
+export const SectionSchema = z.object({
+	name: z.string(),
+	user_limit: z.coerce.number()
+});

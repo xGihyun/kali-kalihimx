@@ -59,10 +59,12 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 
 	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
 
+	const data = Promise.all([getPowerCards(), getLatestMatches(), getLatestOpponentDetails()]);
+
 	return {
-		powerCards: getPowerCards(),
-		matches: getLatestMatches(),
-		opponentDetails: await getLatestOpponentDetails(),
+		lazy: {
+			data
+		},
 		form: await superValidate(LoginSchema)
 	};
 };

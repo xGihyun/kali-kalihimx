@@ -10,8 +10,8 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
 
 	const getUsers = async () => {
 		const response = await fetch(
-			`${BACKEND_URL}/users?order_by=score&order=desc&limit=${limit}&skip=${skip}${
-				sections ? `&section=${sections}` : ''
+			`${BACKEND_URL}/users?order_by=score&order=desc&skip=${skip}${
+				sections ? `&section=${sections}` : `&limit=${limit}`
 			}`,
 			{
 				method: 'GET'
@@ -38,12 +38,14 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
 		return sections;
 	};
 
+	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
+
 	setHeaders({ 'cache-control': `max-age=0, s-maxage=${CACHE_DURATION}, proxy-revalidate` });
 
 	return {
-		users: getUsers(),
-		sections: await getSections(),
-		total: await getUserCount(),
+		lazy: {
+			foo
+		},
 		skip,
 		filteredSections: sections
 	};

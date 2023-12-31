@@ -8,6 +8,7 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
+import { UsersRound } from 'lucide-svelte';
 
 export const ARNIS_STRIKES_VIDEOS: Video[] = [
 	{
@@ -71,6 +72,11 @@ export const ADMIN_ROUTES: Navigation = [
 		name: 'Match History',
 		path: '/match-history',
 		icon: History
+	},
+	{
+		name: 'Sections',
+		path: '/sections',
+		icon: UsersRound
 	}
 	// {
 	// 	name: 'Users',
@@ -358,6 +364,18 @@ export function getRankTitle(score: number): string | null {
 	}
 
 	return rankTitle;
+}
+
+export function titleCaseToSnakeCase(input: string | null) {
+	if (!input) return;
+
+	// Split the string into words based on spaces and capital letters
+	const words = input.split(/(?=[A-Z])|\s+/);
+
+	// Convert each word to lowercase and join them with an underscore
+	const snakeCase = words.map((word) => word.toLowerCase()).join('_');
+
+	return snakeCase;
 }
 
 export function snakeCaseToTitleCase(input: string | null): string | undefined {
