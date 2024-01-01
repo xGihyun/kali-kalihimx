@@ -28,7 +28,7 @@
 
 	<Table.Root>
 		<Table.Header>
-			<Table.Row class="text-base md:text-lg">
+			<Table.Row class="text-sm sm:text-base md:text-lg">
 				<Table.Head class="text-primary/80 font-jost-semibold"
 					>{data.user?.first_name} {data.user?.last_name} (You)</Table.Head
 				>
@@ -39,11 +39,11 @@
 		</Table.Header>
 		<Table.Body>
 			{#each Array(6) as _, idx (idx)}
-				<Table.Row class="text-base md:text-lg">
+				<Table.Row class="text-sm sm:text-base md:text-lg">
 					{#if turns.user1 && turns.user1[idx].user_id === data.user?.id}
 						<Table.Cell class="flex flex-col">
 							<!-- Card name -->
-							<span class="text-base md:text-lg font-jost-medium">
+							<span class="text-sm sm:text-base md:text-lg font-jost-medium">
 								{#if turns.user1 && turns.user1[idx].card_name}
 									{snakeCaseToTitleCase(turns.user1[idx].card_name)}
 								{:else}
@@ -80,7 +80,7 @@
 
 						<!-- Opponent card name -->
 						<Table.Cell class="flex flex-col">
-							<span class="text-base md:text-lg font-jost-medium">
+							<span class="text-sm sm:text-base md:text-lg font-jost-medium">
 								{#if turns.user2 && turns.user2[idx].card_name}
 									{snakeCaseToTitleCase(turns.user2[idx].card_name)}
 								{:else}
@@ -116,7 +116,7 @@
 						{/if}
 					{:else}
 						<Table.Cell class="flex flex-col">
-							<span class="text-base md:text-lg font-jost-medium">
+							<span class="text-sm sm:text-base md:text-lg font-jost-medium">
 								{#if turns.user2 && turns.user2[idx].card_name}
 									{snakeCaseToTitleCase(turns.user2[idx].card_name)}
 								{:else}
@@ -149,7 +149,7 @@
 						{/if}
 
 						<Table.Cell class="flex flex-col">
-							<span class="text-base md:text-lg font-jost-medium">
+							<span class="text-sm sm:text-base md:text-lg font-jost-medium">
 								{#if turns.user1 && turns.user1[idx].card_name}
 									{snakeCaseToTitleCase(turns.user1[idx].card_name)}
 								{:else}

@@ -7,6 +7,7 @@
 	import type { ActionData } from './$types';
 	import { enhance as formEnhance } from '$app/forms';
 	import { LogIn } from 'lucide-svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let form: SuperValidated<typeof LoginSchema>;
 	export let formAction: ActionData;
@@ -21,7 +22,6 @@
 		method="POST"
 		action="?/login"
 		class="space-y-4"
-		use:enhance
 		use:formEnhance={() => {
 			console.log('Logging in...');
 			requestStatus = {
@@ -32,6 +32,7 @@
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus.type = 'success';
+					invalidateAll();
 				} else {
 					console.error('Error');
 					requestStatus = {
@@ -98,6 +99,11 @@
 				Don't have an account yet?
 
 				<a href="/register" class="hover:underline font-jost-semibold text-primary"> Register. </a>
+			</p>
+			<p class="mt-4 text-center">
+				<a href="/recover" class="hover:underline font-jost-medium text-primary">
+					I forgot my password.
+				</a>
 			</p>
 		</div>
 	</form>

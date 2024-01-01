@@ -38,10 +38,10 @@
 	}}
 	closeOnOutsideClick={false}
 >
-	<Dialog.Content class="max-w-6xl">
+	<Dialog.Content class="max-w-6xl z-[250] overflow-y-auto max-h-[90svh]">
 		<Dialog.Header>
 			<Dialog.Title class="text-2xl">Card Battle</Dialog.Title>
-			<!-- <Dialog.Description class="text-base">See how the match went</Dialog.Description> -->
+			<!-- <Dialog.Description class="text-sm sm:text-base">See how the match went</Dialog.Description> -->
 		</Dialog.Header>
 
 		{#if $page.state.selected}
@@ -68,7 +68,7 @@
 				<Tabs.Content value="arnis">
 					<Table.Root>
 						<Table.Header>
-							<Table.Row class="text-base md:text-lg">
+							<Table.Row class="text-sm sm:text-base md:text-lg">
 								<Table.Head>Opponent</Table.Head>
 								<Table.Head>Skill</Table.Head>
 								<Table.Head>Footwork</Table.Head>
@@ -76,8 +76,8 @@
 						</Table.Header>
 						<Table.Body>
 							{#each matches as match (match.id)}
-								<Table.Row class="text-base md:text-lg">
-									<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
+								<Table.Row class="text-sm sm:text-base md:text-lg">
+									<Table.Cell class="w-1/3">{getOpponent(userId, match).name}</Table.Cell>
 									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
 									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
 									>
@@ -90,7 +90,7 @@
 				<Tabs.Content value="card_battle">
 					<Table.Root>
 						<Table.Header>
-							<Table.Row class="text-base md:text-lg">
+							<Table.Row class="text-sm sm:text-base md:text-lg">
 								<Table.Head>Opponent</Table.Head>
 								<Table.Head>DMG Dealt</Table.Head>
 								<Table.Head>DMG Taken</Table.Head>
@@ -103,9 +103,15 @@
 									href={`/card-battle/${match.id}`}
 									on:click|preventDefault={(e) => showModal(e, match)}
 								>
-									<Table.Row class="text-base md:text-lg">
-										<Table.Cell class="w-1/2">{getOpponent(userId, match).name}</Table.Cell>
-										<Table.Cell class="w-1/4">
+									<Table.Row class="text-sm sm:text-base md:text-lg">
+										<Table.Cell class="w-1/3">{getOpponent(userId, match).name}</Table.Cell>
+										<Table.Cell
+											class={`w-1/4 ${
+												match.user1_total_damage
+													? 'text-foreground'
+													: 'text-muted-foreground italic'
+											}`}
+										>
 											{#if match.og_user1_id === userId}
 												{match.user1_total_damage}
 											{:else}

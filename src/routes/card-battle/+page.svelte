@@ -79,12 +79,16 @@
 		timerInterval = setInterval(() => {
 			const currentTime = new Date().getTime();
 			const deadline = new Date(data.matchDate.card_deadline).getTime();
-			difference = deadline - currentTime;
+
+			// Add UTC+8 offset
+			const asiaPacificDate = new Date(deadline - 8 * 60 * 60 * 1000).getTime();
+
+			difference = asiaPacificDate - currentTime;
 
 			console.log(difference);
 
 			console.log(formatTime(new Date(currentTime)));
-			console.log(formatTime(new Date(deadline)));
+			console.log(formatTime(new Date(asiaPacificDate)));
 
 			remainingTime.hours = Math.floor(difference / (1000 * 60 * 60));
 			remainingTime.minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));

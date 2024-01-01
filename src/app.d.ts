@@ -11,6 +11,7 @@ declare global {
 			user_id: string | undefined;
 			supabase: SupabaseClient;
 			getSession: () => Promise<Session | null>;
+			getUserData: () => Promise<User | undefined>;
 		}
 		// interface PageData {}
 		interface PageState {

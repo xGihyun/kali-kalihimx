@@ -1,18 +1,22 @@
 <script lang="ts">
 	// @ts-nocheck
 	import type { Section, User } from '$lib/types';
-	import { addTableFilter, addColumnFilters } from 'svelte-headless-table/plugins';
+	import { addTableFilter, addColumnFilters, addSelectedRows } from 'svelte-headless-table/plugins';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { get, readable } from 'svelte/store';
 	import * as Table from '$lib/components/ui/table';
-	import { UserTableSectionCell, UserTableToolbar } from '.';
+	import { UserTableSectionCell, UserTableToolbar, UserTableCheckbox } from '.';
 	import { Button } from '$lib/components/ui/button';
+	import { DeleteSectionsSchema } from '$lib/schemas';
+	import type { SuperValidated } from 'sveltekit-superforms';
 
 	export let users: User[];
 	export let sections: Section[];
 	export let total: number;
 	export let skip: number;
 	export let filteredSections: string | null;
+	export let form: SuperValidated<typeof DeleteSectionsSchema>;
+	export let currentUser: User | undefined;
 
 	$: pageSize = 5;
 	$: currentPage = skip / pageSize;
@@ -24,10 +28,33 @@
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		}),
-		colFilter: addColumnFilters()
+		colFilter: addColumnFilters(),
+		select: addSelectedRows()
 	});
 
 	const columns = table.createColumns([
+		table.column({
+			accessor: 'id',
+			header: (_, { pluginStates }) => {
+				const { allPageRowsSelected } = pluginStates.select;
+				return createRender(UserTableCheckbox, {
+					checked: allPageRowsSelected
+				});
+			},
+			cell: ({ row }, { pluginStates }) => {
+				const { getRowState } = pluginStates.select;
+				const { isSelected } = getRowState(row);
+
+				return createRender(UserTableCheckbox, {
+					checked: isSelected
+				});
+			},
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
+		}),
 		table.column({
 			accessor: ({ first_name, last_name }) => `${first_name} ${last_name}`,
 			header: 'Name',
@@ -73,13 +100,15 @@
 		})
 	]);
 
-	const tableModel = table.createViewModel(columns);
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
-	// const { hasNextPage, hasPreviousPage } = pluginStates.page;
+	const tableModel = table.createViewModel(
+		currentUser.role === 'admin' ? columns : columns.slice(1)
+	);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } = tableModel;
+	const selectedDataIds = currentUser.role === 'admin' ? pluginStates.select.selectedDataIds : null;
 </script>
 
 <div class="space-y-4">
-	<UserTableToolbar {tableModel} {sections} />
+	<UserTableToolbar {tableModel} {sections} {form} {selectedDataIds} {users} {currentUser} />
 
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
@@ -125,26 +154,38 @@
 		</Table.Root>
 	</div>
 
-	<div class="flex items-center justify-end space-x-2 py-4">
-		<Button
-			variant="outline"
-			size="sm"
-			on:click={() => {
-				currentPage -= 1;
-			}}
-			disabled={hasPreviousPage || filteredSections}
+	<div class="flex items-center justify-between">
+		{#if currentUser.role === 'admin'}
+			<div class="flex-1 text-sm text-muted-foreground">
+				{Object.keys($selectedDataIds).length} of{' '}
+				{$rows.length} row(s) selected.
+			</div>
+		{/if}
+		<div
+			class={`flex items-center justify-end space-x-2 py-4 ${
+				currentUser.role !== 'admin' ? 'w-full' : 'w-auto'
+			}`}
 		>
-			<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Previous</a>
-		</Button>
-		<Button
-			variant="outline"
-			size="sm"
-			disabled={hasNextPage || filteredSections}
-			on:click={() => {
-				currentPage += 1;
-			}}
-		>
-			<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Next</a>
-		</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				on:click={() => {
+					currentPage -= 1;
+				}}
+				disabled={hasPreviousPage || filteredSections}
+			>
+				<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Previous</a>
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				disabled={hasNextPage || filteredSections}
+				on:click={() => {
+					currentPage += 1;
+				}}
+			>
+				<a href={`/leaderboards?limit=${pageSize}&skip=${pageSize * currentPage}`}>Next</a>
+			</Button>
+		</div>
 	</div>
 </div>

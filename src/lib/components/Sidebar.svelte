@@ -6,26 +6,41 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
 	import { ChevronRight } from 'radix-icons-svelte';
+	import { page } from '$app/stores';
 
 	export let user: User;
 
 	const initials = (user.first_name[0] + user.last_name[0]).toUpperCase();
 
 	let isOpen = false;
+
+	$: isSelectedRoute = (path: string) => {
+		const currentPath = $page.url.pathname;
+
+		if (currentPath.length === 1 && path === '/') return true;
+
+		const isSelected = currentPath.startsWith(path) && path !== '/';
+
+		return isSelected;
+	};
 </script>
 
+{#if isOpen}
+	<div class="bg-background/10 fixed top-0 left-0 w-full h-full backdrop-blur z-[90]"></div>
+{/if}
+
 <aside
-	class={`w-72 bg-background h-full text-base md:text-lg fixed top-0 left-0 z-[500] transition-transform duration-300 lg:translate-x-0 ease-in-out ${
+	class={`w-72 bg-background h-full text-base md:text-lg fixed top-0 left-0 z-[100] transition-transform duration-300 lg:translate-x-0 ease-in-out border-r ${
 		isOpen ? 'translate-x-0' : '-translate-x-72'
 	}`}
 >
 	<div class="relative flex flex-col justify-between h-full p-4">
 		<button
-			class="fixed top-1/2 -translate-y-1/2 -right-8 w-10 h-10 bg-primary flex items-center justify-center rounded-r-full lg:hidden"
+			class="fixed top-1/2 -translate-y-1/2 -right-10 w-10 h-16 bg-secondary flex items-center justify-center rounded-r-full lg:hidden shadow-dark"
 			on:click={() => (isOpen = !isOpen)}
 		>
 			<ChevronRight
-				class={`w-8 h-8 text-primary-foreground transition-transform duration-300 ease-in-out ${
+				class={`w-10 h-10 text-primary transition-transform duration-300 ease-in-out ${
 					isOpen ? 'rotate-180' : 'rotate-0'
 				}`}
 			/>
@@ -37,7 +52,12 @@
 			</a>
 
 			{#each USER_ROUTES as route, idx (idx)}
-				<a href={route.path} class="w-full flex gap-2 items-center p-4">
+				<a
+					href={route.path}
+					class={`w-full flex gap-2 items-center p-4 hover:bg-secondary transition-[background-color] duration-300 rounded-md ${
+						isSelectedRoute(route.path) ? 'text-red-500' : ''
+					}`}
+				>
 					<svelte:component this={route.icon} styles="w-6 h-6" />
 					<span>{route.name}</span>
 				</a>
@@ -45,7 +65,12 @@
 
 			{#if user.role === 'admin'}
 				{#each ADMIN_ROUTES as route, idx (idx)}
-					<a href={route.path} class="w-full flex gap-2 items-center p-4">
+					<a
+						href={route.path}
+						class={`w-full flex gap-2 items-center p-4 hover:bg-secondary transition-[background-color] duration-300 rounded-md ${
+							isSelectedRoute(route.path) ? 'text-red-500' : ''
+						}`}
+					>
 						<svelte:component this={route.icon} styles="w-6 h-6" />
 						<span>{route.name}</span>
 					</a>
@@ -65,7 +90,7 @@
 					</div>
 				</Button>
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-64 z-[600]">
+			<DropdownMenu.Content class="w-64 z-[200]">
 				<DropdownMenu.Group>
 					<DropdownMenu.Item>
 						<form action="/logout" method="post" class="w-full">

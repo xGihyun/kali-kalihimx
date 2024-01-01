@@ -1,9 +1,11 @@
 import type { LayoutServerLoad } from './$types';
-import type { User } from '$lib/types';
-import { BACKEND_URL } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 
-export const load: LayoutServerLoad = async ({ locals: { getSession }, depends, fetch, url }) => {
+export const load: LayoutServerLoad = async ({
+	locals: { getSession, getUserData },
+	depends,
+	url
+}) => {
 	// User session
 	const session = await getSession();
 
@@ -18,12 +20,7 @@ export const load: LayoutServerLoad = async ({ locals: { getSession }, depends, 
 		};
 	}
 
-	// User data
-	const response = await fetch(`${BACKEND_URL}/users/${session?.user.id}`, {
-		method: 'GET'
-	});
-
-	const user: User = await response.json();
+	const user = await getUserData();
 
 	depends('user:images');
 

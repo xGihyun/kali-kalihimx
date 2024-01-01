@@ -41,7 +41,7 @@ export const DELETE: RequestHandler = async ({ fetch, request }) => {
 
 	const response = await fetch(`${BACKEND_URL}/sections`, {
 		method: 'DELETE',
-		body: JSON.stringify(data),
+		body: JSON.stringify([...data]),
 		headers: {
 			'Content-Type': 'application/json'
 		}

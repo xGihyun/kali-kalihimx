@@ -167,7 +167,7 @@ async function activatePowerCard(
 ) {
 	console.log('Activating power card...');
 
-	const response = await fetch(`${BACKEND_URL}/power_cards/${payload.card_id}`, {
+	const response = await fetch(`${BACKEND_URL}/power_cards/${card_id}`, {
 		method: 'PATCH',
 		body: JSON.stringify(payload),
 		headers: {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
-	import { UserTableFilter } from '.';
+	import { UserTableFilter, UserTableForm } from '.';
 	import { Button } from '$lib/components/ui/button';
 	import type { Writable } from 'svelte/store';
 	import type { Section, User } from '$lib/types';
@@ -10,9 +10,15 @@
 	import type { TableViewModel } from 'svelte-headless-table/lib/createViewModel';
 	import { selectedSections } from '$lib/stores';
 	import { ArrowDownWideNarrow, FilterX } from 'lucide-svelte';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { DeleteSectionsSchema } from '$lib/schemas';
 
 	export let sections: Section[] = [];
 	export let tableModel: TableViewModel<User, AnyPlugins>;
+	export let form: SuperValidated<typeof DeleteSectionsSchema>;
+	export let selectedDataIds: any;
+	export let users: User[];
+	export let currentUser: User | undefined;
 
 	const { pluginStates } = tableModel;
 	const {
@@ -59,20 +65,26 @@
 		{/if}
 	</div>
 
-	<Button class="h-auto p-0" disabled={!$selectedSections && !isFiltered}>
-		{#if isFiltered && !$selectedSections}
-			<a href={`/leaderboards`} class="flex items-center gap-1 px-3 py-2">
-				<FilterX class="h-5 w-5" />
-				<span class="text-base md:text-lg"> Remove Filter </span>
-			</a>
-		{:else}
-			<a
-				href={`/leaderboards?sections=${$selectedSections}`}
-				class="flex items-center gap-1 px-3 py-2"
-			>
-				<ArrowDownWideNarrow class="h-5 w-5" />
-				<span class="text-base md:text-lg"> Filter by Section </span>
-			</a>
+	<div class="flex items-center gap-2">
+		{#if currentUser?.role === 'admin'}
+			<UserTableForm {form} {selectedDataIds} {users} />
 		{/if}
-	</Button>
+
+		<Button class="h-auto p-0" disabled={!$selectedSections && !isFiltered}>
+			{#if isFiltered && !$selectedSections}
+				<a href={`/leaderboards`} class="flex items-center gap-1 px-3 py-2">
+					<FilterX class="h-5 w-5" />
+					<span class="text-base md:text-lg"> Remove Filter </span>
+				</a>
+			{:else}
+				<a
+					href={`/leaderboards?sections=${$selectedSections}`}
+					class="flex items-center gap-1 px-3 py-2"
+				>
+					<ArrowDownWideNarrow class="h-5 w-5" />
+					<span class="text-base md:text-lg"> Filter by Section </span>
+				</a>
+			{/if}
+		</Button>
+	</div>
 </div>

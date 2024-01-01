@@ -41,7 +41,7 @@
 		{@const initials = (
 			opponentDetails?.first_name[0] + opponentDetails?.last_name[0]
 		).toUpperCase()}
-		<Card.Content class="px-0 flex flex-col sm:flex-row w-full relative flex-wrap">
+		<Card.Content class="px-0 flex flex-col w-full relative ">
 			<div class="relative px-6 py-6 flex-1">
 				{#if opponentDetails.banner_url}
 					<img
@@ -76,22 +76,24 @@
 				</div>
 			</div>
 
-			<div class="px-6 py-6 flex-1 flex items-center relative z-20">
-				<div class="flex items-start gap-10">
-					<div class="flex flex-col">
+			<div class="grid grid-cols-2 px-6 py-6 gap-2">
+				<Card.Root class="px-3 py-2 bg-background flex items-center border-border/75">
+					<Card.Content class="p-0">
 						<h4 class="text-muted-foreground text-sm md:text-base">Skill</h4>
-						<span class="text-xl md:text-2xl font-jost-medium"
+						<span class="text-base sm:text-xl md:text-2xl font-jost-medium"
 							>{snakeCaseToTitleCase(match.arnis_skill)}</span
 						>
-					</div>
+					</Card.Content>
+				</Card.Root>
 
-					<div class="flex flex-col">
+				<Card.Root class="px-3 py-2 bg-background flex items-center border-border/75">
+					<Card.Content class="p-0">
 						<h4 class="text-muted-foreground text-sm md:text-base">Footwork</h4>
-						<span class="text-xl md:text-2xl font-jost-medium"
+						<span class="text-base sm:text-xl md:text-2xl font-jost-medium"
 							>{snakeCaseToTitleCase(match.arnis_footwork)}</span
 						>
-					</div>
-				</div>
+					</Card.Content>
+				</Card.Root>
 			</div>
 		</Card.Content>
 	{:else}

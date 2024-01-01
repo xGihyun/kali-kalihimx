@@ -98,6 +98,7 @@
 		}
 
 		invalidate('sections:table');
+		sections = sections;
 
 		addStatus.type = 'success';
 
@@ -117,15 +118,13 @@
 			sectionsToDelete.push(sections[i].id);
 		});
 
-		const q = sectionsToDelete.join(',');
-
-		console.log(q);
+		// const q = sectionsToDelete.join(',');
+		//
+		// console.log(q);
 
 		const response = await fetch('/api/sections', {
 			method: 'DELETE',
-			body: JSON.stringify({
-				sections: q
-			}),
+			body: JSON.stringify(sectionsToDelete),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -137,6 +136,12 @@
 
 			return;
 		}
+
+		sections.filter((section) => !sectionsToDelete.includes(section.id));
+		sections = sections;
+
+		console.log(sectionsToDelete);
+		console.log(sections);
 
 		invalidate('sections:table');
 

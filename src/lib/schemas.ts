@@ -78,3 +78,12 @@ export const SectionSchema = z.object({
 	name: z.string(),
 	user_limit: z.coerce.number()
 });
+
+export const DeleteSectionsSchema = z.object({
+	sections: z.string().array(),
+	force: z.coerce.boolean()
+});
+
+export const ResetPasswordSchema = z.object({
+	email: z.string().email()
+});

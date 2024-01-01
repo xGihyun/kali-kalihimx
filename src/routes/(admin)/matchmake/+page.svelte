@@ -10,7 +10,7 @@
 <h1 class="font-jost-bold text-6xl mb-10">Matchmake</h1>
 
 <div class="mb-5">
-	<MatchmakeForm form={data.form} sections={data.sections} />
+	<MatchmakeForm form={data.form} sections={data.sections} formAction={form} />
 </div>
 
 {#if form?.success && form.result}

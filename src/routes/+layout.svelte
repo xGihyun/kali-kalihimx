@@ -26,13 +26,13 @@
 </script>
 
 <div class="flex min-h-[100svh]">
-	{#if data.user}
+	{#if data.user && !$page.route.id?.startsWith('/(auth)')}
 		<Sidebar user={data.user} />
 	{/if}
 
 	<main
 		class={`flex-1 ml-0 px-[5%] py-10 ${
-			$page.url.pathname === '/login' || $page.url.pathname === '/register' ? 'lg:ml-0' : 'lg:ml-72'
+			$page.route.id?.startsWith('/(auth)') || !session || !data.user ? 'lg:ml-0' : 'lg:ml-72'
 		}`}
 	>
 		<div

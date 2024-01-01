@@ -23,10 +23,12 @@
 	</div>
 {:then foo}
 	<UserTable
+		form={data.form}
 		users={foo[0]}
 		sections={foo[1]}
 		total={foo[2]}
 		skip={data.skip}
 		filteredSections={data.filteredSections}
+		currentUser={data.user}
 	/>
 {/await}
