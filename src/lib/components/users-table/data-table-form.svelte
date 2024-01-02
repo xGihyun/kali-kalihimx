@@ -6,8 +6,6 @@
 	import { DeleteSectionsSchema } from '$lib/schemas';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { Trash2 } from 'lucide-svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 
@@ -26,7 +24,7 @@
 	<form
 		method="POST"
 		action="?/delete"
-		class="space-y-4"
+		class="flex items-center gap-5"
 		use:enhancer={({ formData }) => {
 			console.log('Deleting...');
 			requestStatus = {
@@ -52,8 +50,11 @@
 
 			return async ({ result }) => {
 				if (result.type === 'success' || result.type === 'redirect') {
-					console.log('Successfully registered.');
+					console.log('Successfully deleted.');
 					requestStatus.type = 'success';
+
+					users.filter((section) => !usersToDelete.includes(section.id));
+					users = users;
 				} else {
 					console.error('Error');
 					requestStatus = {
@@ -76,9 +77,9 @@
 		</div>
 
 		<Form.Button
-			disabled={Object.keys($selectedDataIds).length < 1}
+			disabled={Object.keys($selectedDataIds).length < 1 || requestStatus.type === 'pending'}
 			variant="destructive"
-			class={`text-base md:text-lg h-auto  ${
+			class={`text-sm sm:text-base md:text-lg h-auto  ${
 				requestStatus.type === 'success'
 					? 'bg-green-500 pointer-events-none text-primary-foreground'
 					: requestStatus.type === 'error'
@@ -91,16 +92,16 @@
 			<div class="flex items-center gap-1">
 				{#if requestStatus.type === 'pending'}
 					<Reload class="h-5 w-5 animate-spin" />
-					<span class="text-base md:text-lg">Deleting...</span>
+					<span class="text-sm sm:text-base md:text-lg">Deleting...</span>
 				{:else if requestStatus.type === 'success'}
 					<CheckCircled class="h-5 w-5" />
-					<span class="text-base md:text-lg">Success</span>
+					<span class="text-sm sm:text-base md:text-lg">Success</span>
 				{:else if requestStatus.type === 'error'}
 					<CrossCircled class="h-5 w-5" />
-					<span class="text-base md:text-lg"> Error </span>
+					<span class="text-sm sm:text-base md:text-lg"> Error </span>
 				{:else}
 					<Trash2 class="h-5 w-5" />
-					<span class="text-base md:text-lg">Delete</span>
+					<span class="text-sm sm:text-base md:text-lg">Delete</span>
 				{/if}
 			</div>
 		</Form.Button>

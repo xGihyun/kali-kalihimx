@@ -14,8 +14,6 @@
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
-
-	console.log(currentUserData);
 </script>
 
 <Form.Root method="POST" {form} schema={UpdateUserSchema} let:attrs let:config let:enhance>

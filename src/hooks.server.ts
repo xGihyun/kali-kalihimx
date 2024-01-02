@@ -51,6 +51,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 			redirect(307, '/');
 		}
 
+		if (event.route.id?.startsWith('/(auth)/(supabase)')) {
+			console.log('Please log out first.');
+			redirect(307, '/');
+		}
+
 		if (event.url.pathname === '/register') {
 			console.log('User session available');
 			redirect(302, '/');

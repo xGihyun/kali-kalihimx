@@ -158,6 +158,7 @@ export type RequestStatus = {
 export type Video = {
 	title: string;
 	url: string;
+	image?: string;
 };
 
 export type ArnisMatch = z.infer<typeof arnisMatchSchema>;

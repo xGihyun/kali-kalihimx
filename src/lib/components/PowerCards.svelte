@@ -13,13 +13,15 @@
 	export let powerCards: PowerCard[] = [];
 	export let isCurrentUser: boolean = false;
 	export let user: User | undefined;
-	export let matches: Matchmake[];
+	export let matches: Matchmake[] = [];
 
 	let selectedUser: string | undefined;
 	let selectedCard: string | undefined;
 	let selectedSkill: string | undefined;
 
 	let loadingStatus = Array.from({ length: powerCards.length }).fill('none') as LoadingStatus[];
+
+	$: hasNoCurrentMatch = (matches.length > 0 && matches[0].status === 'done') || matches.length < 1;
 
 	async function getUsersInSection(): Promise<User[] | undefined> {
 		if (!user) return;
@@ -59,6 +61,13 @@
 			</div>
 		</Card.Title>
 	</Card.Header>
+
+	{#if hasNoCurrentMatch && isCurrentUser}
+		<p class="text-muted-foreground italic col-span-2 px-6 pb-6">
+			Please wait for the admin to queue a new match.
+		</p>
+	{/if}
+
 	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-4">
 		{#if user && user.is_private && !isCurrentUser}
 			<p class="text-muted-foreground italic">Power cards are hidden...</p>
@@ -68,12 +77,12 @@
 
 				{#if isCurrentUser}
 					<Dialog.Root closeOnOutsideClick={false}>
-						<Dialog.Trigger disabled={card.is_used || card.is_active}>
+						<Dialog.Trigger disabled={card.is_used || card.is_active || hasNoCurrentMatch}>
 							<img
 								src={powerCardDetails?.image_url}
 								alt={card.name}
 								class={`w-full ${
-									card.is_used
+									card.is_used || hasNoCurrentMatch
 										? 'brightness-[.30]'
 										: card.is_active
 											? 'animate-pulse'
@@ -219,7 +228,7 @@
 														? 'bg-yellow-500 pointer-events-none'
 														: 'bg-primary'
 										}`}
-										disabled={card.is_active || card.is_used}
+										disabled={card.is_active || card.is_used || hasNoCurrentMatch}
 									>
 										<div class="flex items-center gap-1">
 											{#if loadingStatus[idx] === 'pending'}

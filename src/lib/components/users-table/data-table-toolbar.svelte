@@ -40,11 +40,11 @@
 	$: isFiltered = window.location.search.includes('section');
 </script>
 
-<div class="flex items-center justify-between">
+<div class="flex items-start sm:items-center justify-between gap-5 flex-col sm:flex-row">
 	<div class="flex flex-1 items-center gap-2">
 		<Input
 			placeholder="Filter users..."
-			class="w-40 lg:w-60 text-base md:text-lg px-3 py-2 h-auto"
+			class="w-40 lg:w-60 text-sm sm:text-base md:text-lg px-3 py-2 h-auto"
 			type="text"
 			bind:value={$filterValue}
 		/>
@@ -74,7 +74,7 @@
 			{#if isFiltered && !$selectedSections}
 				<a href={`/leaderboards`} class="flex items-center gap-1 px-3 py-2">
 					<FilterX class="h-5 w-5" />
-					<span class="text-base md:text-lg"> Remove Filter </span>
+					<span class="text-sm sm:text-base md:text-lg"> Remove Filter </span>
 				</a>
 			{:else}
 				<a
@@ -82,7 +82,7 @@
 					class="flex items-center gap-1 px-3 py-2"
 				>
 					<ArrowDownWideNarrow class="h-5 w-5" />
-					<span class="text-base md:text-lg"> Filter by Section </span>
+					<span class="text-sm sm:text-base md:text-lg"> Filter </span>
 				</a>
 			{/if}
 		</Button>

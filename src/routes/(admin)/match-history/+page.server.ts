@@ -132,11 +132,12 @@ async function updateMatchStatus(
 	status: 'pending' | 'done'
 ) {
 	console.log('Updating status...');
+	console.log(match_set_id);
+	console.log(status);
 
-	const response = await fetch(`${BACKEND_URL}/matches/update`, {
-		method: 'POST',
+	const response = await fetch(`${BACKEND_URL}/matches/${match_set_id}`, {
+		method: 'PATCH',
 		body: JSON.stringify({
-			match_set_id,
 			status
 		}),
 		headers: {

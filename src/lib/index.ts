@@ -8,47 +8,64 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
-import { UsersRound } from 'lucide-svelte';
+import { Forward, Swords, UsersRound } from 'lucide-svelte';
+import { CardStack } from 'radix-icons-svelte';
+import {
+	Blocks,
+	Footwork,
+	ForwardSinawali,
+	SidewardSinawali,
+	Strikes
+} from './assets/images/thumbnails';
 
 export const ARNIS_STRIKES_VIDEOS: Video[] = [
 	{
 		title: 'Strikes',
-		url: 'https://youtu.be/9ImJFGii6lg'
+		url: 'https://youtu.be/9ImJFGii6lg',
+		image: Strikes
 	},
 	{
 		title: 'Blocks',
-		url: 'https://youtu.be/vsTbagtEiyA'
+		url: 'https://youtu.be/vsTbagtEiyA',
+		image: Blocks
 	},
 	{
 		title: 'Forward Sinawali',
-		url: 'https://youtu.be/0VTyA7fAoNg'
+		url: 'https://youtu.be/0VTyA7fAoNg',
+		image: ForwardSinawali
 	},
 	{
 		title: 'Sideward Sinawali',
-		url: 'https://youtu.be/GbHiKTmVgJw?t=85'
+		url: 'https://youtu.be/GbHiKTmVgJw?t=85',
+		image: SidewardSinawali
 	},
 	{
 		title: 'Reverse Sinawali',
-		url: 'https://youtu.be/GbHiKTmVgJw?t=343'
+		url: 'https://youtu.be/GbHiKTmVgJw?t=343',
+		image: SidewardSinawali
 	}
 ];
 
 export const ARNIS_FOOTWORKS_VIDEOS: Video[] = [
 	{
 		title: 'Caballero',
-		url: 'https://youtu.be/jrXYbouUFR8?t=312'
+		url: 'https://youtu.be/jrXYbouUFR8?t=312',
+		image: Footwork
 	},
 	{
 		title: 'Triangle',
-		url: 'https://youtu.be/jrXYbouUFR8?t=457'
+		url: 'https://youtu.be/jrXYbouUFR8?t=457',
+		image: Footwork
 	},
 	{
 		title: 'Reversed Triangle',
-		url: 'https://youtu.be/jrXYbouUFR8?t=591'
+		url: 'https://youtu.be/jrXYbouUFR8?t=591',
+		image: Footwork
 	},
 	{
 		title: 'Star Reach',
-		url: 'https://youtu.be/jrXYbouUFR8?t=694'
+		url: 'https://youtu.be/jrXYbouUFR8?t=694',
+		image: Footwork
 	}
 ];
 
@@ -66,7 +83,7 @@ export const ADMIN_ROUTES: Navigation = [
 	{
 		name: 'Matchmake',
 		path: '/matchmake',
-		icon: ArrowClockwise
+		icon: Swords
 	},
 	{
 		name: 'Match History',
@@ -104,7 +121,7 @@ export const USER_ROUTES: Navigation = [
 	{
 		name: 'Card Battle',
 		path: '/card-battle',
-		icon: Sword
+		icon: CardStack
 	}
 ];
 

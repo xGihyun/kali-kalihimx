@@ -46,11 +46,14 @@ export const load: PageServerLoad = async ({ fetch, params, locals, setHeaders }
 		return sections;
 	};
 
+	const userData = Promise.all([getUser(), getPowerCards()]);
+
 	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 5}, proxy-revalidate` });
 
 	return {
-		userOnPage: getUser(),
-		powerCards: getPowerCards(),
+		lazy: {
+			userData
+		},
 		currentUserId: current_user_id,
 		form: await superValidate(UpdateUserSchema),
 		sections: getSections()

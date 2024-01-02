@@ -85,11 +85,6 @@
 
 			difference = asiaPacificDate - currentTime;
 
-			console.log(difference);
-
-			console.log(formatTime(new Date(currentTime)));
-			console.log(formatTime(new Date(asiaPacificDate)));
-
 			remainingTime.hours = Math.floor(difference / (1000 * 60 * 60));
 			remainingTime.minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
 			remainingTime.seconds = Math.floor((difference % (1000 * 60)) / 1000);

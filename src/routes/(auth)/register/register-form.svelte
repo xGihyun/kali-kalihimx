@@ -15,6 +15,13 @@
 	};
 </script>
 
+<div class="mb-5">
+	<h1 class="text-2xl font-jost-bold text-center">Create an account</h1>
+	<p class="text-sm sm:text-base text-center text-muted-foreground">
+		Enter the necessary details below.
+	</p>
+</div>
+
 <Form.Root {form} schema={RegisterSchema} let:config let:attrs>
 	<form
 		method="POST"

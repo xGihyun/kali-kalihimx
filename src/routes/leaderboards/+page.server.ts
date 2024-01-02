@@ -7,13 +7,13 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { DeleteSectionsSchema } from '$lib/schemas';
 
 export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
-	const limit = url.searchParams.get('limit') || 5;
+	const limit = url.searchParams.get('limit') || 50;
 	const skip = Number(url.searchParams.get('skip')) || 0;
 	const sections = url.searchParams.get('sections');
 
 	const getUsers = async () => {
 		const response = await fetch(
-			`${BACKEND_URL}/users?order_by=score&order=desc&skip=${skip}${
+			`${BACKEND_URL}/users?order_by=score&order=desc&skip=${skip}&fields=first_name,last_name,id,score,section,sex,rank_overall,rank_section${
 				sections ? `&section=${sections}` : `&limit=${limit}`
 			}`,
 			{

@@ -26,11 +26,11 @@
 </script>
 
 {#if isOpen}
-	<div class="bg-background/10 fixed top-0 left-0 w-full h-full backdrop-blur z-[90]"></div>
+	<div class="bg-background/10 fixed top-0 left-0 w-full h-full backdrop-blur-sm z-[90]"></div>
 {/if}
 
 <aside
-	class={`w-72 bg-background h-full text-base md:text-lg fixed top-0 left-0 z-[100] transition-transform duration-300 lg:translate-x-0 ease-in-out border-r ${
+	class={`w-72 bg-background h-full max-h-[100svh] text-base md:text-lg fixed top-0 left-0 z-[100] transition-transform duration-300 lg:translate-x-0 ease-in-out border-r ${
 		isOpen ? 'translate-x-0' : '-translate-x-72'
 	}`}
 >

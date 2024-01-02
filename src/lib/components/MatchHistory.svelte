@@ -55,7 +55,7 @@
 		<Card.Title class="text-2xl md:text-4xl font-normal font-jost-bold">Match History</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		{#if matches.length < 2}
+		{#if matches.length < 1}
 			<p class="text-muted-foreground italic">
 				History is empty. You will see your previous matches here.
 			</p>
@@ -76,12 +76,15 @@
 						</Table.Header>
 						<Table.Body>
 							{#each matches as match (match.id)}
-								<Table.Row class="text-sm sm:text-base md:text-lg">
-									<Table.Cell class="w-1/3">{getOpponent(userId, match).name}</Table.Cell>
-									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
-									<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
-									>
-								</Table.Row>
+								{#if match.status === 'done'}
+									<Table.Row class="text-sm sm:text-base md:text-lg">
+										<Table.Cell class="w-1/3">{getOpponent(userId, match).name}</Table.Cell>
+										<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
+										<Table.Cell class="w-1/4"
+											>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
+										>
+									</Table.Row>
+								{/if}
 							{/each}
 						</Table.Body>
 					</Table.Root>

@@ -17,7 +17,14 @@
 	};
 </script>
 
-<Form.Root {form} asChild schema={LoginSchema} let:config let:enhance>
+<div class="mb-5">
+	<h1 class="text-2xl font-jost-bold text-center">Welcome back!</h1>
+	<p class="text-sm sm:text-base text-center text-muted-foreground">
+		Enter your email and password below.
+	</p>
+</div>
+
+<Form.Root {form} asChild schema={LoginSchema} let:config>
 	<form
 		method="POST"
 		action="?/login"
@@ -82,7 +89,7 @@
 						<span class="text-base md:text-lg">Logging in...</span>
 					{:else if requestStatus.type === 'success'}
 						<CheckCircled class="h-5 w-5" />
-						<span class="text-base md:text-lg">Success</span>
+						<span class="text-base md:text-lg">Success! Redirecting...</span>
 					{:else if requestStatus.type === 'error'}
 						<CrossCircled class="h-5 w-5" />
 						<span class="text-base md:text-lg">

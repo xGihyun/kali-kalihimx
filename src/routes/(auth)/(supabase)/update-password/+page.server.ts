@@ -1,9 +1,16 @@
-import { fail, type Actions } from '@sveltejs/kit';
+import { fail, type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { LoginSchema } from '$lib/schemas';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+	const code = url.searchParams.get('code');
+
+	if (!code) {
+		console.log('User not verified to reset password.');
+		redirect(307, '/');
+	}
+
 	return {
 		form: await superValidate(LoginSchema)
 	};

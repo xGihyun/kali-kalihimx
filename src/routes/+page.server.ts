@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 
 	depends('user:power_cards');
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${10}, must-revalidate` });
 
 	const data = Promise.all([getPowerCards(), getLatestMatches(), getLatestOpponentDetails()]);
 

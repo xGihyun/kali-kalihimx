@@ -3,7 +3,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import UpdateUserForm from './update-user-form.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import { PenSquare } from 'lucide-svelte';
 
 	export let data;
@@ -11,23 +11,27 @@
 	$: ({ currentUserId } = data);
 </script>
 
-{#await data.userOnPage}
+{#await data.lazy.userData}
 	<Skeleton class="h-96" />
-{:then user}
-	{#if user}
-		<Banner {user} isCurrentUser={user.id === currentUserId} />
-		<UserAvatar {user} isCurrentUser={user.id === currentUserId} />
+	<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+		<Skeleton class="h-80" />
+		<Skeleton class="h-80" />
+	</div>
+{:then userData}
+	{#if userData[0]}
+		<Banner user={userData[0]} isCurrentUser={userData[0].id === currentUserId} />
+		<UserAvatar user={userData[0]} isCurrentUser={userData[0].id === currentUserId} />
 
 		<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
-			<Rank {user} />
+			<Rank user={userData[0]} />
 
-			{#await data.powerCards}
-				<Skeleton class="min-h-20" />
-			{:then powerCards}
-				{#if powerCards}
-					<PowerCards {powerCards} {user} isCurrentUser={user.id === currentUserId} />
-				{/if}
-			{/await}
+			{#if userData[1]}
+				<PowerCards
+					powerCards={userData[1]}
+					user={userData[0]}
+					isCurrentUser={userData[0].id === currentUserId}
+				/>
+			{/if}
 		</div>
 
 		<Dialog.Root closeOnOutsideClick={false}>
@@ -41,7 +45,9 @@
 				<PenSquare class="h-5 w-5" />
 				<span class="text-base md:text-lg"> Edit </span>
 			</Dialog.Trigger>
-			<Dialog.Content class="max-h-[90svh] overflow-y-auto">
+
+			<Dialog.Overlay class="z-[70]" />
+			<Dialog.Content class="max-h-[90svh] overflow-y-auto z-[100]">
 				<Dialog.Header>
 					<Dialog.Title>Edit user information</Dialog.Title>
 					<Dialog.Description>
@@ -52,7 +58,7 @@
 				{#await data.sections}
 					Loading...
 				{:then sections}
-					<UpdateUserForm form={data.form} {sections} currentUserData={user} />
+					<UpdateUserForm form={data.form} {sections} currentUserData={userData[0]} />
 				{/await}
 			</Dialog.Content>
 		</Dialog.Root>

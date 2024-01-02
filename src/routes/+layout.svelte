@@ -25,13 +25,12 @@
 	});
 </script>
 
-<div class="flex min-h-[100svh]">
-	{#if data.user && !$page.route.id?.startsWith('/(auth)')}
-		<Sidebar user={data.user} />
-	{/if}
-
+{#if data.user && !$page.route.id?.startsWith('/(auth)')}
+	<Sidebar user={data.user} />
+{/if}
+<div class="flex min-h-[100svh] relative">
 	<main
-		class={`flex-1 ml-0 px-[5%] py-10 ${
+		class={`flex-1 ml-0 px-[5%] py-10 overflow-y-auto ${
 			$page.route.id?.startsWith('/(auth)') || !session || !data.user ? 'lg:ml-0' : 'lg:ml-72'
 		}`}
 	>
@@ -40,7 +39,7 @@
 				$page.url.pathname === '/' || $page.route.id === '/leaderboards/[user_id]'
 					? 'max-w-none'
 					: 'max-w-5xl'
-			} mx-auto`}
+			} mx-auto h-full`}
 		>
 			<slot />
 		</div>

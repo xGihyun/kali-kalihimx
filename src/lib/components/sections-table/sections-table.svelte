@@ -12,17 +12,18 @@
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { PlusCircle, Trash2 } from 'lucide-svelte';
 	import { invalidate } from '$app/navigation';
+	import { titleCaseToSnakeCase } from '$lib';
 
 	export let sections: Section[];
 
-	const table = createTable(readable(sections), {
+	$: table = createTable(readable(sections), {
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		}),
 		select: addSelectedRows()
 	});
 
-	const columns = table.createColumns([
+	$: columns = table.createColumns([
 		table.column({
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
@@ -59,10 +60,10 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } =
-		table.createViewModel(columns);
-	const { filterValue } = pluginStates.filter;
-	const { selectedDataIds } = pluginStates.select;
+	$: ({ headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } =
+		table.createViewModel(columns));
+	$: ({ filterValue } = pluginStates.filter);
+	$: ({ selectedDataIds } = pluginStates.select);
 
 	// For new sections
 	let sectionName: string;
@@ -97,7 +98,13 @@
 			return;
 		}
 
-		invalidate('sections:table');
+		sections.push({
+			id: titleCaseToSnakeCase(sectionName) || '',
+			name: sectionName,
+			user_limit: userLimit,
+			user_count: 0
+		});
+
 		sections = sections;
 
 		addStatus.type = 'success';
@@ -162,10 +169,11 @@
 
 		<div class="flex items-center gap-2">
 			<Button
+				disabled={Object.keys($selectedDataIds).length < 1 || deleteStatus.type === 'pending'}
 				on:click={deleteSections}
 				variant="destructive"
 				class={` h-auto ${
-					deleteStatus.type === 'success'
+					deleteStatus.type === 'success' && Object.keys($selectedDataIds).length < 1
 						? 'bg-green-500 pointer-events-none'
 						: deleteStatus.type === 'error'
 							? 'bg-red-500 hover:bg-red-600'
@@ -178,11 +186,11 @@
 					{#if deleteStatus.type === 'pending'}
 						<Reload class="h-5 w-5 animate-spin text-primary-foreground" />
 						<span class="text-base md:text-lg">Deleting...</span>
-					{:else if deleteStatus.type === 'success'}
-						<CheckCircled class="h-5 w-5" />
+					{:else if deleteStatus.type === 'success' && Object.keys($selectedDataIds).length < 1}
+						<CheckCircled class="h-5 w-5 text-primary-foreground" />
 						<span class="text-base md:text-lg text-primary-foreground">Success</span>
 					{:else if deleteStatus.type === 'error'}
-						<CrossCircled class="h-5 w-5" />
+						<CrossCircled class="h-5 w-5 text-primary-foreground" />
 						<span class="text-base md:text-lg text-primary-foreground"> Error </span>
 					{:else}
 						<Trash2 class="h-5 w-5" />
@@ -193,7 +201,10 @@
 
 			<Popover.Root>
 				<Popover.Trigger asChild let:builder>
-					<Button builders={[builder]} class="h-auto text-base md:text-lg">New</Button>
+					<Button builders={[builder]} class="h-auto flex gap-1 items-center">
+						<PlusCircle class="w-5 h-5" />
+						<span class="text-base md:text-lg">New</span>
+					</Button>
 				</Popover.Trigger>
 				<Popover.Content class="w-80">
 					<div class="grid gap-4">
@@ -228,6 +239,7 @@
 
 							<Button
 								type="submit"
+								disabled={addStatus.type === 'pending'}
 								class={` h-auto ${
 									addStatus.type === 'success'
 										? 'bg-green-500 pointer-events-none'
@@ -268,7 +280,7 @@
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-									<Table.Head {...attrs}>
+									<Table.Head {...attrs} class="text-base md:text-lg">
 										<Render of={cell.render()} />
 									</Table.Head>
 								</Subscribe>
@@ -280,7 +292,7 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs}>
+						<Table.Row {...rowAttrs} class="text-base md:text-lg">
 							{#each row.cells as cell (cell.id)}
 								{@const section = cell.row.original}
 

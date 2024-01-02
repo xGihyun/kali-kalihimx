@@ -37,7 +37,7 @@
 		<Card.Title class="text-2xl md:text-4xl font-normal font-jost-bold">Upcoming Match</Card.Title>
 	</Card.Header>
 
-	{#if match && opponentDetails}
+	{#if match && opponentDetails && match.status === 'pending'}
 		{@const initials = (
 			opponentDetails?.first_name[0] + opponentDetails?.last_name[0]
 		).toUpperCase()}

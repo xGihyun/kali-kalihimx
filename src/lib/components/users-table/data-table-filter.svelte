@@ -36,24 +36,24 @@
 		<Button
 			builders={[builder]}
 			variant="outline"
-			class="border-dashed text-base md:text-lg px-3 py-2 h-auto"
+			class="border-dashed text-sm sm:text-base md:text-lg px-3 py-2 h-auto"
 		>
 			<PlusCircled class="mr-2 w-4 h-4" />
 			{title}
 
 			{#if filterValues.length > 0}
 				<Separator orientation="vertical" class="mx-2 h-4" />
-				<Badge variant="secondary" class="rounded-sm px-1 font-normal lg:hidden text-sm">
+				<Badge variant="secondary" class="rounded-sm px-1 font-normal lg:hidden text-xs sm:text-sm">
 					{filterValues.length}
 				</Badge>
 				<div class="hidden space-x-1 lg:flex">
 					{#if filterValues.length > 2}
-						<Badge variant="secondary" class="rounded-sm px-1 font-normal text-sm ">
+						<Badge variant="secondary" class="rounded-sm px-1 font-normal text-xs sm:text-sm">
 							{filterValues.length} Selected
 						</Badge>
 					{:else}
 						{#each filterValues as option}
-							<Badge variant="secondary" class="rounded-sm px-1 font-normal text-sm ">
+							<Badge variant="secondary" class="rounded-sm px-1 font-normal text-xs sm:text-sm">
 								{snakeCaseToTitleCase(option)}
 							</Badge>
 						{/each}
@@ -65,7 +65,7 @@
 
 	<Popover.Content class="w-[200px] p-0" align="start" side="bottom">
 		<Command.Root>
-			<Command.Input placeholder={title} class="text-base md:text-lg" />
+			<Command.Input placeholder={title} class="text-sm sm:text-base md:text-lg" />
 			<Command.List>
 				<Command.Empty>No results found.</Command.Empty>
 				<Command.Group>
@@ -86,7 +86,7 @@
 							>
 								<Check class="w-4 h-4" />
 							</div>
-							<span class="text-base md:text-lg">
+							<span class="text-sm sm:text-base md:text-lg">
 								{option.name}
 							</span>
 						</Command.Item>
@@ -95,7 +95,7 @@
 				{#if filterValues.length > 0}
 					<Command.Separator />
 					<Command.Item
-						class="justify-center text-center text-base md:text-lg"
+						class="justify-center text-center text-sm sm:text-base md:text-lg"
 						onSelect={() => {
 							filterValues = [];
 							$selectedSections = '';
