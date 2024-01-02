@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
 
 	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${CACHE_DURATION}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
 
 	return {
 		lazy: {

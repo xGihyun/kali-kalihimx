@@ -76,7 +76,7 @@
 		</Form.Field>
 
 		<Form.Button
-			on:click={() => (requestStatus.type = 'pending')}
+			type="submit"
 			class={`text-base md:text-lg h-auto ${
 				formAction?.success
 					? 'bg-green-500'

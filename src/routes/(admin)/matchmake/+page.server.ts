@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 5}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
 
 	return {
 		sections,
@@ -21,7 +21,10 @@ export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, arnisMatchSchema);
 
+		console.log('Matchmaking...');
+
 		if (!form.valid) {
+			console.log('Invalid matchmake data.');
 			return fail(400, {
 				form,
 				result: null,
@@ -40,6 +43,8 @@ export const actions: Actions = {
 				message: 'Server error. Try again.'
 			};
 		}
+
+		console.log('Matchmaking successful.');
 
 		return {
 			form,

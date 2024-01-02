@@ -1,7 +1,6 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { Register, Section } from '$lib/types.ts';
-import { CACHE_DURATION } from '$lib';
 import { RegisterSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { AuthApiError } from '@supabase/supabase-js';
@@ -18,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, fetch, setHeaders }) => {
 
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${CACHE_DURATION}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
 
 	return {
 		sections,
