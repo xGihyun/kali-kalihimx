@@ -4,7 +4,12 @@ import { error, type RequestHandler } from '@sveltejs/kit';
 
 // Optimize later
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {
-	const { user_id } = locals;
+	const session = await locals.getSession();
+	const user_id = session?.user.id;
+
+	if (!user_id) {
+		error(404, 'User not found.');
+	}
 
 	const cards: BattleCardData[] = await request.json();
 
