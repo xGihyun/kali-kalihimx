@@ -12,7 +12,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import { UserTableSectionCell, UserTableToolbar, UserTableCheckbox } from '.';
 	import { Button } from '$lib/components/ui/button';
-	import { DeleteSectionsSchema } from '$lib/schemas';
+	import { DeleteUsersSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-svelte';
 
@@ -21,7 +21,7 @@
 	export let total: number;
 	export let skip: number;
 	export let filteredSections: string | null;
-	export let form: SuperValidated<typeof DeleteSectionsSchema>;
+	export let form: SuperValidated<typeof DeleteUsersSchema>;
 	export let currentUser: User | undefined;
 
 	$: pageSize = 50;

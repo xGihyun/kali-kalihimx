@@ -1,5 +1,5 @@
 import { BACKEND_URL } from '$env/static/private';
-import type { Section } from 'radix-icons-svelte';
+import type { Section } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, setHeaders, depends }) => {

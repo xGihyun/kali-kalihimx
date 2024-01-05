@@ -4,7 +4,8 @@
 	import UpdateUserForm from './update-user-form.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { PenSquare } from 'lucide-svelte';
+	import { AlertCircle, PenSquare } from 'lucide-svelte';
+	import * as Alert from '$lib/components/ui/alert';
 
 	export let data;
 
@@ -59,8 +60,26 @@
 					Loading...
 				{:then sections}
 					<UpdateUserForm form={data.form} {sections} currentUserData={userData[0]} />
+				{:catch err}
+					<Alert.Root variant="destructive">
+						<AlertCircle class="h-4 w-4" />
+						<Alert.Title>Error</Alert.Title>
+						<Alert.Description>
+							<p>Failed to fetch sections.</p>
+							<p>{err}</p>
+						</Alert.Description>
+					</Alert.Root>
 				{/await}
 			</Dialog.Content>
 		</Dialog.Root>
 	{/if}
+{:catch err}
+	<Alert.Root variant="destructive">
+		<AlertCircle class="h-4 w-4" />
+		<Alert.Title>Error</Alert.Title>
+		<Alert.Description>
+			<p>Failed to fetch user data.</p>
+			<p>{err}</p>
+		</Alert.Description>
+	</Alert.Root>
 {/await}

@@ -5,6 +5,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { LoginSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { AuthApiError } from '@supabase/supabase-js';
+import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 
 export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends }) => {
 	const session = await locals.getSession();
@@ -57,7 +58,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 
 	depends('user:power_cards');
 
-	setHeaders({ 'cache-control': `max-age=${10}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	const data = Promise.all([getPowerCards(), getLatestMatches(), getLatestOpponentDetails()]);
 
@@ -157,6 +158,60 @@ export const actions: Actions = {
 		console.log(data);
 
 		throw redirect(303, '/');
+	},
+	image: async ({ locals, request }) => {
+		const session = await locals.getSession();
+		const user_id = session?.user.id;
+
+		if (!user_id) {
+			return fail(404, {
+				success: false,
+				message: 'User not found.'
+			});
+		}
+
+		const formData = await request.formData();
+
+		// const photoName = formData.get('filename') as string;
+		const blob = formData.get('file') as Blob;
+		const fileName = formData.get('file_name') as string;
+		const type = formData.get('type') as 'avatar' | 'banner';
+
+		const newFileName = `${user_id}_${fileName}`;
+
+		const file = new File([blob], newFileName, { type: 'image/avif' });
+
+		const { error } = await locals.supabase.storage.from(`${type}s`).upload(newFileName, file, {
+			cacheControl: '600',
+			upsert: true,
+			contentType: 'image/*'
+		});
+
+		if (error) {
+			return fail(500, {
+				success: false,
+				message: error.message
+			});
+		}
+
+		const url = `${PUBLIC_SUPABASE_URL}/storage/v1/object/public/${type}s/${newFileName}`;
+
+		const { error: err } = await locals.supabase
+			.from('users')
+			.update(type === 'avatar' ? { avatar_url: url } : { banner_url: url })
+			.eq('id', user_id);
+
+		if (err) {
+			return fail(500, {
+				success: false,
+				message: err.message
+			});
+		}
+
+		return {
+			success: true,
+			message: 'Succesfully updated image.'
+		};
 	}
 };
 

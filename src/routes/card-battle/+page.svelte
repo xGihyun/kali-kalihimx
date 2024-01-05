@@ -55,13 +55,13 @@
 		}
 	}
 
-	function formatTime(date: Date) {
-		const hours = date.getHours().toString().padStart(2, '0');
-		const minutes = date.getMinutes().toString().padStart(2, '0');
-		const seconds = date.getSeconds().toString().padStart(2, '0');
-
-		return `${hours}:${minutes}:${seconds}`;
-	}
+	// function formatTime(date: Date) {
+	// 	const hours = date.getHours().toString().padStart(2, '0');
+	// 	const minutes = date.getMinutes().toString().padStart(2, '0');
+	// 	const seconds = date.getSeconds().toString().padStart(2, '0');
+	//
+	// 	return `${hours}:${minutes}:${seconds}`;
+	// }
 
 	let timerInterval: number | undefined;
 
@@ -74,9 +74,9 @@
 	let difference = 0;
 
 	onMount(() => {
-		if (!data.matchDate) return;
-
 		timerInterval = setInterval(() => {
+			if (!data.matchDate) return;
+
 			const currentTime = new Date().getTime();
 			const deadline = new Date(data.matchDate.card_deadline).getTime();
 
@@ -105,7 +105,7 @@
 	<p class="text-sm md:text-xl text-muted-foreground">Select your cards before the timer expires</p>
 </div>
 
-{#if data.matchDate && difference > 0}
+{#if (data.matchDate && difference > 0) || data.user?.role === 'admin'}
 	<div
 		class="bg-card fixed top-5 left-[calc(50%+18rem)] -translate-x-1/2 lg:-translate-x-[calc(50%+9rem)] px-4 py-2 border border-border rounded-full"
 	>

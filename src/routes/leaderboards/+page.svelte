@@ -2,6 +2,8 @@
 	import { UserTable } from '$lib/components/users-table';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { selectedSections } from '$lib/stores.js';
+	import * as Alert from '$lib/components/ui/alert';
+	import { AlertCircle } from 'lucide-svelte';
 
 	export let data;
 
@@ -31,4 +33,13 @@
 		filteredSections={data.filteredSections}
 		currentUser={data.user}
 	/>
+{:catch err}
+	<Alert.Root variant="destructive">
+		<AlertCircle class="h-4 w-4" />
+		<Alert.Title>Error</Alert.Title>
+		<Alert.Description>
+			<p>Failed to fetch sections.</p>
+			<p>{err}</p>
+		</Alert.Description>
+	</Alert.Root>
 {/await}

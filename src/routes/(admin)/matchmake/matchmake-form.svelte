@@ -6,27 +6,39 @@
 	import { Swords } from 'lucide-svelte';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
 
 	export let form: SuperValidated<ArnisMatchSchema>;
 	export let sections: Section[];
-	export let formAction: ActionData;
 
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
 </script>
 
-<Form.Root
-	{form}
-	schema={arnisMatchSchema}
-	let:config
-	asChild
-	let:attrs
-	let:enhance
-	on:submit={() => (requestStatus.type = 'pending')}
->
-	<form class="w-full max-w-5xl flex items-center gap-2" method="post" {...attrs} use:enhance>
+<Form.Root {form} schema={arnisMatchSchema} let:config asChild let:attrs>
+	<form
+		class="w-full max-w-5xl flex items-center gap-2"
+		method="post"
+		{...attrs}
+		use:enhance={() => {
+			requestStatus.type = 'pending';
+			console.log('Matchmaking...');
+
+			return async ({ result, update }) => {
+				await update();
+
+				if (result.type !== 'error') {
+					requestStatus.type = 'success';
+					console.log('Matchmaking success.');
+					return;
+				}
+
+				requestStatus.type = 'error';
+				console.error('Matchmaking failed.');
+			};
+		}}
+	>
 		<Form.Field {config} name="section">
 			<Form.Item class="space-y-0 flex-[2]">
 				<Form.Select>
@@ -78,7 +90,7 @@
 		<Form.Button
 			type="submit"
 			class={`text-base md:text-lg h-auto ${
-				formAction?.success
+				requestStatus.type === 'success'
 					? 'bg-green-500'
 					: requestStatus.type === 'error'
 						? 'bg-red-500 hover:bg-red-600'
@@ -86,10 +98,10 @@
 							? 'bg-yellow-500 pointer-events-none'
 							: 'bg-primary'
 			}`}
-			disabled={requestStatus.type === 'pending' && !formAction?.success}
+			disabled={requestStatus.type === 'pending'}
 		>
 			<div class="flex items-center gap-1">
-				{#if formAction?.success}
+				{#if requestStatus.type === 'success'}
 					<CheckCircled class="h-5 w-5" />
 				{:else if requestStatus.type === 'pending'}
 					<Reload class="h-5 w-5 animate-spin" />

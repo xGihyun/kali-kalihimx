@@ -1,44 +1,57 @@
 import { BACKEND_URL } from '$env/static/private';
-import { CACHE_DURATION } from '$lib';
 import type { Section, User } from '$lib/types';
-import { fail, type Actions } from '@sveltejs/kit';
+import { fail, type Actions, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
-import { DeleteSectionsSchema } from '$lib/schemas';
+import { DeleteUsersSchema } from '$lib/schemas';
 
-export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
-	const limit = url.searchParams.get('limit') || 50;
+export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
+	const limit = Number(url.searchParams.get('limit')) || 50;
 	const skip = Number(url.searchParams.get('skip')) || 0;
 	const sections = url.searchParams.get('sections');
 
 	const getUsers = async () => {
-		const response = await fetch(
-			`${BACKEND_URL}/users?order_by=score&order=desc&skip=${skip}&fields=first_name,last_name,id,score,section,sex,rank_overall,rank_section${
-				sections ? `&section=${sections}` : `&limit=${limit}`
-			}`,
-			{
-				method: 'GET'
-			}
-		);
-		const users: User[] = await response.json();
+		const users = locals.supabase
+			.from('users')
+			.select('first_name, last_name, id, score, section, sex, rank_overall, rank_section')
+			.order('score', { ascending: false })
+			.range(skip, skip + limit - 1);
 
-		return users;
+		const { data, error: err } = sections
+			? await users.in('section', sections.split(','))
+			: await users;
+
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
+
+		return data as User[];
 	};
 
 	const getUserCount = async () => {
-		const response = await fetch(`${BACKEND_URL}/users/count`, {
-			method: 'GET'
-		});
-		const { total } = await response.json();
+		const { count, error: err } = await locals.supabase
+			.from('users')
+			.select('', { count: 'exact' });
 
-		return (total as number) || 0;
+		console.log(count);
+
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
+
+		return count || 0;
 	};
 
 	const getSections = async () => {
-		const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
-		const sections: Section[] = await response.json();
+		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
-		return sections;
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
+		return data as Section[];
 	};
 
 	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
@@ -51,20 +64,20 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, url }) => {
 		},
 		skip,
 		filteredSections: sections,
-		form: await superValidate(DeleteSectionsSchema)
+		form: await superValidate(DeleteUsersSchema)
 	};
 };
 
 export const actions: Actions = {
 	delete: async (event) => {
-		const form = await superValidate(event, DeleteSectionsSchema);
+		const form = await superValidate(event, DeleteUsersSchema);
 
 		console.log('Forced: ', form.data.force);
 
 		console.log('->> FORM DATA');
 		console.log(form.data);
 
-		if (!form.valid || form.data.sections.length < 1) {
+		if (!form.valid || form.data.users.length < 1) {
 			return fail(400, {
 				form,
 				success: false
@@ -73,7 +86,7 @@ export const actions: Actions = {
 
 		const response = await event.fetch(`${BACKEND_URL}/users?force=${form.data.force}`, {
 			method: 'DELETE',
-			body: JSON.stringify(form.data.sections),
+			body: JSON.stringify(form.data.users),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -88,20 +101,6 @@ export const actions: Actions = {
 				success: false
 			});
 		}
-
-		// const deletePromises = form.data.sections.map((user_id) => {
-		// 	return event.locals.supabase.auth.admin.deleteUser(user_id);
-		// });
-		//
-		// const results = await Promise.all(deletePromises);
-		//
-		// results.forEach(({ error }, index) => {
-		// 	if (error) {
-		// 		console.error(`Error deleting user with id ${form.data.sections[index]}: `, error);
-		// 	} else {
-		// 		console.log(`User with id ${form.data.sections[index]} deleted successfully`);
-		// 	}
-		// });
 
 		return {
 			form,

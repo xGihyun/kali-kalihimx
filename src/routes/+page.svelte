@@ -11,7 +11,6 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	export let data;
-	export let form;
 
 	$: ({ session, user } = data);
 </script>
@@ -36,7 +35,7 @@
 	<div class="flex w-full h-full">
 		<!-- <div class="w-1/2 bg-card"></div> -->
 		<div class="max-w-sm w-full m-auto">
-			<LoginForm form={data.form} formAction={form} />
+			<LoginForm form={data.form} />
 		</div>
 	</div>
 {/if}

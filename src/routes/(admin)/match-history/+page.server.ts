@@ -1,11 +1,11 @@
 import type { Matchmake, MaxSet, Section, UpdateScore } from '$lib/types';
-import { fail, type Actions } from '@sveltejs/kit';
+import { fail, type Actions, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SubmitScoreSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { BACKEND_URL } from '$env/static/private';
 
-export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders }) => {
+export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, locals }) => {
 	const section = url.searchParams.get('section');
 	const set = Number(url.searchParams.get('set')) || 1;
 	const matchType = url.searchParams.get('match_type') || 'arnis';
@@ -25,14 +25,14 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders }) 
 	};
 
 	const getSections = async () => {
-		const response = await fetch(`${BACKEND_URL}/sections`, { method: 'GET' });
-		const sections: Section[] = await response.json();
+		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
-		if (response.ok) {
-			return sections;
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
 		}
 
-		return null;
+		return data as Section[] | null;
 	};
 
 	const getMaxSets = async () => {
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders }) 
 	depends('card-battle:damage');
 
 	// TODO: CACHE INVALIDATION
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=120, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=60, must-revalidate` });
 
 	return {
 		matches: getMatches(),

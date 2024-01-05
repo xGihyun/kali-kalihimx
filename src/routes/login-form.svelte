@@ -5,12 +5,11 @@
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { ActionData } from './$types';
-	import { enhance as formEnhance } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import { LogIn } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 
 	export let form: SuperValidated<typeof LoginSchema>;
-	export let formAction: ActionData;
 
 	let requestStatus: RequestStatus = {
 		type: 'none'
@@ -29,22 +28,26 @@
 		method="POST"
 		action="?/login"
 		class="space-y-4"
-		use:formEnhance={() => {
+		use:enhance={() => {
 			console.log('Logging in...');
+
 			requestStatus = {
 				type: 'pending'
 			};
 
-			return async ({ result }) => {
+			return async ({ result, update }) => {
+				await update();
+
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus.type = 'success';
-					invalidateAll();
+					await invalidateAll();
 				} else {
 					console.error('Error');
 					requestStatus = {
 						type: 'error',
-						code: result.status
+						code: result.status,
+						message: result.data.message
 					};
 				}
 			};
@@ -93,7 +96,7 @@
 					{:else if requestStatus.type === 'error'}
 						<CrossCircled class="h-5 w-5" />
 						<span class="text-base md:text-lg">
-							{formAction?.message}
+							{requestStatus.message}
 						</span>
 					{:else}
 						<LogIn class="h-5 w-5" />

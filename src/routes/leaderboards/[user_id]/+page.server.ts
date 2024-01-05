@@ -1,49 +1,49 @@
 import { BACKEND_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
-import type { PowerCard, User } from '$lib/types';
+import type { PowerCard, Section, User } from '$lib/types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { UpdateUserSchema } from '$lib/schemas';
-import type { Section } from 'radix-icons-svelte';
-import { fail, type Actions } from '@sveltejs/kit';
+import { fail, type Actions, error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ fetch, params, locals, setHeaders }) => {
+export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 	const { user_id } = params;
 	const current_user_id = locals.user_id;
 
 	const getUser = async () => {
-		const response = await fetch(`${BACKEND_URL}/users/${user_id}`, {
-			method: 'GET'
-		});
+		const { data, error: err } = await locals.supabase.from('users').select('*').eq('id', user_id);
 
-		const user: User = await response.json();
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
 
-		return user;
+		return data[0] as User;
 	};
 
 	const getPowerCards = async () => {
-		const response = await fetch(`${BACKEND_URL}/power_cards`, {
-			method: 'POST',
-			body: JSON.stringify({
-				user_id
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+		const { data, error: err } = await locals.supabase
+			.from('power_cards')
+			.select('*')
+			.eq('user_id', user_id)
+			.order('name');
 
-		const powerCards: PowerCard[] = await response.json();
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
 
-		return powerCards;
+		return data as PowerCard[];
 	};
 
 	const getSections = async () => {
-		const response = await fetch(`${BACKEND_URL}/sections`, {
-			method: 'GET'
-		});
+		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
-		const sections: Section[] = await response.json();
+		if (err) {
+			console.log(err.code);
+			error(500, err.message);
+		}
 
-		return sections;
+		return data as Section[];
 	};
 
 	const userData = Promise.all([getUser(), getPowerCards()]);

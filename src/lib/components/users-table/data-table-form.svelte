@@ -1,15 +1,15 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
-	import { enhance as enhancer } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { RequestStatus, User } from '$lib/types';
-	import { DeleteSectionsSchema } from '$lib/schemas';
+	import { DeleteUsersSchema } from '$lib/schemas';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { Trash2 } from 'lucide-svelte';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 
-	export let form: SuperValidated<typeof DeleteSectionsSchema>;
+	export let form: SuperValidated<typeof DeleteUsersSchema>;
 	export let selectedDataIds: any;
 	export let users: User[];
 
@@ -18,49 +18,64 @@
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
+
+	function usersToDelete(selectedDataIds: any): string[] {
+		const indices = Object.keys(selectedDataIds);
+
+		let usersToDelete: string[] = [];
+
+		indices.forEach((idx) => {
+			const i = Number(idx);
+
+			usersToDelete.push(users[i].id);
+		});
+
+		return usersToDelete;
+	}
 </script>
 
-<Form.Root {form} asChild schema={DeleteSectionsSchema}>
+<Form.Root {form} asChild schema={DeleteUsersSchema}>
 	<form
 		method="POST"
 		action="?/delete"
 		class="flex items-center gap-5"
-		use:enhancer={({ formData }) => {
+		use:enhance={({ formData }) => {
 			console.log('Deleting...');
+
 			requestStatus = {
 				type: 'pending'
 			};
 
-			const indices = Object.keys($selectedDataIds);
+			const users = usersToDelete($selectedDataIds);
 
-			let usersToDelete = [];
-
-			indices.forEach((idx) => {
-				const i = Number(idx);
-
-				usersToDelete.push(users[i].id);
-			});
-
-			// Should be 'users'
-			if (usersToDelete.length > 0) {
+			if (users.length > 0) {
 				console.log(checked);
-				formData.append('sections', usersToDelete);
+				console.log(users);
+				formData.append('users', users.toString());
 				formData.append('force', checked.toString());
 			}
 
-			return async ({ result }) => {
-				if (result.type === 'success' || result.type === 'redirect') {
-					console.log('Successfully deleted.');
-					requestStatus.type = 'success';
+			return async ({ result, update }) => {
+				await update();
 
-					users.filter((section) => !usersToDelete.includes(section.id));
-					users = users;
-				} else {
-					console.error('Error');
+				if (result.type === 'error') {
+					console.error('Error in deleting users.');
+
 					requestStatus = {
 						type: 'error',
 						code: result.status
 					};
+					return;
+				} else if (result.type === 'failure') {
+					console.error('Failed to delete users.');
+
+					requestStatus = {
+						type: 'error',
+						code: result.status
+					};
+				} else {
+					console.log('Successfully deleted.');
+					requestStatus.type = 'success';
 				}
 			};
 		}}
@@ -97,8 +112,13 @@
 					<CheckCircled class="h-5 w-5" />
 					<span class="text-sm sm:text-base md:text-lg">Success</span>
 				{:else if requestStatus.type === 'error'}
-					<CrossCircled class="h-5 w-5" />
-					<span class="text-sm sm:text-base md:text-lg"> Error </span>
+					{#if requestStatus.code === 409}
+						<CrossCircled class="h-5 w-5" />
+						<span class="text-sm sm:text-base md:text-lg"> Failure </span>
+					{:else}
+						<CrossCircled class="h-5 w-5" />
+						<span class="text-sm sm:text-base md:text-lg"> Error </span>
+					{/if}
 				{:else}
 					<Trash2 class="h-5 w-5" />
 					<span class="text-sm sm:text-base md:text-lg">Delete</span>

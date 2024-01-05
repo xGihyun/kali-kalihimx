@@ -1,6 +1,8 @@
 import { BACKEND_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
 
+export const prerender = true;
+
 type MatchDate = {
 	created_at: string;
 	card_deadline: string;

@@ -79,8 +79,8 @@ export const SectionSchema = z.object({
 	user_limit: z.coerce.number()
 });
 
-export const DeleteSectionsSchema = z.object({
-	sections: z.string().array(),
+export const DeleteUsersSchema = z.object({
+	users: z.string().array(),
 	force: z.coerce.boolean()
 });
 

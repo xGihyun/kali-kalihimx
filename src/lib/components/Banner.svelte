@@ -1,9 +1,7 @@
-<!-- This could be merged with Avatar into a single function since they're pretty much the same -->
 <script lang="ts">
 	import type { User } from '$lib/types';
-	import { invalidate } from '$app/navigation';
-	import { crop } from '$lib/pkg/my_package';
 	import { PenSquare } from 'lucide-svelte';
+	import { upload } from '$lib/helpers';
 
 	export let user: User;
 	export let isCurrentUser: boolean = false;
@@ -16,39 +14,14 @@
 		height: 320
 	};
 
-	async function upload() {
-		if (!selectedBanner) return;
-
-		const ogBannerBuffer = await selectedBanner.arrayBuffer();
-		const bytes = new Uint8Array(ogBannerBuffer);
-		const croppedAvatar = crop(bytes, BANNER.width, BANNER.height);
-
-		const formData = new FormData();
-
-		formData.append('file', new Blob([croppedAvatar]));
-		formData.append('filename', selectedBanner.name);
-
-		const response = await fetch('/api/banner/upload', {
-			method: 'POST',
-			body: formData
-		});
-
-		if (response.ok) {
-			console.log('Updated banner');
-			invalidate('user:images');
-		} else {
-			console.error('Failed to update banner');
-		}
-	}
-
-	function handleSelectedAvatar(e: Event) {
+	async function handleSelectedAvatar(e: Event) {
 		const target = e.target as HTMLInputElement;
 
 		if (!target.files) return;
 
 		selectedBanner = target.files[0];
 
-		upload();
+		await upload(selectedBanner, 'banner', BANNER);
 	}
 </script>
 

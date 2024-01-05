@@ -176,7 +176,7 @@
 									class="flex items-center justify-end"
 									method="POST"
 									action="/?/power_card"
-									use:enhance={async ({ formData }) => {
+									use:enhance={({ formData }) => {
 										console.log('Activating power card: ', card.name);
 
 										if (card.name === "Warlord's Domain") {
@@ -203,7 +203,9 @@
 											formData.append('match_set_id', matches[0].id);
 										}
 
-										return async ({ result }) => {
+										return async ({ result, update }) => {
+											await update();
+
 											if (result.type === 'success') {
 												loadingStatus[idx] = 'success';
 												console.log('Successfully activated power card.');

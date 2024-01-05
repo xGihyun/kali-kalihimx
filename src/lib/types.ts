@@ -153,6 +153,7 @@ export type LoadingStatus = 'none' | 'pending' | 'success' | 'error';
 export type RequestStatus = {
 	type: 'none' | 'pending' | 'success' | 'error';
 	code?: number;
+	message?: string;
 };
 
 export type Video = {
@@ -162,3 +163,8 @@ export type Video = {
 };
 
 export type ArnisMatch = z.infer<typeof arnisMatchSchema>;
+
+export type Dimensions = {
+	width: number;
+	height: number;
+};

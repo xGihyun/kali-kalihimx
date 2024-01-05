@@ -2,11 +2,12 @@ import { BACKEND_URL, SERVICE_ROLE } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const POST: RequestHandler = async ({ fetch, request, locals }) => {
+export const POST: RequestHandler = async ({ fetch, request, locals, url }) => {
 	const session = await locals.getSession();
 	const user_id = session?.user.id;
+	const query = url.searchParams.get('image');
 
-	if (!user_id) {
+	if (!user_id || !query) {
 		throw new Error('Failed to update avatar.');
 	}
 
@@ -16,11 +17,14 @@ export const POST: RequestHandler = async ({ fetch, request, locals }) => {
 	const file = formData.get('file') as Blob;
 	const fileName = `${user_id}_${photoName}`;
 
-	await uploadAvatar(fetch, file, fileName);
+	const { data, error } = await locals.supabase.storage
+		.from(query)
+		.upload(`/public/${fileName}`, file, {
+			cacheControl: '3600',
+			upsert: true
+		});
 
-	const url = `${PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${fileName}`;
-
-	await updateAvatarUrl(fetch, user_id, url);
+	console.log(data?.path);
 
 	return new Response();
 };
@@ -39,9 +43,12 @@ async function uploadAvatar(
 		body: file
 	});
 
-	if (response.ok) {
-		console.log('Successfully uploaded avatar');
+	if (!response.ok) {
+		console.log('Failed to upload avatar');
+		console.log(await response.text());
 	}
+
+	console.log('Successfully uploaded avatar');
 }
 
 async function updateAvatarUrl(

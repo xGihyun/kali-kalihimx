@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { User } from '$lib/types';
+	import type { Dimensions, User } from '$lib/types';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { snakeCaseToTitleCase } from '$lib';
-	import { invalidate } from '$app/navigation';
-	import { crop } from '$lib/pkg/my_package';
 	import { Switch } from '$lib/components/ui/switch';
 	import { Label } from '$lib/components/ui/label';
+	import { upload } from '$lib/helpers';
+	import { error } from '@sveltejs/kit';
 
 	export let user: User;
 	export let isCurrentUser: boolean = false;
@@ -15,44 +15,22 @@
 	let isPrivate = user.is_private;
 	const initials = (user.first_name[0] + user.last_name[0]).toUpperCase();
 
-	const AVATAR = {
+	const AVATAR: Dimensions = {
 		width: 160,
 		height: 160
 	};
 
-	async function upload() {
-		if (!selectedAvatar) return;
-
-		const ogArrayBuffer = await selectedAvatar.arrayBuffer();
-		const bytes = new Uint8Array(ogArrayBuffer);
-		const croppedAvatar = crop(bytes, AVATAR.width, AVATAR.height);
-
-		const formData = new FormData();
-
-		formData.append('file', new Blob([croppedAvatar]));
-		formData.append('filename', selectedAvatar.name);
-
-		const response = await fetch('/api/avatar/upload', {
-			method: 'POST',
-			body: formData
-		});
-
-		if (response.ok) {
-			console.log('Updated avatar');
-			invalidate('user:images');
-		} else {
-			console.error('Failed to update avatar');
-		}
-	}
-
-	function handleSelectedAvatar(e: Event) {
+	async function handleSelectedAvatar(e: Event) {
 		const target = e.target as HTMLInputElement;
 
-		if (!target.files) return;
+		if (!target.files) {
+			console.log('File not found.');
+			return;
+		}
 
 		selectedAvatar = target.files[0];
 
-		upload();
+		await upload(selectedAvatar, 'avatar', AVATAR);
 	}
 
 	async function togglePrivateStatus() {
@@ -71,10 +49,11 @@
 		});
 
 		if (!response.ok) {
-			console.error('Failed to update private status');
-		} else {
-			console.log('Successfully updated private status');
+			console.error('Failed to update private status.');
+			throw error(500, await response.text());
 		}
+
+		console.log('Successfully updated private status.');
 	}
 </script>
 

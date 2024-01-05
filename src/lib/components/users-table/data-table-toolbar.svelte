@@ -11,11 +11,11 @@
 	import { selectedSections } from '$lib/stores';
 	import { ArrowDownWideNarrow, FilterX } from 'lucide-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { DeleteSectionsSchema } from '$lib/schemas';
+	import type { DeleteUsersSchema } from '$lib/schemas';
 
 	export let sections: Section[] = [];
 	export let tableModel: TableViewModel<User, AnyPlugins>;
-	export let form: SuperValidated<typeof DeleteSectionsSchema>;
+	export let form: SuperValidated<typeof DeleteUsersSchema>;
 	export let selectedDataIds: any;
 	export let users: User[];
 	export let currentUser: User | undefined;

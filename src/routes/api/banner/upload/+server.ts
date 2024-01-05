@@ -1,9 +1,13 @@
 import { BACKEND_URL, SERVICE_ROLE } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import type { RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ fetch, request, locals }) => {
-	const { user_id } = locals;
+	const session = await locals.getSession();
+
+	if (!session) error(500, 'User not found');
+
+	const user_id = session.user.id;
 	const formData = await request.formData();
 
 	console.log(formData);
