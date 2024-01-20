@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ setHeaders, locals, depends }) => {
 
 	depends('card_battle:timer');
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return {
 		matchDate: await getLatestMatches()

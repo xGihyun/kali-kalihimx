@@ -41,7 +41,7 @@ export const RegisterSchema = z.object({
 
 export const arnisMatchSchema = z.object({
 	section: z.string(),
-	skill: z.string().optional(),
+	skill: z.string(),
 	footwork: z.string()
 });
 

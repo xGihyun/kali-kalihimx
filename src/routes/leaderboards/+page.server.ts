@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 
 	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return {
 		lazy: {
@@ -91,6 +91,8 @@ export const actions: Actions = {
 				'Content-Type': 'application/json'
 			}
 		});
+
+		// event.locals.supabase.auth.admin.deleteUser('');
 
 		if (!response.ok) {
 			console.log(await response.text());

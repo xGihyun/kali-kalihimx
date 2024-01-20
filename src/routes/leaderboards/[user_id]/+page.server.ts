@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 
 	const userData = Promise.all([getUser(), getPowerCards()]);
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return {
 		lazy: {

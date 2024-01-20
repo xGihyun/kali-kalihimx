@@ -8,7 +8,7 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
-import { Forward, Swords, UsersRound } from 'lucide-svelte';
+import { Diamond, Forward, Swords, UsersRound } from 'lucide-svelte';
 import { CardStack } from 'radix-icons-svelte';
 import {
 	Blocks,
@@ -121,7 +121,7 @@ export const USER_ROUTES: Navigation = [
 	{
 		name: 'Card Battle',
 		path: '/card-battle',
-		icon: CardStack
+		icon: Diamond
 	}
 ];
 
@@ -161,14 +161,14 @@ export const POWER_CARDS = new Map([
 			image_url: viral_x_rival,
 			description: 'Current opponent will also be their opponent for the next Arnis match.'
 		}
-	],
-	[
-		"Warlord's Domain",
-		{
-			image_url: warlords_domain,
-			description: 'Change the skill to perform for the upcoming Arnis match.'
-		}
 	]
+	// [
+	// 	"Warlord's Domain",
+	// 	{
+	// 		image_url: warlords_domain,
+	// 		description: 'Change the skill to perform for the upcoming Arnis match.'
+	// 	}
+	// ]
 ]);
 
 export const SKILLS = new Map([

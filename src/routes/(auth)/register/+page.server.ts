@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, fetch, setHeaders }) => {
 
 	const sections: Section[] = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return {
 		sections,
@@ -97,7 +97,7 @@ async function insertUserToDatabase(
 	});
 
 	if (!response.ok) {
-		throw new Error('->> Failed to insert new user:\n->> ', await response.text());
+		throw new Error('->> Failed to insert new user:\n->> ', { cause: await response.text() });
 	}
 }
 
@@ -117,6 +117,6 @@ async function insertRandomPowerCards(
 	});
 
 	if (!response.ok) {
-		throw new Error('->> Failed to insert power cards:\n->> ', await response.text());
+		throw new Error('->> Failed to insert power cards:\n->> ', { cause: await response.text() });
 	}
 }

@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	console.log(user1Turns);
 	console.log(user2Turns);
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=${60 * 2}, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return {
 		turns: {

@@ -4,10 +4,8 @@
 	import type { RequestStatus } from '$lib/types';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';
 	import { LogIn } from 'lucide-svelte';
-	import { invalidateAll } from '$app/navigation';
 
 	export let form: SuperValidated<typeof LoginSchema>;
 
@@ -41,7 +39,7 @@
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus.type = 'success';
-					await invalidateAll();
+					// await invalidateAll();
 				} else {
 					console.error('Error');
 					requestStatus = {

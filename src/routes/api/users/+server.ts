@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ url, fetch, setHeaders }) => {
 
 	const users = await response.json();
 
-	setHeaders({ 'cache-control': `max-age=0, s-maxage=120, proxy-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
 
 	return json(users);
 };
