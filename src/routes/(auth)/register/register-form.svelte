@@ -89,7 +89,7 @@
 						<Form.Label class="text-base md:text-lg">First Name</Form.Label>
 						<Form.Input
 							type="text"
-							placeholder="Ayaka"
+							placeholder="Enter first name (e.g. Crisostomo)"
 							class="text-base md:text-lg h-auto"
 							required
 						/>
@@ -102,7 +102,7 @@
 						<Form.Label class="text-base md:text-lg">Last Name</Form.Label>
 						<Form.Input
 							type="text"
-							placeholder="Kamisato"
+							placeholder="Enter first name (e.g. Ibarra)"
 							class="text-base md:text-lg h-auto"
 							required
 						/>
@@ -121,7 +121,12 @@
 				<Form.Field {config} name="contact_number">
 					<Form.Item>
 						<Form.Label class="text-base md:text-lg">Contact Number</Form.Label>
-						<Form.Input type="text" class="text-base md:text-lg h-auto" required />
+						<Form.Input
+							type="text"
+							class="text-base md:text-lg h-auto"
+							placeholder="Enter contact number (e.g. 09123456789)"
+							required
+						/>
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

@@ -1,7 +1,3 @@
-import arnis_bg from './arnis-bg.jpg'
-import hamster from './hamster.webp'
+import cardBattleGuide from './card-battle.png';
 
-export {
-  arnis_bg,
-  hamster
-}
+export { cardBattleGuide };

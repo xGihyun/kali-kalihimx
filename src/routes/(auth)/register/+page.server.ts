@@ -62,7 +62,11 @@ export const actions: Actions = {
 				});
 			}
 
-			console.log(error.message);
+			const cookies = event.cookies.getAll();
+
+			cookies.forEach(({ name }) => {
+				event.cookies.delete(name, { path: '/' });
+			});
 
 			return fail(500, {
 				form,
