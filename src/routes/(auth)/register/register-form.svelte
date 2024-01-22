@@ -34,10 +34,12 @@
 			return async ({ result }) => {
 				console.log('Register result: ');
 				console.log(result);
+
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus = {
 						type: 'success',
+						code: result.status,
 						message: result.data.message
 					};
 				} else {

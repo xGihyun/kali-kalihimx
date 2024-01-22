@@ -183,7 +183,7 @@
 	{:then matches}
 		{#if matches}
 			{#if selectedMatchType === 'arnis'}
-				<ArnisTable form={data.form} {matches} formAction={form?.success} />
+				<ArnisTable form={data.form} {matches} />
 			{:else if selectedMatchType === 'card_battle'}
 				<CardBattleTable {matches} />
 			{:else}

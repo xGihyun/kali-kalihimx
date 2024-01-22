@@ -3,9 +3,11 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { SubmitScoreSchema } from '$lib/schemas';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
+	import { enhance } from '$app/forms';
+	import type { RequestStatus } from '$lib/types';
 	// import type { ActionData } from './$types';
 
-	export let formAction: boolean = false;
+	// export let formAction: boolean = false;
 	export let form: SuperValidated<typeof SubmitScoreSchema>;
 	export let user1_id: string;
 	export let user2_id: string;
@@ -13,58 +15,95 @@
 	export let user2_name: string = 'N/A';
 	export let match_set_id: string;
 
-	let loadingStatus = 'none' as 'none' | 'pending' | 'success' | 'error';
-
-	$: if (formAction) {
-		loadingStatus = 'none';
-	}
+	let requestStatus: RequestStatus = {
+		type: 'none'
+	};
 </script>
 
-<Form.Root
-	method="POST"
-	action="/match-history?/submit_score"
-	{form}
-	schema={SubmitScoreSchema}
-	let:config
-	on:submit={() => {
-		console.log('Submitting...');
-		formAction = false;
-		loadingStatus = 'pending';
-	}}
->
-	<input type="text" name="user1_id" value={user1_id} hidden required />
-	<input type="text" name="user2_id" value={user2_id} hidden required />
-	<input type="text" name="match_set_id" value={match_set_id} hidden required />
+<Form.Root {form} schema={SubmitScoreSchema} let:config let:attrs>
+	<form
+		action="/match-history?/submit_score"
+		method="post"
+		use:enhance={() => {
+			console.log('Updating...');
+			requestStatus = {
+				type: 'pending'
+			};
 
-	<Form.Field {config} name="user1_score">
-		<Form.Item class="text-base md:text-lg">
-			<Form.Label class="text-base md:text-lg">{user1_name}</Form.Label>
-			<Form.Input type="number" class="text-base md:text-lg" required />
-			<Form.Validation />
-		</Form.Item>
-	</Form.Field>
+			return async ({ result, update }) => {
+				await update();
 
-	<Form.Field {config} name="user2_score">
-		<Form.Item>
-			<Form.Label class="text-base md:text-lg">{user2_name}</Form.Label>
-			<Form.Input type="number" class="text-base md:text-lg" required />
-			<Form.Validation />
-		</Form.Item>
-	</Form.Field>
+				console.log(result);
 
-	<div class="flex w-full justify-between items-center mt-4">
-		<div class="flex items-center gap-1">
-			{#if loadingStatus === 'pending' && !formAction}
-				<Reload class="h-5 w-5 text-yellow-500 animate-spin" />
-				<span class="text-base md:text-lg text-yellow-500">Submitting...</span>
-			{:else if formAction}
-				<CheckCircled class="h-5 w-5 text-green-500" />
-				<span class="text-base md:text-lg text-green-500">Success</span>
-			{:else if loadingStatus === 'error'}
-				<CrossCircled class="h-5 w-5 text-red-500" />
-				<span class="text-base md:text-lg text-red-500">Failed to submit</span>
-			{/if}
+				if (result.type === 'success' || result.type === 'redirect') {
+					console.log('Successfully submitted score.');
+
+					requestStatus = {
+						type: 'success',
+						code: result.status,
+						message: result.data.message
+					};
+				} else {
+					console.error('Failed to submit score.');
+					requestStatus = {
+						type: 'error',
+						code: result.status,
+						message: result.data.message
+					};
+				}
+			};
+		}}
+		{...attrs}
+	>
+		<input type="text" name="user1_id" value={user1_id} hidden required />
+		<input type="text" name="user2_id" value={user2_id} hidden required />
+		<input type="text" name="match_set_id" value={match_set_id} hidden required />
+
+		<Form.Field {config} name="user1_score">
+			<Form.Item class="text-base md:text-lg">
+				<Form.Label class="text-base md:text-lg">{user1_name}</Form.Label>
+				<Form.Input type="number" class="text-base md:text-lg" required />
+				<Form.Validation />
+			</Form.Item>
+		</Form.Field>
+
+		<Form.Field {config} name="user2_score">
+			<Form.Item>
+				<Form.Label class="text-base md:text-lg">{user2_name}</Form.Label>
+				<Form.Input type="number" class="text-base md:text-lg" required />
+				<Form.Validation />
+			</Form.Item>
+		</Form.Field>
+
+		<div class="flex w-full justify-between items-center mt-4">
+			<Form.Button
+				class={`text-base md:text-lg h-auto w-full ${
+					requestStatus.type === 'success'
+						? 'bg-green-500 pointer-events-none'
+						: requestStatus.type === 'error'
+							? 'bg-red-500 hover:bg-red-600'
+							: requestStatus.type === 'pending'
+								? 'bg-yellow-500 pointer-events-none'
+								: 'bg-primary'
+				}`}
+			>
+				<div class="flex items-center gap-1">
+					{#if requestStatus.type === 'pending'}
+						<Reload class="h-5 w-5 animate-spin" />
+						<span class="text-base md:text-lg">Submitting...</span>
+					{:else if requestStatus.type === 'success'}
+						<CheckCircled class="h-5 w-5 " />
+						<span class="text-base md:text-lg">Success</span>
+					{:else if requestStatus.type === 'error'}
+						<CrossCircled class="h-5 w-5 " />
+						<span class="text-base md:text-lg">
+							{requestStatus.message}
+						</span>
+					{:else}
+						<span class="text-base md:text-lg">Submit</span>
+					{/if}
+				</div>
+			</Form.Button>
 		</div>
-		<Form.Button class="text-base md:text-lg">Submit</Form.Button>
-	</div>
+	</form>
 </Form.Root>

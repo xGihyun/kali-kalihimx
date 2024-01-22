@@ -3,7 +3,7 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { UpdateUserSchema } from '$lib/schemas';
 	import type { RequestStatus, Section, User } from '$lib/types';
-	import { enhance as enhancer } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { snakeCaseToTitleCase } from '$lib';
 
@@ -16,29 +16,33 @@
 	};
 </script>
 
-<Form.Root method="POST" {form} schema={UpdateUserSchema} let:attrs let:config let:enhance>
+<Form.Root {form} schema={UpdateUserSchema} let:attrs let:config>
 	<form
 		method="POST"
 		class="space-y-4"
 		action="?/update_user"
-		use:enhance
-		use:enhancer={() => {
+		use:enhance={() => {
 			console.log('Updating...');
 			requestStatus = {
 				type: 'pending'
 			};
 
-			return async ({ result }) => {
+			return async ({ result, update }) => {
+				await update();
+
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully updated user data.');
 					requestStatus = {
-						type: 'success'
+						type: 'success',
+						code: result.status,
+						message: result.data.message
 					};
 				} else {
 					console.error('Failed to update user data.');
 					requestStatus = {
 						type: 'error',
-						code: result.status
+						code: result.status,
+						message: result.data.message
 					};
 				}
 			};
@@ -200,11 +204,7 @@
 					{:else if requestStatus.type === 'error'}
 						<CrossCircled class="h-5 w-5 " />
 						<span class="text-base md:text-lg">
-							{#if requestStatus.code === 400}
-								Invalid data
-							{:else}
-								Server error. Please try again.
-							{/if}
+							{requestStatus.message}
 						</span>
 					{:else}
 						<span class="text-base md:text-lg">Update</span>

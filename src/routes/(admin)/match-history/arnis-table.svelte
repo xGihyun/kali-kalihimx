@@ -8,7 +8,6 @@
 	import { CheckCircled, Clock } from 'radix-icons-svelte';
 	import { snakeCaseToTitleCase } from '$lib';
 
-	export let formAction: boolean = false;
 	export let form: SuperValidated<typeof SubmitScoreSchema>;
 	export let matches: Matchmake[];
 
@@ -71,7 +70,6 @@
 
 					<ScoresForm
 						{form}
-						{formAction}
 						user1_id={match.user1_id}
 						user2_id={match.user2_id}
 						user1_name={user1}

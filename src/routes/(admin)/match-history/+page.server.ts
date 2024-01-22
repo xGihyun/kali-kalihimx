@@ -70,7 +70,8 @@ export const actions: Actions = {
 		if (!form.valid) {
 			return fail(400, {
 				form,
-				success: false
+				success: false,
+				message: 'Invalid form data.'
 			});
 		}
 
@@ -91,13 +92,36 @@ export const actions: Actions = {
 			difference
 		};
 
+		// const results = await Promise.all(
+		// );
+
+		// Check for errors in results
+		// results.forEach((result) => {
+		// 	if (result && result.success === false) {
+		// 		return fail(result.code, {
+		// 			form,
+		// 			success: false,
+		// 			message: result.message
+		// 		});
+		// 	}
+		// });
+
 		await submitScore(data1, event.fetch);
 		await submitScore(data2, event.fetch);
-		await updateMatchStatus(event.fetch, match_set_id, 'done');
+		const updateMatch = await updateMatchStatus(event.fetch, match_set_id, 'done');
+
+		if (!updateMatch.success) {
+			return fail(updateMatch.code, {
+				form,
+				success: false,
+				message: updateMatch.message
+			});
+		}
 
 		return {
 			form,
-			success: true
+			success: true,
+			message: 'Success!'
 		};
 	}
 };
@@ -108,22 +132,29 @@ async function submitScore(
 ) {
 	console.log('Submitting...');
 
-	const response = await fetch(`${BACKEND_URL}/scores/update`, {
-		method: 'POST',
+	const response = await fetch(`${BACKEND_URL}/scores`, {
+		method: 'PATCH',
 		body: JSON.stringify(data),
 		headers: {
 			'Content-Type': 'application/json'
 		}
 	});
 
-	if (response.ok) {
-		console.log('Successfully submitted score.');
-	} else {
-		return fail(response.status, {
+	if (!response.ok) {
+		return {
 			success: false,
-			error: 'Failed to submit score.'
-		});
+			message: 'Failed to submit score.',
+			code: response.status
+		};
 	}
+
+	console.log('Successfully submitted score.');
+
+	return {
+		success: true,
+		message: 'Successfully submitted score.',
+		code: response.status
+	};
 }
 
 async function updateMatchStatus(
@@ -145,7 +176,19 @@ async function updateMatchStatus(
 		}
 	});
 
-	if (response.ok) {
-		console.log('Successfully updated match status to: ', status);
+	if (!response.ok) {
+		return {
+			success: false,
+			code: response.status,
+			message: 'Failed to update match status.'
+		};
 	}
+
+	console.log('Successfully updated match status to: ', status);
+
+	return {
+		success: true,
+		message: `Successfully updated match status to: ${status}`,
+		code: response.status
+	};
 }
