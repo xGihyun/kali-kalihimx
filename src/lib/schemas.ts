@@ -18,7 +18,7 @@ export const RegisterSchema = z.object({
 	first_name: z.string(),
 	last_name: z.string(),
 	age: z.coerce.number(),
-	contact_number: z.coerce.number(),
+	contact_number: z.string(),
 	sex: z.number()
 });
 
@@ -68,7 +68,7 @@ export const UpdateUserSchema = z.object({
 	first_name: z.string().nullable(),
 	last_name: z.string().nullable(),
 	age: z.coerce.number().nullable(),
-	contact_number: z.coerce.number().nullable(),
+	contact_number: z.string().nullable(),
 	sex: z.string().nullable(),
 	score: z.coerce.number().nullable(),
 	role: z.string().nullable()

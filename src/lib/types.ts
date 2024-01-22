@@ -9,7 +9,7 @@ export type User = {
 	first_name: string;
 	last_name: string;
 	age: number;
-	contact_number: number;
+	contact_number: string;
 	sex: number;
 	rank_overall: number;
 	rank_section: number;

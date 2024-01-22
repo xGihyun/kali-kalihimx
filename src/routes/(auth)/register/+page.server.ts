@@ -96,6 +96,9 @@ async function insertUserToDatabase(
 		}
 	});
 
+	console.log('Inserting user to database...');
+	console.log(data);
+
 	if (!response.ok) {
 		throw new Error('->> Failed to insert new user:\n->> ', { cause: await response.text() });
 	}

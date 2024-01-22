@@ -32,6 +32,8 @@
 			};
 
 			return async ({ result }) => {
+				console.log('Register result: ');
+				console.log(result);
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus = {
@@ -117,7 +119,7 @@
 				<Form.Field {config} name="contact_number">
 					<Form.Item>
 						<Form.Label class="text-base md:text-lg">Contact Number</Form.Label>
-						<Form.Input type="number" class="text-base md:text-lg h-auto" required />
+						<Form.Input type="text" class="text-base md:text-lg h-auto" required />
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

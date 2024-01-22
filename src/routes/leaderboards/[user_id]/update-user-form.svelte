@@ -96,7 +96,7 @@
 			<Form.Item>
 				<Form.Label class="text-base md:text-lg">Contact Number</Form.Label>
 				<Form.Input
-					type="number"
+					type="text"
 					class="text-base md:text-lg h-auto"
 					value={currentUserData.contact_number}
 				/>
