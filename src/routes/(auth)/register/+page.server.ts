@@ -1,6 +1,6 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { Register, Section } from '$lib/types.ts';
+import type { Register, Section, User } from '$lib/types.ts';
 import { RegisterSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { AuthApiError } from '@supabase/supabase-js';
@@ -58,23 +58,44 @@ export const actions: Actions = {
 				return fail(400, {
 					form,
 					success: false,
-					message: 'Invalid email or password.'
+					message: 'Invalid form data.'
 				});
 			}
+
+			console.log(error.message);
 
 			return fail(500, {
 				form,
 				success: false,
-				message: 'Server error. Try again later.'
+				message: error.message
 			});
 		}
 
-		await insertUserToDatabase(event.fetch, {
+		const insertUser = await insertUserToDatabase(event.fetch, {
 			...registerUserData,
 			id: data.user?.id
 		});
 
-		await insertRandomPowerCards(event.fetch, data.user.id);
+		console.log('Insert user status');
+		console.log(insertUser);
+
+		if (!insertUser.success) {
+			return fail(409, {
+				form,
+				success: false,
+				message: insertUser.message
+			});
+		}
+
+		const insertPowerCards = await insertRandomPowerCards(event.fetch, data.user?.id);
+
+		if (!insertPowerCards.success) {
+			return fail(500, {
+				form,
+				success: false,
+				message: insertPowerCards.message
+			});
+		}
 
 		return {
 			form,
@@ -86,7 +107,7 @@ export const actions: Actions = {
 
 async function insertUserToDatabase(
 	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
-	data: Register
+	data: User
 ) {
 	const response = await fetch(`${BACKEND_URL}/register`, {
 		method: 'POST',
@@ -99,16 +120,42 @@ async function insertUserToDatabase(
 	console.log('Inserting user to database...');
 	console.log(data);
 
-	if (!response.ok) {
-		throw new Error('->> Failed to insert new user:\n->> ', { cause: await response.text() });
+	if (response.status === 409) {
+		return {
+			code: 409,
+			message: 'User already exists',
+			success: false
+		};
 	}
+
+	if (!response.ok) {
+		return {
+			code: 500,
+			message: 'Unexpected server error',
+			success: false
+		};
+	}
+
+	return {
+		code: 200,
+		message: 'Successfully registered',
+		success: true
+	};
 }
 
 // Get 3 random power cards by default
 async function insertRandomPowerCards(
 	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
-	userId: string
+	userId: string | undefined
 ) {
+	if (!userId) {
+		return {
+			code: 500,
+			message: 'User ID not found',
+			success: false
+		};
+	}
+
 	const response = await fetch(`${BACKEND_URL}/power_cards`, {
 		method: 'POST',
 		body: JSON.stringify({
@@ -120,6 +167,16 @@ async function insertRandomPowerCards(
 	});
 
 	if (!response.ok) {
-		throw new Error('->> Failed to insert power cards:\n->> ', { cause: await response.text() });
+		return {
+			code: 500,
+			message: 'Unexpected server error',
+			success: false
+		};
 	}
+
+	return {
+		code: 200,
+		message: 'Successfully registered',
+		success: true
+	};
 }

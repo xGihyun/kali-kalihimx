@@ -37,13 +37,15 @@
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
 					requestStatus = {
-						type: 'success'
+						type: 'success',
+						message: result.data.message
 					};
 				} else {
 					console.error('Error');
 					requestStatus = {
 						type: 'error',
-						code: result.status
+						code: result.status,
+						message: result.data.message
 					};
 				}
 			};
@@ -186,11 +188,7 @@
 							{:else if requestStatus.type === 'error'}
 								<CrossCircled class="h-5 w-5 " />
 								<span class="text-base md:text-lg">
-									{#if requestStatus.code === 400}
-										Invalid data
-									{:else}
-										Server error. Please try again.
-									{/if}
+									{requestStatus.message}
 								</span>
 							{:else}
 								<span class="text-base md:text-lg">Register</span>

@@ -15,7 +15,9 @@ export const RegisterSchema = z.object({
 	email: z.string().email(),
 	password: z.string().min(5),
 	section: z.string(),
-	first_name: z.string(),
+	first_name: z.string().regex(/^[A-Za-z]+$/, {
+		message: 'String must contain only alphabets'
+	}),
 	last_name: z.string(),
 	age: z.coerce.number(),
 	contact_number: z.string(),
