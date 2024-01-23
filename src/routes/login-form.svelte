@@ -38,8 +38,11 @@
 
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
-					requestStatus.type = 'success';
-					// await invalidateAll();
+					requestStatus = {
+						type: 'success',
+						code: result.status,
+						message: result.data.message
+					};
 				} else {
 					console.error('Error');
 					requestStatus = {
@@ -56,7 +59,7 @@
 				<Form.Label class="text-base md:text-lg">Email</Form.Label>
 				<Form.Input
 					type="email"
-					placeholder="name@example.com"
+					placeholder="Enter your email (e.g. pangalan@gmail.com)"
 					class="text-base md:text-lg h-auto"
 					required
 				/>
@@ -103,16 +106,26 @@
 				</div>
 			</Form.Button>
 
-			<p class="mt-4 text-center">
-				Don't have an account yet?
+			<div class="flex flex-col justify-center gap-2 mt-10">
+				<div class="grid grid-cols-2 gap-4">
+					<p class="col-span-1 text-end">New user?</p>
+					<a href="/register" class="hover:underline font-jost-semibold text-primary"> Register </a>
+				</div>
 
-				<a href="/register" class="hover:underline font-jost-semibold text-primary"> Register. </a>
-			</p>
-			<p class="mt-4 text-center">
-				<a href="/recover" class="hover:underline font-jost-medium text-primary">
-					I forgot my password.
-				</a>
-			</p>
+				<div class="grid grid-cols-2 gap-4">
+					<p class="col-span-1 text-end">Unverified account?</p>
+					<a href="/verify" class="hover:underline font-jost-semibold text-primary">
+						Verify Email
+					</a>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<p class="col-span-1 text-end">Forgot password?</p>
+					<a href="/recover" class="hover:underline font-jost-medium text-primary">
+						Reset Password
+					</a>
+				</div>
+			</div>
 		</div>
 	</form>
 </Form.Root>

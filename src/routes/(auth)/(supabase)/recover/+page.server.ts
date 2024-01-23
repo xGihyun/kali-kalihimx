@@ -22,7 +22,18 @@ export const actions: Actions = {
 
 		const { error } = await event.locals.supabase.auth.resetPasswordForEmail(form.data.email);
 
+		console.log('Reset password for email');
+		console.log(error);
+
 		if (error) {
+			if (error instanceof AuthApiError && error.status === 400) {
+				return fail(400, {
+					form,
+					success: false,
+					message: 'Invalid form data.'
+				});
+			}
+
 			return fail(error.status || 500, {
 				form,
 				success: false,

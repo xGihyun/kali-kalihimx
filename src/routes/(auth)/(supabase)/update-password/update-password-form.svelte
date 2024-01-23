@@ -2,63 +2,95 @@
 	import * as Form from '$lib/components/ui/form';
 	import { LoginSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { ActionData } from './$types';
 	import type { RequestStatus } from '$lib/types';
 	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
+	import { enhance } from '$app/forms';
 
 	export let form: SuperValidated<typeof LoginSchema>;
-	export let actionData: ActionData;
 
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
 </script>
 
-<Form.Root
-	method="POST"
-	{form}
-	schema={LoginSchema}
-	let:config
-	on:submit={() => (requestStatus.type = 'pending')}
->
-	<Form.Field {config} name="email">
-		<Form.Item>
-			<Form.Label class="text-base md:text-lg">Email</Form.Label>
-			<Form.Input class="text-base md:text-lg h-auto" type="email" />
-			<Form.Validation />
-		</Form.Item>
-	</Form.Field>
+<Form.Root {form} schema={LoginSchema} let:config>
+	<form
+		method="POST"
+		use:enhance={() => {
+			console.log('Logging in...');
 
-	<Form.Field {config} name="password">
-		<Form.Item>
-			<Form.Label class="text-base md:text-lg">Password</Form.Label>
-			<Form.Input class="text-base md:text-lg h-auto" type="password" />
-			<Form.Validation />
-		</Form.Item>
-	</Form.Field>
+			requestStatus = {
+				type: 'pending'
+			};
 
-	<Form.Button
-		class={` h-auto w-full space-x-1 ${
-			actionData?.success
-				? 'bg-green-500 pointer-events-none'
-				: requestStatus.type === 'pending'
-					? 'bg-yellow-500 pointer-events-none'
-					: !actionData?.success && requestStatus.type !== 'none'
-						? 'bg-red-500 hover:bg-red-600'
-						: 'bg-primary'
-		}`}
+			return async ({ result, update }) => {
+				await update();
+
+				if (result.type === 'success' || result.type === 'redirect') {
+					console.log('Successfully registered.');
+					requestStatus = {
+						type: 'success',
+						code: result.status,
+						message: result.data.message
+					};
+				} else {
+					console.error('Error');
+					requestStatus = {
+						type: 'error',
+						code: result.status,
+						message: result.data.message
+					};
+				}
+			};
+		}}
 	>
-		{#if actionData?.success}
-			<CheckCircled class="w-5 h-5" />
-			<span class="text-base md:text-lg">{actionData?.message}</span>
-		{:else if requestStatus.type === 'pending'}
-			<Reload class="w-5 h-5 animate-spin" />
-			<span class="text-base md:text-lg">Submitting...</span>
-		{:else if !actionData?.success && requestStatus.type !== 'none'}
-			<CrossCircled class="w-5 h-5" />
-			<span class="text-base md:text-lg">{actionData?.message}</span>
-		{:else}
-			<span class="text-base md:text-lg">Submit</span>
-		{/if}
-	</Form.Button>
+		<Form.Field {config} name="email">
+			<Form.Item>
+				<Form.Label class="text-base md:text-lg">Email</Form.Label>
+				<Form.Input
+					class="text-base md:text-lg h-auto"
+					type="email"
+					placeholder="Enter email (e.g. pangalan@gmail.com)"
+				/>
+				<Form.Validation />
+			</Form.Item>
+		</Form.Field>
+
+		<Form.Field {config} name="password">
+			<Form.Item>
+				<Form.Label class="text-base md:text-lg">New Password</Form.Label>
+				<Form.Input class="text-base md:text-lg h-auto" type="password" />
+				<Form.Validation />
+			</Form.Item>
+		</Form.Field>
+
+		<Form.Button
+			class={`text-base md:text-lg h-auto w-full ${
+				requestStatus.type === 'success'
+					? 'bg-green-500 pointer-events-none'
+					: requestStatus.type === 'error'
+						? 'bg-red-500 hover:bg-red-600'
+						: requestStatus.type === 'pending'
+							? 'bg-yellow-500 pointer-events-none'
+							: 'bg-primary'
+			}`}
+		>
+			<div class="flex items-center gap-1">
+				{#if requestStatus.type === 'pending'}
+					<Reload class="h-5 w-5 animate-spin" />
+					<span class="text-base md:text-lg">Updating...</span>
+				{:else if requestStatus.type === 'success'}
+					<CheckCircled class="h-5 w-5 " />
+					<span class="text-base md:text-lg">Success!</span>
+				{:else if requestStatus.type === 'error'}
+					<CrossCircled class="h-5 w-5 " />
+					<span class="text-base md:text-lg">
+						{requestStatus.message}
+					</span>
+				{:else}
+					<span class="text-base md:text-lg">Update</span>
+				{/if}
+			</div>
+		</Form.Button>
+	</form>
 </Form.Root>

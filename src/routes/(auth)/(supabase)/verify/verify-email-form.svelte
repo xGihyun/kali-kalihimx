@@ -1,19 +1,19 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
-	import { ResetPasswordSchema } from '$lib/schemas';
+	import { EmailSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import type { RequestStatus } from '$lib/types';
+	import { CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { enhance } from '$app/forms';
 
-	export let form: SuperValidated<typeof ResetPasswordSchema>;
+	export let form: SuperValidated<typeof EmailSchema>;
 
 	let requestStatus: RequestStatus = {
 		type: 'none'
 	};
 </script>
 
-<Form.Root {form} schema={ResetPasswordSchema} let:config>
+<Form.Root {form} schema={EmailSchema} let:config>
 	<form
 		method="POST"
 		use:enhance={() => {
@@ -25,6 +25,8 @@
 
 			return async ({ result, update }) => {
 				await update();
+
+				console.log(result);
 
 				if (result.type === 'success' || result.type === 'redirect') {
 					console.log('Successfully registered.');
@@ -50,9 +52,8 @@
 				<Form.Input
 					class="text-base md:text-lg h-auto"
 					type="email"
-					placeholder="Enter email (e.g pangalan@gmail.com)"
+					placeholder="Enter email (e.g. pangalan@gmail.com)"
 				/>
-				<Form.Description>Please enter your email to receive a confirmation link.</Form.Description>
 				<Form.Validation />
 			</Form.Item>
 		</Form.Field>
@@ -71,7 +72,7 @@
 			<div class="flex items-center gap-1">
 				{#if requestStatus.type === 'pending'}
 					<Reload class="h-5 w-5 animate-spin" />
-					<span class="text-base md:text-lg">Resetting...</span>
+					<span class="text-base md:text-lg">Verifying...</span>
 				{:else if requestStatus.type === 'success'}
 					<CheckCircled class="h-5 w-5 " />
 					<span class="text-base md:text-lg">Success! Please check your email.</span>
@@ -81,7 +82,7 @@
 						{requestStatus.message}
 					</span>
 				{:else}
-					<span class="text-base md:text-lg">Reset Password</span>
+					<span class="text-base md:text-lg">Verify</span>
 				{/if}
 			</div>
 		</Form.Button>

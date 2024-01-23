@@ -24,6 +24,10 @@ export const RegisterSchema = z.object({
 	sex: z.number()
 });
 
+export const EmailSchema = z.object({
+	email: z.string().email()
+});
+
 // export const RegisterSchema = object({
 // 	email: string([email()]),
 // 	password: string(),

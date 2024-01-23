@@ -127,7 +127,7 @@ async function insertUserToDatabase(
 	if (response.status === 409) {
 		return {
 			code: 409,
-			message: 'User already exists',
+			message: 'User already exists. Please reverify your email.',
 			success: false
 		};
 	}

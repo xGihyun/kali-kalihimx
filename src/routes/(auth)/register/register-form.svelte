@@ -69,7 +69,7 @@
 						<Form.Label class="text-base md:text-lg">Email</Form.Label>
 						<Form.Input
 							type="email"
-							placeholder="name@example.com"
+							placeholder="Enter email (e.g. pangalan@gmail.com)"
 							class="text-base md:text-lg h-auto"
 							required
 						/>

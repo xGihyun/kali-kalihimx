@@ -1,25 +1,18 @@
-import { fail, type Actions, redirect } from '@sveltejs/kit';
+import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
-import { LoginSchema } from '$lib/schemas';
+import { EmailSchema } from '$lib/schemas';
 import { AuthApiError } from '@supabase/supabase-js';
 
-export const load: PageServerLoad = async ({ url }) => {
-	const code = url.searchParams.get('code');
-
-	if (!code) {
-		console.log('User not verified to reset password.');
-		redirect(307, '/');
-	}
-
+export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(LoginSchema)
+		form: await superValidate(EmailSchema)
 	};
 };
 
 export const actions: Actions = {
 	default: async (event) => {
-		const form = await superValidate(event, LoginSchema);
+		const form = await superValidate(event, EmailSchema);
 
 		if (!form.valid) {
 			return fail(400, {
@@ -29,11 +22,16 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error } = await event.locals.supabase.auth.updateUser({
-			password: form.data.password
+		const { data, error } = await event.locals.supabase.auth.resend({
+			type: 'signup',
+			email: form.data.email,
+			options: {
+				emailRedirectTo: `${event.url.origin}/auth/callback`
+			}
 		});
 
-		console.log('Update password.');
+		console.log('Email reverification...');
+		console.log(data);
 		console.log(error);
 
 		if (error) {
@@ -45,7 +43,7 @@ export const actions: Actions = {
 				});
 			}
 
-			return fail(error.status || 500, {
+			return fail(500, {
 				form,
 				success: false,
 				message: 'Server error. Please try again later.'
@@ -55,7 +53,7 @@ export const actions: Actions = {
 		return {
 			form,
 			success: true,
-			message: 'Success!'
+			message: 'Success! Please check your email.'
 		};
 	}
 };
