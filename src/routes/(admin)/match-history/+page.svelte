@@ -42,7 +42,7 @@
 	}
 </script>
 
-<h1 class="font-jost-bold text-6xl mb-10">Match History</h1>
+<h1 class="text-4xl md:text-6xl font-jost-bold mb-10">Match History</h1>
 
 <div class="w-full mx-auto">
 	<div class="flex gap-2 mb-5">

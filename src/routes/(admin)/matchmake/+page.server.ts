@@ -25,11 +25,13 @@ export const actions: Actions = {
 
 		if (!form.valid) {
 			console.log('Invalid matchmake data.');
+
 			return fail(400, {
 				form,
 				result: null,
 				success: false,
-				message: 'Invalid form data'
+				message: 'Invalid form data.',
+				code: 400
 			});
 		}
 
@@ -48,9 +50,10 @@ export const actions: Actions = {
 
 		return {
 			form,
-			result: matches,
 			success: true,
-			message: 'Success'
+			message: matches.message,
+			code: matches.code,
+			result: matches.matches
 		};
 	}
 };
@@ -70,10 +73,20 @@ async function matchmake(
 	if (!response.ok) {
 		console.log(await response.text());
 
-		return;
+		return {
+			success: false,
+			code: response.status,
+			message: 'Matchmaking failed.',
+			matches: null
+		};
 	}
 
 	const matches: Matchmake[] = await response.json();
 
-	return matches;
+	return {
+		success: true,
+		code: response.status,
+		message: 'Matchmaking success.',
+		matches
+	};
 }

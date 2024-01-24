@@ -1,6 +1,6 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { Register, Section, User } from '$lib/types.ts';
+import type { Register, Section } from '$lib/types.ts';
 import { RegisterSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 import { AuthApiError } from '@supabase/supabase-js';
@@ -68,38 +68,41 @@ export const actions: Actions = {
 				event.cookies.delete(name, { path: '/' });
 			});
 
-			return fail(500, {
+			return fail(error.status || 500, {
 				form,
 				success: false,
 				message: error.message
 			});
 		}
 
-		const insertUser = await insertUserToDatabase(event.fetch, {
-			...registerUserData,
-			id: data.user?.id
-		});
+		const insertUser = await insertUserToDatabase(
+			event.fetch,
+			{
+				...registerUserData
+			},
+			data.user?.id
+		);
 
 		console.log('Insert user status');
 		console.log(insertUser);
 
 		if (!insertUser.success) {
-			return fail(409, {
+			return fail(insertUser.code, {
 				form,
 				success: false,
 				message: insertUser.message
 			});
 		}
 
-		const insertPowerCards = await insertRandomPowerCards(event.fetch, data.user?.id);
-
-		if (!insertPowerCards.success) {
-			return fail(500, {
-				form,
-				success: false,
-				message: insertPowerCards.message
-			});
-		}
+		// const insertPowerCards = await insertRandomPowerCards(event.fetch, data.user?.id);
+		//
+		// if (!insertPowerCards.success) {
+		// 	return fail(insertPowerCards.code, {
+		// 		form,
+		// 		success: false,
+		// 		message: insertPowerCards.message
+		// 	});
+		// }
 
 		return {
 			form,
@@ -111,18 +114,33 @@ export const actions: Actions = {
 
 async function insertUserToDatabase(
 	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
-	data: User
+	data: Register,
+	userId: string | undefined
 ) {
+	if (!userId) {
+		return {
+			code: 404,
+			message: 'User ID not found',
+			success: false
+		};
+	}
+
 	const response = await fetch(`${BACKEND_URL}/register`, {
 		method: 'POST',
-		body: JSON.stringify(data),
+		body: JSON.stringify({
+			...data,
+			id: userId
+		}),
 		headers: {
 			'Content-Type': 'application/json'
 		}
 	});
 
 	console.log('Inserting user to database...');
-	console.log(data);
+	console.log({
+		...data,
+		id: userId
+	});
 
 	if (response.status === 409) {
 		return {
@@ -134,14 +152,14 @@ async function insertUserToDatabase(
 
 	if (!response.ok) {
 		return {
-			code: 500,
+			code: response.status,
 			message: 'Unexpected server error',
 			success: false
 		};
 	}
 
 	return {
-		code: 200,
+		code: response.status,
 		message: 'Successfully registered',
 		success: true
 	};
@@ -154,7 +172,7 @@ async function insertRandomPowerCards(
 ) {
 	if (!userId) {
 		return {
-			code: 500,
+			code: 404,
 			message: 'User ID not found',
 			success: false
 		};
@@ -172,14 +190,14 @@ async function insertRandomPowerCards(
 
 	if (!response.ok) {
 		return {
-			code: 500,
+			code: response.status,
 			message: 'Unexpected server error',
 			success: false
 		};
 	}
 
 	return {
-		code: 200,
+		code: response.status,
 		message: 'Successfully registered',
 		success: true
 	};

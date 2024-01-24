@@ -1,6 +1,5 @@
 import { invalidate } from '$app/navigation';
 import { crop } from '$lib/pkg/my_package';
-import { error } from '@sveltejs/kit';
 import type { Dimensions } from './types';
 
 export async function upload(
@@ -8,7 +7,13 @@ export async function upload(
 	type: 'avatar' | 'banner',
 	{ width, height }: Dimensions
 ) {
-	if (!photo) return;
+	if (!photo) {
+		return {
+			success: false,
+			message: 'File not found.',
+			code: 404
+		};
+	}
 
 	const ogArrayBuffer = await photo.arrayBuffer();
 	const bytes = new Uint8Array(ogArrayBuffer);
@@ -20,17 +25,30 @@ export async function upload(
 	formData.append('file_name', `${photo.name.split('.')[0]}.avif`);
 	formData.append('type', type);
 
+	console.log(formData);
+
 	const response = await fetch('?/image', {
 		method: 'POST',
 		body: formData
 	});
 
 	if (!response.ok) {
-		console.error('Failed to update avatar');
-		throw error(500, await response.text());
+		console.error('Failed to update image.');
+
+		return {
+			success: false,
+			message: 'Failed to update image.',
+			code: response.status
+		};
 	}
 
 	await invalidate('user:images');
 
-	console.log('Updated avatar');
+	console.log('Successfully updated image.');
+
+	return {
+		success: true,
+		message: 'Successfully updated image.',
+		code: response.status
+	};
 }

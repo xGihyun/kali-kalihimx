@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 
 	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
 
-	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=${60}, must-revalidate` });
 
 	return {
 		lazy: {
@@ -80,7 +80,8 @@ export const actions: Actions = {
 		if (!form.valid || form.data.users.length < 1) {
 			return fail(400, {
 				form,
-				success: false
+				success: false,
+				message: 'Invalid form data.'
 			});
 		}
 
@@ -94,19 +95,23 @@ export const actions: Actions = {
 
 		// event.locals.supabase.auth.admin.deleteUser('');
 
+		console.log('Deleting user...');
+
 		if (!response.ok) {
 			console.log(await response.text());
 			console.log(response.status);
 
 			return fail(response.status, {
 				form,
-				success: false
+				success: false,
+				message: 'Failed to delete user.'
 			});
 		}
 
 		return {
 			form,
-			success: true
+			success: true,
+			message: 'Success'
 		};
 	}
 };

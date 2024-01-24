@@ -7,7 +7,7 @@
 	export let form;
 </script>
 
-<h1 class="font-jost-bold text-6xl mb-10">Matchmake</h1>
+<h1 class="text-4xl md:text-6xl font-jost-bold mb-10">Matchmake</h1>
 
 <div class="mb-5">
 	<MatchmakeForm form={data.form} sections={data.sections} />

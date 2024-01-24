@@ -58,24 +58,23 @@
 			return async ({ result, update }) => {
 				await update();
 
-				if (result.type === 'error') {
-					console.error('Error in deleting users.');
+				console.log(result);
+
+				if (result.type === 'success' || result.type === 'redirect') {
+					console.log('Successfully submitted score.');
 
 					requestStatus = {
-						type: 'error',
-						code: result.status
-					};
-					return;
-				} else if (result.type === 'failure') {
-					console.error('Failed to delete users.');
-
-					requestStatus = {
-						type: 'error',
-						code: result.status
+						type: 'success',
+						code: result.status,
+						message: result.data.message
 					};
 				} else {
-					console.log('Successfully deleted.');
-					requestStatus.type = 'success';
+					console.error('Failed to submit score.');
+					requestStatus = {
+						type: 'error',
+						code: result.status,
+						message: result.data.message
+					};
 				}
 			};
 		}}

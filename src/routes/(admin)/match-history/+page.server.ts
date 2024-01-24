@@ -78,6 +78,8 @@ export const actions: Actions = {
 		const { user1_id, user2_id, user1_score, user2_score, match_set_id } = form.data;
 		const difference = Math.abs(user1_score - user2_score);
 
+		console.log('Score difference: ', difference);
+
 		const data1: UpdateScore = {
 			user_id: user1_id,
 			score: user1_score,
@@ -91,20 +93,6 @@ export const actions: Actions = {
 			is_winner: user1_score < user2_score,
 			difference
 		};
-
-		// const results = await Promise.all(
-		// );
-
-		// Check for errors in results
-		// results.forEach((result) => {
-		// 	if (result && result.success === false) {
-		// 		return fail(result.code, {
-		// 			form,
-		// 			success: false,
-		// 			message: result.message
-		// 		});
-		// 	}
-		// });
 
 		await submitScore(data1, event.fetch);
 		await submitScore(data2, event.fetch);

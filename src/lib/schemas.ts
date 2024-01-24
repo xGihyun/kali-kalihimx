@@ -46,9 +46,9 @@ export const EmailSchema = z.object({
 // });
 
 export const arnisMatchSchema = z.object({
-	section: z.string(),
-	skill: z.string(),
-	footwork: z.string()
+	section: z.string().min(1),
+	skill: z.string().min(1),
+	footwork: z.string().min(1)
 });
 
 export type ArnisMatchSchema = typeof arnisMatchSchema;

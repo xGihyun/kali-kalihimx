@@ -1,7 +1,8 @@
 use image::imageops::FilterType::Lanczos3;
 use image::{DynamicImage, ImageOutputFormat};
 use std::io::Cursor;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsValue;
 // use webp::Encoder;
 
 #[wasm_bindgen]
