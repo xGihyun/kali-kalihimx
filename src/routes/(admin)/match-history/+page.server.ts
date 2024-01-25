@@ -79,23 +79,45 @@ export const actions: Actions = {
 		const difference = Math.abs(user1_score - user2_score);
 
 		console.log('Score difference: ', difference);
+		console.log('Verdict: ');
+		console.log(getVerdict(user1_score, user2_score));
+		console.log(getVerdict(user2_score, user1_score));
 
 		const data1: UpdateScore = {
 			user_id: user1_id,
 			score: user1_score,
-			is_winner: user1_score > user2_score,
-			difference
+			is_winner: getVerdict(user1_score, user2_score),
+			difference,
+			match_set_id
 		};
 
 		const data2: UpdateScore = {
 			user_id: user2_id,
 			score: user2_score,
-			is_winner: user1_score < user2_score,
-			difference
+			is_winner: getVerdict(user2_score, user1_score),
+			difference,
+			match_set_id
 		};
 
-		await submitScore(data1, event.fetch);
-		await submitScore(data2, event.fetch);
+		const submitScore1 = await submitScore(data1, event.fetch);
+		const submitScore2 = await submitScore(data2, event.fetch);
+
+		if (!submitScore1.success) {
+			return fail(submitScore1.code, {
+				form,
+				success: false,
+				message: submitScore1.message
+			});
+		}
+
+		if (!submitScore2.success) {
+			return fail(submitScore2.code, {
+				form,
+				success: false,
+				message: submitScore2.message
+			});
+		}
+
 		const updateMatch = await updateMatchStatus(event.fetch, match_set_id, 'done');
 
 		if (!updateMatch.success) {
@@ -113,6 +135,18 @@ export const actions: Actions = {
 		};
 	}
 };
+
+function getVerdict(user_score: number, opponent_score: number): 'win' | 'lose' | 'draw' {
+	if (user_score > opponent_score) {
+		return 'win';
+	}
+
+	if (user_score < opponent_score) {
+		return 'lose';
+	}
+
+	return 'draw';
+}
 
 async function submitScore(
 	data: UpdateScore,

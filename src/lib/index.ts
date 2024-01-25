@@ -407,6 +407,52 @@ export function snakeCaseToTitleCase(input: string | null): string | undefined {
 	return titleCase;
 }
 
+export function getUserVerdict(
+	userId: string,
+	match: Matchmake
+): 'win' | 'lose' | 'draw' | undefined {
+	if (userId === match.user1_id) {
+		return match.user1_arnis_verdict;
+	}
+
+	if (userId === match.user2_id) {
+		return match.user2_arnis_verdict;
+	}
+}
+
+export function getUserCardBattleVerdict(
+	userId: string,
+	match: Matchmake
+): 'win' | 'lose' | 'draw' | undefined {
+	if (match.user1_total_damage === match.user2_total_damage) {
+		return 'draw';
+	}
+
+	if (userId === match.user1_id) {
+		if (
+			match.user1_total_damage &&
+			match.user2_total_damage &&
+			match.user1_total_damage > match.user2_total_damage
+		) {
+			return 'win';
+		}
+
+		return 'lose';
+	}
+
+	if (userId === match.user2_id) {
+		if (
+			match.user1_total_damage &&
+			match.user2_total_damage &&
+			match.user2_total_damage > match.user1_total_damage
+		) {
+			return 'win';
+		}
+
+		return 'lose';
+	}
+}
+
 export function getOpponent(
 	userId: string | undefined,
 	match: Matchmake | undefined,

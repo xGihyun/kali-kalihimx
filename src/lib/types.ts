@@ -55,6 +55,10 @@ export type Matchmake = {
 	set: number;
 	user1_total_damage?: number;
 	user2_total_damage?: number;
+	user1_arnis_verdict?: 'win' | 'lose' | 'draw';
+	user2_arnis_verdict?: 'win' | 'lose' | 'draw';
+	user1_score?: number;
+	user2_score?: number;
 };
 
 export type LatestOpponent = {
@@ -120,7 +124,8 @@ export type UpdateScore = {
 	user_id: string;
 	score: number;
 	difference: number;
-	is_winner: boolean;
+	is_winner: 'win' | 'lose' | 'draw';
+	match_set_id: string;
 };
 
 export type PowerCard = {
