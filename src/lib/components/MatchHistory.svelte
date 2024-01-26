@@ -13,14 +13,16 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { goto, preloadData, pushState } from '$app/navigation';
 	import CardBattle from '../../routes/card-battle/[match_set_id]/+page.svelte';
+	import ArnisMatch from '../../routes/arnis/[match_set_id]/+page.svelte';
 	import { page } from '$app/stores';
 
 	export let matches: Matchmake[];
 	export let userId: string;
 
-	let isOpen = false;
+	let cardBattleIsOpen = false;
+	let arnisMatchIsOpen = false;
 
-	async function showModal(e: MouseEvent, match: Matchmake) {
+	async function showModal(e: MouseEvent, match: Matchmake, type: 'arnis' | 'card_battle') {
 		const { href } = e.currentTarget as HTMLAnchorElement;
 
 		const result = await preloadData(href);
@@ -28,7 +30,11 @@
 		if (result.type === 'loaded' && result.status === 200) {
 			pushState(href, { selected: { turns: result.data.turns, user: result.data.user, match } });
 
-			isOpen = true;
+			if (type === 'arnis') {
+				arnisMatchIsOpen = true;
+			} else {
+				cardBattleIsOpen = true;
+			}
 		} else {
 			goto(href);
 		}
@@ -36,9 +42,9 @@
 </script>
 
 <Dialog.Root
-	open={isOpen}
+	open={cardBattleIsOpen}
 	onOpenChange={(open) => {
-		isOpen = open;
+		cardBattleIsOpen = open;
 		history.back();
 	}}
 	closeOnOutsideClick={false}
@@ -55,9 +61,49 @@
 	</Dialog.Content>
 </Dialog.Root>
 
+<Dialog.Root
+	open={arnisMatchIsOpen}
+	onOpenChange={(open) => {
+		arnisMatchIsOpen = open;
+		history.back();
+	}}
+	closeOnOutsideClick={false}
+>
+	<Dialog.Content class="max-w-6xl z-[250] overflow-y-auto max-h-[90svh]">
+		<Dialog.Header>
+			<Dialog.Title class="text-2xl">Arnis</Dialog.Title>
+		</Dialog.Header>
+
+		{#if $page.state.selected}
+			<ArnisMatch data={$page.state.selected} />
+		{/if}
+	</Dialog.Content>
+</Dialog.Root>
+
 <Card.Root>
 	<Card.Header>
-		<Card.Title class="text-2xl md:text-4xl font-normal font-jost-bold">Match History</Card.Title>
+		<Card.Title
+			class="text-2xl md:text-4xl font-normal font-jost-bold flex justify-between flex-wrap gap-2"
+		>
+			Match History
+
+			<div class="flex gap-8 items-center mb-2 text-base flex-wrap">
+				<div class="flex items-center gap-2">
+					<div class="bg-green-500 w-4 h-4 rounded-full"></div>
+					<span class="font-jost-medium">Win</span>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<div class="bg-yellow-500 w-4 h-4 rounded-full"></div>
+					<span class="font-jost-medium">Draw</span>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<div class="bg-red-600 w-4 h-4 rounded-full"></div>
+					<span class="font-jost-medium">Loss</span>
+				</div>
+			</div>
+		</Card.Title>
 	</Card.Header>
 	<Card.Content>
 		{#if matches.length < 1}
@@ -82,23 +128,31 @@
 						<Table.Body>
 							{#each matches as match (match.id)}
 								{#if match.status === 'done'}
-									<Table.Row class="text-sm sm:text-base md:text-lg">
-										<Table.Cell
-											class={`w-1/3 bg-gradient-to-r  to-50% border-l-8 ${
-												getUserVerdict(userId, match) === 'win'
-													? 'border-l-green-500 from-green-900'
-													: getUserVerdict(userId, match) === 'lose'
-														? 'border-l-red-600 from-red-950'
-														: getUserVerdict(userId, match) === 'draw'
-															? 'border-l-yellow-500 from-yellow-900'
-															: 'border-l-neutral-500 from-neutral-900'
-											}`}>{getOpponent(userId, match).name}</Table.Cell
-										>
-										<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
-										<Table.Cell class="w-1/4"
-											>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
-										>
-									</Table.Row>
+									<a
+										class="contents"
+										href={`/arnis/${match.id}`}
+										on:click|preventDefault={(e) => showModal(e, match, 'arnis')}
+									>
+										<Table.Row class="text-sm sm:text-base md:text-lg">
+											<Table.Cell
+												class={`w-1/3 bg-gradient-to-r  to-50% border-l-8 ${
+													getUserVerdict(userId, match) === 'win'
+														? 'border-l-green-500 from-green-900'
+														: getUserVerdict(userId, match) === 'lose'
+															? 'border-l-red-600 from-red-950'
+															: getUserVerdict(userId, match) === 'draw'
+																? 'border-l-yellow-500 from-yellow-900'
+																: 'border-l-neutral-500 from-neutral-900'
+												}`}>{getOpponent(userId, match).name}</Table.Cell
+											>
+											<Table.Cell class="w-1/4"
+												>{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell
+											>
+											<Table.Cell class="w-1/4"
+												>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
+											>
+										</Table.Row>
+									</a>
 								{/if}
 							{/each}
 						</Table.Body>
@@ -120,7 +174,7 @@
 									<a
 										class="contents"
 										href={`/card-battle/${match.id}`}
-										on:click|preventDefault={(e) => showModal(e, match)}
+										on:click|preventDefault={(e) => showModal(e, match, 'card_battle')}
 									>
 										<Table.Row class="text-sm sm:text-base md:text-lg">
 											<Table.Cell

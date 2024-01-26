@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 	depends('card-battle:damage');
 
 	// TODO: CACHE INVALIDATION
-	setHeaders({ 'cache-control': `max-age=60, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	return {
 		matches: getMatches(),

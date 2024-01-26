@@ -59,6 +59,10 @@ export type Matchmake = {
 	user2_arnis_verdict?: 'win' | 'lose' | 'draw';
 	user1_score?: number;
 	user2_score?: number;
+	user1_des_count: number;
+	user2_des_count: number;
+	user1_ap_count: number;
+	user2_ap_count: number;
 };
 
 export type LatestOpponent = {

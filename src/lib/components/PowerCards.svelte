@@ -179,6 +179,8 @@
 									use:enhance={({ formData }) => {
 										console.log('Activating power card: ', card.name);
 
+										card.is_active = true;
+
 										if (card.name === "Warlord's Domain") {
 											selectedCard = undefined;
 											selectedUser = undefined;

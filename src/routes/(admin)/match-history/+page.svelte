@@ -45,99 +45,103 @@
 <h1 class="text-4xl md:text-6xl font-jost-bold mb-10">Match History</h1>
 
 <div class="w-full mx-auto">
-	<div class="flex gap-2 mb-5">
-		{#await data.sections}
-			<Skeleton class="min-h-10 w-80" />
-		{:then sections}
-			{#if sections}
-				<Select.Root
-					selected={{
-						value: selectedSection,
-						label: snakeCaseToTitleCase(selectedSection)
-					}}
-				>
-					<Select.Trigger class="flex-[2] h-auto">
-						<Select.Value placeholder="Section" class="text-base md:text-lg" />
-					</Select.Trigger>
-					<Select.Content>
-						{#each sections as section (section.id)}
-							<a
-								class="contents"
-								href={`/match-history?set=${selectedSet}&section=${section.id}&match_type=${selectedMatchType}`}
-							>
-								<Select.Item value={section.id} class="text-base md:text-lg h-auto">
-									{section.name}
-								</Select.Item>
-							</a>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			{:else}
-				<Alert.Root variant="destructive">
-					<AlertCircle class="h-4 w-4" />
-					<Alert.Title>Error</Alert.Title>
-					<Alert.Description
-						>Failed to fetch sections. Please check your connection.</Alert.Description
+	<div class="flex gap-2 mb-5 flex-col sm:flex-row">
+		<div class="flex gap-2 w-full">
+			{#await data.sections}
+				<Skeleton class="min-h-10 w-80" />
+			{:then sections}
+				{#if sections}
+					<Select.Root
+						selected={{
+							value: selectedSection,
+							label: snakeCaseToTitleCase(selectedSection)
+						}}
 					>
-				</Alert.Root>
-			{/if}
-		{/await}
+						<Select.Trigger class="flex-[2] h-auto">
+							<Select.Value placeholder="Section" class="text-base md:text-lg" />
+						</Select.Trigger>
+						<Select.Content>
+							{#each sections as section (section.id)}
+								<a
+									class="contents"
+									href={`/match-history?set=${selectedSet}&section=${section.id}&match_type=${selectedMatchType}`}
+								>
+									<Select.Item value={section.id} class="text-base md:text-lg h-auto">
+										{section.name}
+									</Select.Item>
+								</a>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				{:else}
+					<Alert.Root variant="destructive">
+						<AlertCircle class="h-4 w-4" />
+						<Alert.Title>Error</Alert.Title>
+						<Alert.Description
+							>Failed to fetch sections. Please check your connection.</Alert.Description
+						>
+					</Alert.Root>
+				{/if}
+			{/await}
 
-		{#await data.maxSets}
-			<Skeleton class="min-h-10 w-60" />
-		{:then maxSets}
-			{#if maxSets}
-				<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
-					<Select.Trigger class="flex-1 h-auto">
-						<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
-					</Select.Trigger>
-					<Select.Content>
-						{#each maxSets as maxSet (maxSet.section)}
-							{#if maxSet.section === selectedSection}
-								{#each Array(maxSet.max_set) as _, idx (idx)}
-									<a
-										class="contents"
-										href={`/match-history?set=${
-											idx + 1
-										}&section=${selectedSection}&match_type=${selectedMatchType}`}
-									>
-										<Select.Item value={idx + 1} class="text-base md:text-lg h-auto">
-											{idx + 1}
-										</Select.Item>
-									</a>
-								{/each}
-							{/if}
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			{:else}
-				<Alert.Root variant="destructive">
-					<AlertCircle class="h-4 w-4" />
-					<Alert.Title>Error</Alert.Title>
-					<Alert.Description
-						>Failed to fetch match sets. Please check your connection.</Alert.Description
-					>
-				</Alert.Root>
-			{/if}
-		{/await}
+			{#await data.maxSets}
+				<Skeleton class="min-h-10 w-60" />
+			{:then maxSets}
+				{#if maxSets}
+					<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
+						<Select.Trigger class="flex-1 h-auto">
+							<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
+						</Select.Trigger>
+						<Select.Content>
+							{#each maxSets as maxSet (maxSet.section)}
+								{#if maxSet.section === selectedSection}
+									{#each Array(maxSet.max_set) as _, idx (idx)}
+										<a
+											class="contents"
+											href={`/match-history?set=${
+												idx + 1
+											}&section=${selectedSection}&match_type=${selectedMatchType}`}
+										>
+											<Select.Item value={idx + 1} class="text-base md:text-lg h-auto">
+												{idx + 1}
+											</Select.Item>
+										</a>
+									{/each}
+								{/if}
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				{:else}
+					<Alert.Root variant="destructive">
+						<AlertCircle class="h-4 w-4" />
+						<Alert.Title>Error</Alert.Title>
+						<Alert.Description
+							>Failed to fetch match sets. Please check your connection.</Alert.Description
+						>
+					</Alert.Root>
+				{/if}
+			{/await}
 
-		<Select.Root selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}>
-			<Select.Trigger class="flex-1 h-auto">
-				<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
-			</Select.Trigger>
-			<Select.Content>
-				{#each MATCH_TYPES as [key, value] (key)}
-					<a
-						class="contents"
-						href={`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${key}`}
-					>
-						<Select.Item value={key} class="text-base md:text-lg h-auto">
-							{value}
-						</Select.Item>
-					</a>
-				{/each}
-			</Select.Content>
-		</Select.Root>
+			<Select.Root
+				selected={{ value: selectedMatchType, label: MATCH_TYPES.get(selectedMatchType) }}
+			>
+				<Select.Trigger class="flex-1 h-auto">
+					<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
+				</Select.Trigger>
+				<Select.Content>
+					{#each MATCH_TYPES as [key, value] (key)}
+						<a
+							class="contents"
+							href={`/match-history?set=${selectedSet}&section=${selectedSection}&match_type=${key}`}
+						>
+							<Select.Item value={key} class="text-base md:text-lg h-auto">
+								{value}
+							</Select.Item>
+						</a>
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
 
 		{#if selectedMatchType === 'card_battle'}
 			<Button
