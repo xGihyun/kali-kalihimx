@@ -110,11 +110,11 @@
 		class="bg-card fixed top-5 left-[calc(50%+18rem)] -translate-x-1/2 lg:-translate-x-[calc(50%+9rem)] px-4 py-2 border border-border rounded-full"
 	>
 		<p class="text-base font-jost-medium">
-			{remainingTime.hours}
+			{remainingTime.hours.toString().padStart(2, '0')}
 			<span class="text-primary">:</span>
-			{remainingTime.minutes}
+			{remainingTime.minutes.toString().padStart(2, '0')}
 			<span class="text-primary">:</span>
-			{remainingTime.seconds}
+			{remainingTime.seconds.toString().padStart(2, '0')}
 		</p>
 	</div>
 

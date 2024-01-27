@@ -422,8 +422,13 @@ export function getUserVerdict(
 
 export function getUserCardBattleVerdict(
 	userId: string,
-	match: Matchmake
+	match: Matchmake,
+	latest: boolean
 ): 'win' | 'lose' | 'draw' | undefined {
+	if (latest && (!match.user1_total_damage || !match.user2_total_damage)) {
+		return;
+	}
+
 	if (match.user1_total_damage === match.user2_total_damage) {
 		return 'draw';
 	}

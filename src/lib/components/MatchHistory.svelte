@@ -102,6 +102,11 @@
 					<div class="bg-red-600 w-4 h-4 rounded-full"></div>
 					<span class="font-jost-medium">Loss</span>
 				</div>
+
+				<!-- <div class="flex items-center gap-2"> -->
+				<!-- 	<div class="bg-muted-foreground w-4 h-4 rounded-full"></div> -->
+				<!-- 	<span class="font-jost-medium">Pending</span> -->
+				<!-- </div> -->
 			</div>
 		</Card.Title>
 	</Card.Header>
@@ -127,33 +132,29 @@
 						</Table.Header>
 						<Table.Body>
 							{#each matches as match (match.id)}
-								{#if match.status === 'done'}
-									<a
-										class="contents"
-										href={`/arnis/${match.id}`}
-										on:click|preventDefault={(e) => showModal(e, match, 'arnis')}
-									>
-										<Table.Row class="text-sm sm:text-base md:text-lg">
-											<Table.Cell
-												class={`w-1/3 bg-gradient-to-r  to-50% border-l-8 ${
-													getUserVerdict(userId, match) === 'win'
-														? 'border-l-green-500 from-green-900'
-														: getUserVerdict(userId, match) === 'lose'
-															? 'border-l-red-600 from-red-950'
-															: getUserVerdict(userId, match) === 'draw'
-																? 'border-l-yellow-500 from-yellow-900'
-																: 'border-l-neutral-500 from-neutral-900'
-												}`}>{getOpponent(userId, match).name}</Table.Cell
-											>
-											<Table.Cell class="w-1/4"
-												>{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell
-											>
-											<Table.Cell class="w-1/4"
-												>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
-											>
-										</Table.Row>
-									</a>
-								{/if}
+								<a
+									class="contents"
+									href={`/arnis/${match.id}`}
+									on:click|preventDefault={(e) => showModal(e, match, 'arnis')}
+								>
+									<Table.Row class="text-sm sm:text-base md:text-lg">
+										<Table.Cell
+											class={`w-1/3 bg-gradient-to-r  to-50% border-l-8 ${
+												getUserVerdict(userId, match) === 'win'
+													? 'border-l-green-500 from-green-900'
+													: getUserVerdict(userId, match) === 'lose'
+														? 'border-l-red-600 from-red-950'
+														: getUserVerdict(userId, match) === 'draw'
+															? 'border-l-yellow-500 from-yellow-900'
+															: 'border-l-muted-foreground from-muted'
+											}`}>{getOpponent(userId, match).name}</Table.Cell
+										>
+										<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
+										<Table.Cell class="w-1/4"
+											>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
+										>
+									</Table.Row>
+								</a>
 							{/each}
 						</Table.Body>
 					</Table.Root>
@@ -170,53 +171,56 @@
 						</Table.Header>
 						<Table.Body>
 							{#each matches as match, idx (match.id)}
-								{#if idx < matches.length - 1}
-									<a
-										class="contents"
-										href={`/card-battle/${match.id}`}
-										on:click|preventDefault={(e) => showModal(e, match, 'card_battle')}
-									>
-										<Table.Row class="text-sm sm:text-base md:text-lg">
-											<Table.Cell
-												class={`w-1/3 bg-gradient-to-r to-50% border-l-8 ${
-													getUserCardBattleVerdict(userId, match) === 'win'
-														? 'border-l-green-500 from-green-900'
-														: getUserCardBattleVerdict(userId, match) === 'lose'
-															? 'border-l-red-600 from-red-950'
-															: getUserCardBattleVerdict(userId, match) === 'draw'
-																? 'border-l-yellow-500 from-yellow-900'
-																: 'border-l-neutral-500 from-neutral-900'
-												}`}>{getOpponent(userId, match).name}</Table.Cell
-											>
-											<Table.Cell
-												class={`w-1/4 ${
-													match.user1_total_damage
-														? 'text-foreground'
-														: 'text-muted-foreground italic'
-												}`}
-											>
-												{#if match.og_user1_id === userId}
-													{match.user1_total_damage}
-												{:else}
-													{match.user2_total_damage}
-												{/if}
-											</Table.Cell>
-											<Table.Cell
-												class={`w-1/4 ${
-													match.user1_total_damage
-														? 'text-foreground'
-														: 'text-muted-foreground italic'
-												}`}
-											>
-												{#if match.og_user1_id === userId}
-													{match.user2_total_damage}
-												{:else}
-													{match.user1_total_damage}
-												{/if}
-											</Table.Cell>
-										</Table.Row>
-									</a>
-								{/if}
+								{@const dmg1 =
+									match.og_user1_id === userId
+										? match.user1_total_damage
+										: match.user2_total_damage}
+								{@const dmg2 =
+									match.og_user1_id !== userId
+										? match.user1_total_damage
+										: match.user2_total_damage}
+
+								<a
+									class="contents"
+									href={`/card-battle/${match.id}`}
+									on:click|preventDefault={(e) => showModal(e, match, 'card_battle')}
+								>
+									<Table.Row class="text-sm sm:text-base md:text-lg">
+										<Table.Cell
+											class={`w-1/3 bg-gradient-to-r to-50% border-l-8 ${
+												getUserCardBattleVerdict(userId, match, idx === 0) === 'win'
+													? 'border-l-green-500 from-green-900'
+													: getUserCardBattleVerdict(userId, match, idx === 0) === 'lose'
+														? 'border-l-red-600 from-red-950'
+														: getUserCardBattleVerdict(userId, match, idx === 0) === 'draw'
+															? 'border-l-yellow-500 from-yellow-900'
+															: 'border-l-muted-foreground from-muted'
+											}`}>{getOpponent(userId, match).name}</Table.Cell
+										>
+										<Table.Cell
+											class={`w-1/4 ${dmg1 ? 'text-foreground' : 'text-muted-foreground italic'}`}
+										>
+											{#if idx === 0 && !dmg1}
+												Pending
+											{:else if dmg1}
+												{dmg1}
+											{:else}
+												Null
+											{/if}
+										</Table.Cell>
+										<Table.Cell
+											class={`w-1/4 ${dmg2 ? 'text-foreground' : 'text-muted-foreground italic'}`}
+										>
+											{#if idx === 0 && !dmg2}
+												Pending
+											{:else if dmg2}
+												{dmg2}
+											{:else}
+												Null
+											{/if}
+										</Table.Cell>
+									</Table.Row>
+								</a>
 							{/each}
 						</Table.Body>
 					</Table.Root>

@@ -59,19 +59,11 @@
 				>
 
 				<Table.Cell class="text-sm sm:text-base md:text-lg">
-					{#if match.user1_id === data.user?.id}
-						{match.user1_score}
-					{:else}
-						{match.user2_score}
-					{/if}
+					{user1Score}
 				</Table.Cell>
 
 				<Table.Cell class="text-sm sm:text-base md:text-lg">
-					{#if match.user1_id !== data.user?.id}
-						{match.user1_score}
-					{:else}
-						{match.user2_score}
-					{/if}
+					{user2Score}
 				</Table.Cell>
 			</Table.Row>
 

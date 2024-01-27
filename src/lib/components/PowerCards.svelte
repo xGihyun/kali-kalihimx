@@ -9,6 +9,7 @@
 	import { invalidate } from '$app/navigation';
 	import { CardStackPlus, CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let powerCards: PowerCard[] = [];
 	export let isCurrentUser: boolean = false;
@@ -34,37 +35,94 @@
 
 		return users;
 	}
+
+	let timerInterval: number | undefined;
+	let difference = 0;
+	let remainingTime = {
+		hours: 0,
+		minutes: 0,
+		seconds: 0
+	};
+
+	$: isPowerCardDisabled = (card: PowerCard) => {
+		return card.is_used || card.is_active || hasNoCurrentMatch || difference > 0;
+	};
+
+	onMount(() => {
+		timerInterval = setInterval(() => {
+			if (!matches[0]) return;
+
+			const currentTime = new Date().getTime();
+			const deadline = new Date(matches[0].card_deadline).getTime();
+
+			// Add UTC+8 offset
+			const asiaPacificDate = new Date(deadline - 8 * 60 * 60 * 1000).getTime();
+
+			difference = asiaPacificDate - currentTime;
+
+			remainingTime.hours = Math.floor(difference / (1000 * 60 * 60));
+			remainingTime.minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+			remainingTime.seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+			if (difference <= 0) {
+				console.log('STOP');
+				clearInterval(timerInterval);
+				invalidate('card_battle:timer');
+			}
+		}, 1000);
+	});
+
+	onDestroy(() => clearInterval(timerInterval));
 </script>
 
 <Card.Root>
 	<Card.Header>
 		<Card.Title
-			class="text-2xl md:text-4xl font-normal font-jost-bold flex justify-between flex-wrap gap-2"
+			class="text-2xl md:text-4xl font-normal font-jost-bold flex justify-between flex-wrap gap-2 items-center"
 		>
 			Power Cards
 
-			<div class="flex gap-8 items-center mb-2 text-base flex-wrap">
-				<div class="flex items-center gap-2">
-					<div class="bg-muted-foreground w-4 h-4 rounded-full"></div>
-					<span class="font-jost-medium">Available</span>
+			{#if difference > 0}
+				<div class="bg-card px-4 py-2 border border-border rounded-full">
+					<p class="text-base font-jost-medium">
+						{remainingTime.hours.toString().padStart(2, '0')}
+						<span class="text-primary">:</span>
+						{remainingTime.minutes.toString().padStart(2, '0')}
+						<span class="text-primary">:</span>
+						{remainingTime.seconds.toString().padStart(2, '0')}
+					</p>
 				</div>
+			{:else}
+				<div class="flex gap-8 items-center mb-2 text-base flex-wrap h-full">
+					<div class="flex items-center gap-2">
+						<div class="bg-muted-foreground w-4 h-4 rounded-full"></div>
+						<span class="font-jost-medium">Available</span>
+					</div>
 
-				<div class="flex items-center gap-2">
-					<div class="bg-muted-foreground w-4 h-4 animate-pulse rounded-full"></div>
-					<span class="font-jost-medium">Activated</span>
-				</div>
+					<div class="flex items-center gap-2">
+						<div class="bg-muted-foreground w-4 h-4 animate-pulse rounded-full"></div>
+						<span class="font-jost-medium">Activated</span>
+					</div>
 
-				<div class="flex items-center gap-2">
-					<div class="bg-muted w-4 h-4 rounded-full"></div>
-					<span class="font-jost-medium">Used</span>
+					<div class="flex items-center gap-2">
+						<div class="bg-muted w-4 h-4 rounded-full"></div>
+						<span class="font-jost-medium">Used</span>
+					</div>
 				</div>
-			</div>
+			{/if}
 		</Card.Title>
 	</Card.Header>
 
 	{#if hasNoCurrentMatch && isCurrentUser}
 		<p class="text-muted-foreground italic col-span-2 px-6 pb-6">
 			Please wait for the admin to queue a new match.
+		</p>
+	{:else if difference > 0}
+		<p class="text-muted-foreground italic col-span-2 px-6 pb-6">
+			You can only use Power Cards after the
+
+			<a href="/card-battle" class="font-jost-medium text-primary/75 underline">Card Battle</a>
+			is over.
 		</p>
 	{/if}
 
@@ -77,12 +135,12 @@
 
 				{#if isCurrentUser}
 					<Dialog.Root closeOnOutsideClick={false}>
-						<Dialog.Trigger disabled={card.is_used || card.is_active || hasNoCurrentMatch}>
+						<Dialog.Trigger disabled={isPowerCardDisabled(card)}>
 							<img
 								src={powerCardDetails?.image_url}
 								alt={card.name}
 								class={`w-full ${
-									card.is_used || hasNoCurrentMatch
+									isPowerCardDisabled(card)
 										? 'brightness-[.30]'
 										: card.is_active
 											? 'animate-pulse'
@@ -232,7 +290,7 @@
 														? 'bg-yellow-500 pointer-events-none'
 														: 'bg-primary'
 										}`}
-										disabled={card.is_active || card.is_used || hasNoCurrentMatch}
+										disabled={isPowerCardDisabled(card)}
 									>
 										<div class="flex items-center gap-1">
 											{#if loadingStatus[idx] === 'pending'}
