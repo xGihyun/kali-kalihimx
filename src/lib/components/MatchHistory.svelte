@@ -6,7 +6,7 @@
 		getUserVerdict,
 		snakeCaseToTitleCase
 	} from '$lib';
-	import type { Matchmake } from '$lib/types';
+	import type { Matchmake, Result } from '$lib/types';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Table from '$lib/components/ui/table';
 	import * as Card from '$lib/components/ui/card';
@@ -14,10 +14,13 @@
 	import { goto, preloadData, pushState } from '$app/navigation';
 	import CardBattle from '../../routes/card-battle/[match_set_id]/+page.svelte';
 	import ArnisMatch from '../../routes/arnis/[match_set_id]/+page.svelte';
+	import * as Alert from '$lib/components/ui/alert';
+	import { AlertCircle } from 'lucide-svelte';
 	import { page } from '$app/stores';
+	import { isResult } from '$lib/helpers';
 
-	export let matches: Matchmake[];
-	export let ogMatches: Matchmake[];
+	export let matches: Matchmake[] | Result;
+	export let ogMatches: Matchmake[] | Result;
 	export let userId: string;
 
 	let cardBattleIsOpen = false;
@@ -112,7 +115,25 @@
 		</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		{#if matches.length < 1}
+		{#if isResult(matches)}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>
+					<p>Failed to fetch matches.</p>
+					<p>{matches.message}</p>
+				</Alert.Description>
+			</Alert.Root>
+		{:else if isResult(ogMatches)}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>
+					<p>Failed to fetch matches.</p>
+					<p>{ogMatches.message}</p>
+				</Alert.Description>
+			</Alert.Root>
+		{:else if matches.length < 1}
 			<p class="text-muted-foreground italic">
 				History is empty. You will see your previous matches here.
 			</p>

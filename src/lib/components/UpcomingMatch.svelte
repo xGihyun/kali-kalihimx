@@ -1,12 +1,15 @@
 <script lang="ts">
-	import type { LatestOpponent, Matchmake } from '$lib/types';
+	import type { LatestOpponent, Matchmake, Result } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import * as Alert from '$lib/components/ui/alert';
+	import { AlertCircle } from 'lucide-svelte';
 	import { getRankTitle, snakeCaseToTitleCase } from '$lib';
+	import { isResult } from '$lib/helpers';
 
-	export let match: Matchmake | null;
+	export let matches: Matchmake[] | null | Result;
 	export let userId: string;
-	export let opponentDetails: LatestOpponent | null;
+	export let opponentDetails: LatestOpponent | null | Result;
 
 	function getOpponent(match: Matchmake | undefined): {
 		id: string | undefined;
@@ -37,7 +40,25 @@
 		<Card.Title class="text-2xl md:text-4xl font-normal font-jost-bold">Upcoming Match</Card.Title>
 	</Card.Header>
 
-	{#if match && opponentDetails && match.status === 'pending'}
+	{#if isResult(opponentDetails)}
+		<Alert.Root variant="destructive">
+			<AlertCircle class="h-4 w-4" />
+			<Alert.Title>Error</Alert.Title>
+			<Alert.Description>
+				<p>Failed to fetch opponent.</p>
+				<p>{opponentDetails.message}</p>
+			</Alert.Description>
+		</Alert.Root>
+	{:else if isResult(matches)}
+		<Alert.Root variant="destructive">
+			<AlertCircle class="h-4 w-4" />
+			<Alert.Title>Error</Alert.Title>
+			<Alert.Description>
+				<p>Failed to fetch matcheses.</p>
+				<p>{matches.message}</p>
+			</Alert.Description>
+		</Alert.Root>
+	{:else if matches && matches[0] && opponentDetails && matches[0].status === 'pending'}
 		{@const initials = (
 			opponentDetails?.first_name[0] + opponentDetails?.last_name[0]
 		).toUpperCase()}
@@ -64,9 +85,9 @@
 
 						<div>
 							<a
-								href={`/leaderboards/${getOpponent(match).id}`}
+								href={`/leaderboards/${getOpponent(matches[0]).id}`}
 								class="text-xl font-jost-semibold line-clamp-1 hover:underline"
-								>{getOpponent(match).name}</a
+								>{getOpponent(matches[0]).name}</a
 							>
 							<div class="text-base text-muted-foreground">
 								{getRankTitle(opponentDetails.score)}
@@ -81,7 +102,7 @@
 					<Card.Content class="p-0">
 						<h4 class="text-muted-foreground text-sm md:text-base">Skill</h4>
 						<span class="text-base sm:text-xl md:text-2xl font-jost-medium"
-							>{snakeCaseToTitleCase(match.arnis_skill)}</span
+							>{snakeCaseToTitleCase(matches[0].arnis_skill)}</span
 						>
 					</Card.Content>
 				</Card.Root>
@@ -90,7 +111,7 @@
 					<Card.Content class="p-0">
 						<h4 class="text-muted-foreground text-sm md:text-base">Footwork</h4>
 						<span class="text-base sm:text-xl md:text-2xl font-jost-medium"
-							>{snakeCaseToTitleCase(match.arnis_footwork)}</span
+							>{snakeCaseToTitleCase(matches[0].arnis_footwork)}</span
 						>
 					</Card.Content>
 				</Card.Root>

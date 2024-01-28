@@ -26,7 +26,7 @@
 			<Skeleton class="min-h-20" />
 			<Skeleton class="min-h-20" />
 		{:then lazyData}
-			<UpcomingMatch match={lazyData[1][0]} userId={user.id} opponentDetails={lazyData[2]} />
+			<UpcomingMatch matches={lazyData[1]} userId={user.id} opponentDetails={lazyData[2]} />
 			<PowerCards powerCards={lazyData[0]} isCurrentUser={true} {user} matches={lazyData[1]} />
 			<MatchHistory matches={lazyData[1]} userId={user.id} ogMatches={lazyData[3]} />
 		{/await}

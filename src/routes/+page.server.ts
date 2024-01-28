@@ -1,4 +1,4 @@
-import type { Matchmake, PowerCard, UpdatePowerCard, LatestOpponent } from '$lib/types';
+import type { Matchmake, PowerCard, UpdatePowerCard, LatestOpponent, Result } from '$lib/types';
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
@@ -12,7 +12,13 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 	const user_id = session?.user.id;
 
 	const getLatestMatches = async () => {
-		if (!user_id) return [];
+		if (!user_id) {
+			return {
+				code: 404,
+				message: 'User not found',
+				success: false
+			} satisfies Result;
+		}
 
 		const response = await fetch(`${BACKEND_URL}/matches/latest`, {
 			method: 'POST',
@@ -24,13 +30,27 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 			}
 		});
 
+		if (!response.ok) {
+			return {
+				code: response.status,
+				message: await response.text(),
+				success: false
+			} satisfies Result;
+		}
+
 		const matches: Matchmake[] = await response.json();
 
 		return matches;
 	};
 
 	const getOriginalMatches = async () => {
-		if (!user_id) return [];
+		if (!user_id) {
+			return {
+				code: 404,
+				message: 'User not found',
+				success: false
+			} satisfies Result;
+		}
 
 		const response = await fetch(`${BACKEND_URL}/matches/original`, {
 			method: 'POST',
@@ -42,13 +62,27 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 			}
 		});
 
+		if (!response.ok) {
+			return {
+				code: response.status,
+				message: await response.text(),
+				success: false
+			} satisfies Result;
+		}
+
 		const matches: Matchmake[] = await response.json();
 
 		return matches;
 	};
 
 	const getPowerCards = async () => {
-		if (!user_id) return [];
+		if (!user_id) {
+			return {
+				code: 404,
+				message: 'User not found',
+				success: false
+			} satisfies Result;
+		}
 
 		const response = await fetch(`${BACKEND_URL}/power_cards?user_id=${user_id}`, {
 			method: 'GET',
@@ -57,26 +91,44 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 			}
 		});
 
+		if (!response.ok) {
+			return {
+				code: response.status,
+				message: await response.text(),
+				success: false
+			} satisfies Result;
+		}
+
 		const powerCards: PowerCard[] = await response.json();
 
 		return powerCards;
 	};
 
-	const getLatestOpponentDetails = async () => {
-		if (!user_id) return null;
+	const getLatestOpponentDetails = async (): Promise<Result | LatestOpponent | null> => {
+		if (!user_id) {
+			return {
+				code: 404,
+				message: 'User not found',
+				success: false
+			} satisfies Result;
+		}
 
 		const response = await fetch(`${BACKEND_URL}/matches/latest/${user_id}`, {
 			method: 'GET'
 		});
 
+		if (!response.ok) {
+			return {
+				code: response.status,
+				message: await response.text(),
+				success: false
+			} satisfies Result;
+		}
+
 		const latestOpponent: LatestOpponent | null = await response.json();
 
 		return latestOpponent;
 	};
-
-	depends('user:power_cards');
-
-	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	const data = Promise.all([
 		getPowerCards(),
@@ -84,6 +136,10 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 		getLatestOpponentDetails(),
 		getOriginalMatches()
 	]);
+
+	depends('user:power_cards');
+
+	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	return {
 		lazy: {

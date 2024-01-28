@@ -21,6 +21,12 @@ export type User = {
 	is_private: boolean;
 };
 
+export type Result = {
+	code: number;
+	message: string;
+	success: boolean;
+};
+
 export type Register = Omit<z.infer<typeof RegisterSchema>, 'password'>;
 
 export type Section = {

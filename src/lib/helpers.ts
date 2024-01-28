@@ -1,6 +1,6 @@
 import { invalidate } from '$app/navigation';
 import { crop } from '$lib/pkg/my_package';
-import type { Dimensions } from './types';
+import type { Dimensions, Result } from './types';
 
 export async function upload(
 	photo: File | null,
@@ -51,4 +51,8 @@ export async function upload(
 		message: 'Successfully updated image.',
 		code: response.status
 	};
+}
+
+export function isResult(obj: any): obj is Result {
+	return obj && typeof obj === 'object' && 'success' in obj;
 }

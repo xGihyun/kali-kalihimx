@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { POWER_CARDS, SKILLS } from '$lib';
-	import type { LoadingStatus, Matchmake, PowerCard, User } from '$lib/types';
+	import type { LoadingStatus, Matchmake, PowerCard, Result, User } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
@@ -10,19 +10,26 @@
 	import { CardStackPlus, CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { onDestroy, onMount } from 'svelte';
+	import { isResult } from '$lib/helpers';
+	import * as Alert from '$lib/components/ui/alert';
+	import { AlertCircle } from 'lucide-svelte';
 
-	export let powerCards: PowerCard[] = [];
+	export let powerCards: PowerCard[] | Result;
 	export let isCurrentUser: boolean = false;
 	export let user: User | undefined;
-	export let matches: Matchmake[] = [];
+	export let matches: Matchmake[] | Result;
 
 	let selectedUser: string | undefined;
 	let selectedCard: string | undefined;
 	let selectedSkill: string | undefined;
 
-	let loadingStatus = Array.from({ length: powerCards.length }).fill('none') as LoadingStatus[];
+	let loadingStatus = Array.from({ length: isResult(powerCards) ? 0 : powerCards.length }).fill(
+		'none'
+	) as LoadingStatus[];
 
-	$: hasNoCurrentMatch = (matches.length > 0 && matches[0].status === 'done') || matches.length < 1;
+	$: hasNoCurrentMatch = isResult(matches)
+		? false
+		: (matches.length > 0 && matches[0].status === 'done') || matches.length < 1;
 
 	async function getUsersInSection(): Promise<User[] | undefined> {
 		if (!user) return;
@@ -50,7 +57,7 @@
 
 	onMount(() => {
 		timerInterval = setInterval(() => {
-			if (!matches[0]) return;
+			if (isResult(matches)) return;
 
 			const currentTime = new Date().getTime();
 			const deadline = new Date(matches[0].card_deadline).getTime();
@@ -127,7 +134,25 @@
 	{/if}
 
 	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-4">
-		{#if user && user.is_private && !isCurrentUser}
+		{#if isResult(powerCards)}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>
+					<p>Failed to fetch Power Cards.</p>
+					<p>{powerCards.message}</p>
+				</Alert.Description>
+			</Alert.Root>
+		{:else if isResult(matches)}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>
+					<p>Failed to fetch matches.</p>
+					<p>{matches.message}</p>
+				</Alert.Description>
+			</Alert.Root>
+		{:else if user && user.is_private && !isCurrentUser}
 			<p class="text-muted-foreground italic">Power cards are hidden...</p>
 		{:else}
 			{#each powerCards as card, idx (idx)}
