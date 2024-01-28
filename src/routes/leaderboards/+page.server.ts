@@ -85,6 +85,21 @@ export const actions: Actions = {
 			});
 		}
 
+		form.data.users.forEach(async (id) => {
+			const { error } = await event.locals.supabaseAdmin.auth.admin.deleteUser(id);
+
+			console.log('Deleting auth data...');
+			console.log(error);
+
+			if (error) {
+				return fail(error.status || 500, {
+					form,
+					success: false,
+					message: 'Failed to delete user auth account.'
+				});
+			}
+		});
+
 		const response = await event.fetch(`${BACKEND_URL}/users?force=${form.data.force}`, {
 			method: 'DELETE',
 			body: JSON.stringify(form.data.users),
@@ -92,8 +107,6 @@ export const actions: Actions = {
 				'Content-Type': 'application/json'
 			}
 		});
-
-		// event.locals.supabase.auth.admin.deleteUser('');
 
 		console.log('Deleting user...');
 
@@ -104,7 +117,7 @@ export const actions: Actions = {
 			return fail(response.status, {
 				form,
 				success: false,
-				message: 'Failed to delete user.'
+				message: 'Failed to delete user in the database.'
 			});
 		}
 

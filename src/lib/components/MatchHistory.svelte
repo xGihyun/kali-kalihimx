@@ -17,6 +17,7 @@
 	import { page } from '$app/stores';
 
 	export let matches: Matchmake[];
+	export let ogMatches: Matchmake[];
 	export let userId: string;
 
 	let cardBattleIsOpen = false;
@@ -170,7 +171,7 @@
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{#each matches as match, idx (match.id)}
+							{#each ogMatches as match, idx (match.id)}
 								{@const dmg1 =
 									match.og_user1_id === userId
 										? match.user1_total_damage
@@ -188,11 +189,11 @@
 									<Table.Row class="text-sm sm:text-base md:text-lg">
 										<Table.Cell
 											class={`w-1/3 bg-gradient-to-r to-50% border-l-8 ${
-												getUserCardBattleVerdict(userId, match, idx === 0) === 'win'
+												getUserCardBattleVerdict(dmg1, dmg2, idx === 0) === 'win'
 													? 'border-l-green-500 from-green-900'
-													: getUserCardBattleVerdict(userId, match, idx === 0) === 'lose'
+													: getUserCardBattleVerdict(dmg1, dmg2, idx === 0) === 'lose'
 														? 'border-l-red-600 from-red-950'
-														: getUserCardBattleVerdict(userId, match, idx === 0) === 'draw'
+														: getUserCardBattleVerdict(dmg1, dmg2, idx === 0) === 'draw'
 															? 'border-l-yellow-500 from-yellow-900'
 															: 'border-l-muted-foreground from-muted'
 											}`}>{getOpponent(userId, match).name}</Table.Cell

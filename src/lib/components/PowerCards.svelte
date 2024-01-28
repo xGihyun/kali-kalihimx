@@ -33,10 +33,10 @@
 
 		const users: User[] = await response.json();
 
-		return users;
+		return users.filter(({ id }) => id !== user?.id);
 	}
 
-	let timerInterval: number | undefined;
+	let timerInterval: NodeJS.Timeout;
 	let difference = 0;
 	let remainingTime = {
 		hours: 0,

@@ -421,41 +421,23 @@ export function getUserVerdict(
 }
 
 export function getUserCardBattleVerdict(
-	userId: string,
-	match: Matchmake,
+	dmg1: number | undefined,
+	dmg2: number | undefined,
 	latest: boolean
 ): 'win' | 'lose' | 'draw' | undefined {
-	if (latest && (!match.user1_total_damage || !match.user2_total_damage)) {
+	if (latest && (!dmg1 || !dmg2)) {
 		return;
 	}
 
-	if (match.user1_total_damage === match.user2_total_damage) {
+	if (dmg1 === dmg2) {
 		return 'draw';
 	}
 
-	if (userId === match.user1_id) {
-		if (
-			match.user1_total_damage &&
-			match.user2_total_damage &&
-			match.user1_total_damage > match.user2_total_damage
-		) {
-			return 'win';
-		}
-
-		return 'lose';
+	if (dmg1 > dmg2) {
+		return 'win';
 	}
 
-	if (userId === match.user2_id) {
-		if (
-			match.user1_total_damage &&
-			match.user2_total_damage &&
-			match.user2_total_damage > match.user1_total_damage
-		) {
-			return 'win';
-		}
-
-		return 'lose';
-	}
+	return 'lose';
 }
 
 export function getOpponent(
@@ -472,24 +454,50 @@ export function getOpponent(
 	// }
 
 	// if (original) {
-	// 	if (userId === match.og_user1_id) {
+	// 	if (match?.user1_id === match?.og_user1_id) {
 	// 		return {
-	// 			id: match.og_user2_id,
-	// 			name: `${match.og_user2_first_name} ${match.og_user2_last_name}`
+	// 			id: match?.user1_id,
+	// 			name: `${match?.user1_id} ${match?.user1_id}`,
+	// 			totalDamage: match?.user1_total_damage
+	// 		};
+	// 	}
+	//
+	// 	if (match?.user2_id === match?.og_user1_id) {
+	// 		return {
+	// 			id: match?.user2_id,
+	// 			name: `${match?.user2_id} ${match?.user2_id}`,
+	// 			totalDamage: match?.user2_total_damage
+	// 		};
+	// 	}
+	//
+	// 	if (match?.user1_id === match?.og_user2_id) {
+	// 		return {
+	// 			id: match?.user1_id,
+	// 			name: `${match?.user1_id} ${match?.user1_id}`,
+	// 			totalDamage: match?.user1_total_damage
+	// 		};
+	// 	}
+	//
+	// 	if (match?.user2_id === match?.og_user2_id) {
+	// 		return {
+	// 			id: match?.user2_id,
+	// 			name: `${match?.user2_id} ${match?.user2_id}`,
+	// 			totalDamage: match?.user2_total_damage
 	// 		};
 	// 	}
 	// }
-	if (userId === match.user1_id) {
+
+	if (userId === match?.user1_id) {
 		return {
-			id: match.user2_id,
-			name: `${match.user2_first_name} ${match.user2_last_name}`,
-			totalDamage: match.user1_total_damage
+			id: match?.user2_id,
+			name: `${match?.user2_first_name} ${match?.user2_last_name}`,
+			totalDamage: match?.user1_total_damage
 		};
 	}
 
 	return {
-		id: match.user1_id,
-		name: `${match.user1_first_name} ${match.user1_last_name}`,
-		totalDamage: match.user1_total_damage
+		id: match?.user1_id,
+		name: `${match?.user1_first_name} ${match?.user1_last_name}`,
+		totalDamage: match?.user1_total_damage
 	};
 }

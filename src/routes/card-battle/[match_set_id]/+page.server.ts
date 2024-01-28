@@ -2,8 +2,6 @@ import { BACKEND_URL } from '$env/static/private';
 import type { CardBattleTurn } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
-// export const prerender = true;
-
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	const { match_set_id } = params;
 
@@ -13,7 +11,10 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 
 	if (!response.ok) {
 		return {
-			turns: undefined
+			turns: {
+				user1: undefined,
+				user2: undefined
+			}
 		};
 	}
 

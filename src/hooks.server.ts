@@ -1,8 +1,9 @@
-import { BACKEND_URL } from '$env/static/private';
+import { BACKEND_URL, SERVICE_ROLE } from '$env/static/private';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import type { User } from '$lib/types';
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
+import { createClient } from '@supabase/supabase-js';
 import { redirect, type Handle } from '@sveltejs/kit';
-import type { User } from 'lucide-svelte';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createSupabaseServerClient({
@@ -10,6 +11,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
 		event
 	});
+
+	event.locals.supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SERVICE_ROLE);
 
 	event.locals.getSession = async () => {
 		const {

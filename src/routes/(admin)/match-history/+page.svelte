@@ -12,7 +12,6 @@
 	import type { RequestStatus } from '$lib/types';
 
 	export let data;
-	export let form;
 
 	$: ({ selectedSet, selectedSection, selectedMatchType } = data);
 
@@ -47,10 +46,10 @@
 <div class="w-full mx-auto">
 	<div class="flex gap-2 mb-5 flex-col sm:flex-row">
 		<div class="flex gap-2 w-full">
-			{#await data.sections}
+			{#await data.lazy.data}
 				<Skeleton class="min-h-10 w-80" />
-			{:then sections}
-				{#if sections}
+			{:then lazyData}
+				{#if lazyData[2]}
 					<Select.Root
 						selected={{
 							value: selectedSection,
@@ -61,7 +60,7 @@
 							<Select.Value placeholder="Section" class="text-base md:text-lg" />
 						</Select.Trigger>
 						<Select.Content>
-							{#each sections as section (section.id)}
+							{#each lazyData[2] as section (section.id)}
 								<a
 									class="contents"
 									href={`/match-history?set=${selectedSet}&section=${section.id}&match_type=${selectedMatchType}`}
@@ -84,16 +83,16 @@
 				{/if}
 			{/await}
 
-			{#await data.maxSets}
+			{#await data.lazy.data}
 				<Skeleton class="min-h-10 w-60" />
-			{:then maxSets}
-				{#if maxSets}
+			{:then lazyData}
+				{#if lazyData[3]}
 					<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
 						<Select.Trigger class="flex-1 h-auto">
 							<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 						</Select.Trigger>
 						<Select.Content>
-							{#each maxSets as maxSet (maxSet.section)}
+							{#each lazyData[3] as maxSet (maxSet.section)}
 								{#if maxSet.section === selectedSection}
 									{#each Array(maxSet.max_set) as _, idx (idx)}
 										<a
@@ -173,7 +172,7 @@
 		{/if}
 	</div>
 
-	{#await data.matches}
+	{#await data.lazy.data}
 		<div class="grid grid-cols-5 gap-2">
 			<Skeleton class="h-10 col-span-2" />
 			<Skeleton class="h-10 col-span-2" />
@@ -184,12 +183,12 @@
 				<Skeleton class="h-8 col-span-1" />
 			{/each}
 		</div>
-	{:then matches}
-		{#if matches}
+	{:then lazyData}
+		{#if lazyData[0] && lazyData[1]}
 			{#if selectedMatchType === 'arnis'}
-				<ArnisTable form={data.form} {matches} />
+				<ArnisTable form={data.form} matches={lazyData[0]} />
 			{:else if selectedMatchType === 'card_battle'}
-				<CardBattleTable {matches} />
+				<CardBattleTable matches={lazyData[1]} />
 			{:else}
 				<Alert.Root variant="destructive">
 					<AlertCircle class="h-4 w-4" />

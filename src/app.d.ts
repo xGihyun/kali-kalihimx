@@ -10,6 +10,7 @@ declare global {
 		interface Locals {
 			user_id: string | undefined;
 			supabase: SupabaseClient;
+			supabaseAdmin: SupabaseClient;
 			getSession: () => Promise<Session | null>;
 			getUserData: () => Promise<User | undefined>;
 		}

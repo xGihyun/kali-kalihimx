@@ -29,6 +29,24 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 		return matches;
 	};
 
+	const getOriginalMatches = async () => {
+		if (!user_id) return [];
+
+		const response = await fetch(`${BACKEND_URL}/matches/original`, {
+			method: 'POST',
+			body: JSON.stringify({
+				user_id
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const matches: Matchmake[] = await response.json();
+
+		return matches;
+	};
+
 	const getPowerCards = async () => {
 		if (!user_id) return [];
 
@@ -60,7 +78,12 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 
 	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
-	const data = Promise.all([getPowerCards(), getLatestMatches(), getLatestOpponentDetails()]);
+	const data = Promise.all([
+		getPowerCards(),
+		getLatestMatches(),
+		getLatestOpponentDetails(),
+		getOriginalMatches()
+	]);
 
 	return {
 		lazy: {

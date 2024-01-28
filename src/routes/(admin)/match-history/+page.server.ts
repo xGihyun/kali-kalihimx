@@ -24,6 +24,23 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 		return null;
 	};
 
+	const getOriginalMatches = async () => {
+		const response = await fetch(
+			`${BACKEND_URL}/matches?set=${set}&section=${section}&original=true`,
+			{
+				method: 'GET'
+			}
+		);
+
+		if (response.ok) {
+			const matches: Matchmake[] = await response.json();
+
+			return matches;
+		}
+
+		return null;
+	};
+
 	const getSections = async () => {
 		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
@@ -46,15 +63,17 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 		return null;
 	};
 
+	const data = Promise.all([getMatches(), getOriginalMatches(), getSections(), getMaxSets()]);
+
 	depends('card-battle:damage');
 
 	// TODO: CACHE INVALIDATION
 	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	return {
-		matches: getMatches(),
-		sections: getSections(),
-		maxSets: getMaxSets(),
+		lazy: {
+			data
+		},
 		form: await superValidate(SubmitScoreSchema),
 		selectedSection: section,
 		selectedSet: set,
