@@ -1,9 +1,9 @@
 import { BACKEND_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
-import type { PowerCard, Section, User } from '$lib/types';
+import type { PowerCard, Result, Section, User } from '$lib/types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { UpdateUserSchema } from '$lib/schemas';
-import { fail, type Actions, error } from '@sveltejs/kit';
+import { fail, type Actions } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 	const { user_id } = params;
@@ -13,8 +13,11 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 		const { data, error: err } = await locals.supabase.from('users').select('*').eq('id', user_id);
 
 		if (err) {
-			console.log(err.code);
-			error(500, err.message);
+			return {
+				code: parseInt(err.code),
+				message: err.message,
+				success: false
+			} satisfies Result;
 		}
 
 		return data[0] as User;
@@ -28,8 +31,11 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 			.order('name');
 
 		if (err) {
-			console.log(err.code);
-			error(500, err.message);
+			return {
+				code: parseInt(err.code),
+				message: err.message,
+				success: false
+			} satisfies Result;
 		}
 
 		return data as PowerCard[];
@@ -39,8 +45,11 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
 		if (err) {
-			console.log(err.code);
-			error(500, err.message);
+			return {
+				code: parseInt(err.code),
+				message: err.message,
+				success: false
+			} satisfies Result;
 		}
 
 		return data as Section[];

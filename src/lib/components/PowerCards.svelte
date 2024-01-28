@@ -16,8 +16,8 @@
 
 	export let powerCards: PowerCard[] | Result;
 	export let isCurrentUser: boolean = false;
-	export let user: User | undefined;
-	export let matches: Matchmake[] | Result;
+	export let user: User | Result;
+	export let matches: Matchmake[] | Result = [];
 
 	let selectedUser: string | undefined;
 	let selectedCard: string | undefined;
@@ -32,7 +32,7 @@
 		: (matches.length > 0 && matches[0].status === 'done') || matches.length < 1;
 
 	async function getUsersInSection(): Promise<User[] | undefined> {
-		if (!user) return;
+		if (isResult(user)) return;
 
 		const response = await fetch(`/api/users?section=${user.section}`, {
 			method: 'GET'
@@ -40,7 +40,7 @@
 
 		const users: User[] = await response.json();
 
-		return users.filter(({ id }) => id !== user?.id);
+		return users.filter(({ id }) => id !== user.id);
 	}
 
 	let timerInterval: NodeJS.Timeout;
@@ -134,7 +134,16 @@
 	{/if}
 
 	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-4">
-		{#if isResult(powerCards)}
+		{#if isResult(user)}
+			<Alert.Root variant="destructive">
+				<AlertCircle class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>
+					<p>Failed to fetch user.</p>
+					<p>{user.message}</p>
+				</Alert.Description>
+			</Alert.Root>
+		{:else if isResult(powerCards)}
 			<Alert.Root variant="destructive">
 				<AlertCircle class="h-4 w-4" />
 				<Alert.Title>Error</Alert.Title>

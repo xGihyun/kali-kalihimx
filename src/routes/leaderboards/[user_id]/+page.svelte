@@ -6,6 +6,7 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { AlertCircle, PenSquare } from 'lucide-svelte';
 	import * as Alert from '$lib/components/ui/alert';
+	import { isResult } from '$lib/helpers';
 
 	export let data;
 
@@ -20,8 +21,14 @@
 	</div>
 {:then userData}
 	{#if userData[0]}
-		<Banner user={userData[0]} isCurrentUser={userData[0].id === currentUserId} />
-		<UserAvatar user={userData[0]} isCurrentUser={userData[0].id === currentUserId} />
+		<Banner
+			user={userData[0]}
+			isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
+		/>
+		<UserAvatar
+			user={userData[0]}
+			isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
+		/>
 
 		<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
 			<Rank user={userData[0]} />
@@ -30,7 +37,7 @@
 				<PowerCards
 					powerCards={userData[1]}
 					user={userData[0]}
-					isCurrentUser={userData[0].id === currentUserId}
+					isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
 				/>
 			{/if}
 		</div>
