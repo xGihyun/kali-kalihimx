@@ -137,9 +137,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 		getOriginalMatches()
 	]);
 
-	depends('user:power_cards');
-
-	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
 
 	return {
 		lazy: {

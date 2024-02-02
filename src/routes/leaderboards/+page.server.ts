@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 
 	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
 
-	setHeaders({ 'cache-control': `max-age=${60}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=0, s-maxage=60, proxy-revalidate` });
 
 	return {
 		lazy: {

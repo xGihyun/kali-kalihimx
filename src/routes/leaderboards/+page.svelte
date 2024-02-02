@@ -23,12 +23,12 @@
 			<Skeleton class="h-8 col-span-1" />
 		{/each}
 	</div>
-{:then foo}
+{:then [users, sections, userCount]}
 	<UserTable
 		form={data.form}
-		users={foo[0]}
-		sections={foo[1]}
-		total={foo[2]}
+		{users}
+		{sections}
+		total={userCount}
 		skip={data.skip}
 		filteredSections={data.filteredSections}
 		currentUser={data.user}

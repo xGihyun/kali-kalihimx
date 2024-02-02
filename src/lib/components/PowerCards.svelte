@@ -298,16 +298,15 @@
 										}
 
 										return async ({ result, update }) => {
-											await update();
-
 											if (result.type === 'success') {
 												loadingStatus[idx] = 'success';
 												console.log('Successfully activated power card.');
-												invalidate('user:power_cards');
 											} else {
 												loadingStatus[idx] = 'error';
 												console.error('Failed to activate power card.');
 											}
+
+											await update();
 										};
 									}}
 								>

@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, depends }) => {
 
 	depends('sections:table');
 
-	setHeaders({ 'cache-control': `max-age=${60 * 2}, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
 
 	return {
 		sections
