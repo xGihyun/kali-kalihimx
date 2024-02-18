@@ -8,7 +8,7 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
-import { Diamond, Forward, Swords, UsersRound } from 'lucide-svelte';
+import { BlocksIcon, Diamond, Forward, Swords, UsersRound } from 'lucide-svelte';
 import { CardStack } from 'radix-icons-svelte';
 import {
 	Blocks,
@@ -70,11 +70,11 @@ export const ARNIS_FOOTWORKS_VIDEOS: Video[] = [
 ];
 
 export const RANK_LOGO_COLORS: Map<string, string> = new Map([
-	['likas', 'border-white bg-gradient-to-l from-red-900 to-red-600'],
-	['likha', 'border-white bg-gradient-to-l from-orange-900 to-orange-500'],
-	['lakan', 'border-black bg-gradient-to-l from-amber-900 to-amber-500'],
-	['grandmaster', 'border-red-800 bg-gradient-to-l from-red-900 to-red-600'],
-	['unranked', 'border-border bg-background']
+	['likas', 'border-yellow-700 bg-gradient-to-l from-yellow-900 to-yellow-600'],
+	['likha', 'border-blue-500 bg-gradient-to-l from-blue-900 to-blue-500'],
+	['lakan', 'border-amber-500 bg-gradient-to-l from-amber-900 to-amber-500'],
+	['grandmaster', 'border-black bg-gradient-to-l from-red-900 to-red-600'],
+	['unranked', 'border-white bg-gradient-to-l from-neutral-500 to-neutral-50']
 ]);
 
 export const CACHE_DURATION = 60 * 10;
@@ -94,6 +94,11 @@ export const ADMIN_ROUTES: Navigation = [
 		name: 'Sections',
 		path: '/sections',
 		icon: UsersRound
+	},
+	{
+		name: 'Rubrics',
+		path: '/rubrics',
+		icon: BlocksIcon
 	}
 	// {
 	// 	name: 'Users',

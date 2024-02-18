@@ -1,6 +1,8 @@
 import { invalidate } from '$app/navigation';
 import { crop } from '$lib/pkg/my_package';
+import type { NumericRange } from '@sveltejs/kit';
 import type { Dimensions, Result } from './types';
+import z, { ZodSchema, type AnyZodObject } from 'zod';
 
 export async function upload(
 	photo: File | null,
@@ -55,4 +57,21 @@ export async function upload(
 
 export function isResult(obj: any): obj is Result {
 	return obj && typeof obj === 'object' && 'success' in obj;
+}
+
+export function toHttpResult(data: ZodSchema) {
+	return z.object({
+		success: z.boolean(),
+		code: z.number(),
+		message: z.string(),
+		data: data.optional()
+	});
+}
+
+export function toErrorCode(num: number): NumericRange<400, 599> {
+	if (num >= 400 && num <= 599) {
+		return num as NumericRange<400, 599>;
+	}
+
+	return 500;
 }
