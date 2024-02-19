@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Banner, PowerCards, Rank, UserAvatar } from '$lib/components';
+	import { Badges, Banner, PowerCards, Rank, UserAvatar } from '$lib/components';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import UpdateUserForm from './update-user-form.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -19,27 +19,23 @@
 		<Skeleton class="h-80" />
 		<Skeleton class="h-80" />
 	</div>
-{:then userData}
-	{#if userData[0]}
-		<Banner
-			user={userData[0]}
-			isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
-		/>
-		<UserAvatar
-			user={userData[0]}
-			isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
-		/>
+{:then [user, powerCards, badges]}
+	{#if user}
+		<Banner {user} isCurrentUser={isResult(user) ? false : user.id === currentUserId} />
+		<UserAvatar {user} isCurrentUser={isResult(user) ? false : user.id === currentUserId} />
 
 		<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
-			<Rank user={userData[0]} />
+			<Rank {user} />
 
-			{#if userData[1]}
+			{#if powerCards}
 				<PowerCards
-					powerCards={userData[1]}
-					user={userData[0]}
-					isCurrentUser={isResult(userData[0]) ? false : userData[0].id === currentUserId}
+					{powerCards}
+					{user}
+					isCurrentUser={isResult(user) ? false : user.id === currentUserId}
 				/>
 			{/if}
+
+			<Badges {badges} />
 		</div>
 
 		<Dialog.Root closeOnOutsideClick={false}>
@@ -66,7 +62,7 @@
 				{#await data.sections}
 					Loading...
 				{:then sections}
-					<UpdateUserForm form={data.form} {sections} currentUserData={userData[0]} />
+					<UpdateUserForm form={data.form} {sections} currentUserData={user} />
 				{:catch err}
 					<Alert.Root variant="destructive">
 						<AlertCircle class="h-4 w-4" />

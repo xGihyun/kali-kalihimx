@@ -203,3 +203,20 @@ export type RequestStatus2 = {
 	type: 'success' | 'failure' | 'pending' | 'none' | 'unknown';
 	message: string;
 };
+
+export type Badge = {
+	id: string;
+	name: string;
+	description: string;
+	user_id: string;
+};
+
+export type BadgeInfo = {
+	name: string;
+	description: string;
+};
+
+export type BadgeIcon = {
+	name: string;
+	icon?: ComponentType<SvelteComponent>;
+};

@@ -1,5 +1,22 @@
-import { ArrowClockwise, Guide, History, Home, Sword, Trophy } from './assets/icons';
-import type { BlockData, Matchmake, Navigation, StrikeData, Video } from './types';
+import {
+	ArrowClockwise,
+	Guide,
+	HandsHoldingCircle,
+	History,
+	Home,
+	Sword,
+	Trophy
+} from './assets/icons';
+import type {
+	Badge,
+	BadgeIcon,
+	BadgeInfo,
+	BlockData,
+	Matchmake,
+	Navigation,
+	StrikeData,
+	Video
+} from './types';
 import {
 	ancients_protection,
 	double_edged_sword,
@@ -8,7 +25,16 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
-import { BlocksIcon, Diamond, Forward, Swords, UsersRound } from 'lucide-svelte';
+import {
+	ArrowBigRightDash,
+	BlocksIcon,
+	Crown,
+	Diamond,
+	Forward,
+	ShieldPlus,
+	Swords,
+	UsersRound
+} from 'lucide-svelte';
 import { CardStack } from 'radix-icons-svelte';
 import {
 	Blocks,
@@ -17,6 +43,29 @@ import {
 	SidewardSinawali,
 	Strikes
 } from './assets/images/thumbnails';
+
+export const BADGES: BadgeIcon[] = [
+	{
+		name: 'Top 5',
+		icon: Crown
+	},
+	{
+		name: 'Defensive Blocker',
+		icon: ShieldPlus
+	},
+	{
+		name: 'Superior Striker',
+		icon: Swords
+	},
+	{
+		name: 'Forward Sinawali Specialist',
+		icon: ArrowBigRightDash
+	},
+	{
+		name: 'Sinawali Virtuoso',
+		icon: HandsHoldingCircle
+	}
+];
 
 export const ARNIS_STRIKES_VIDEOS: Video[] = [
 	{
