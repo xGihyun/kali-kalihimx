@@ -7,7 +7,6 @@ import { fail, type Actions } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 	const { user_id } = params;
-	const current_user_id = locals.user_id;
 
 	const getUser = async () => {
 		const { data, error: err } = await locals.supabase.from('users').select('*').eq('id', user_id);
@@ -73,7 +72,6 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 		lazy: {
 			userData
 		},
-		currentUserId: current_user_id,
 		form: await superValidate(UpdateUserSchema),
 		sections: getSections()
 	};

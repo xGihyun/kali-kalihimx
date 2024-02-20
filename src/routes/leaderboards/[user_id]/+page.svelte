@@ -9,8 +9,6 @@
 	import { isResult } from '$lib/helpers';
 
 	export let data;
-
-	$: ({ currentUserId } = data);
 </script>
 
 {#await data.lazy.userData}
@@ -21,8 +19,8 @@
 	</div>
 {:then [user, powerCards, badges]}
 	{#if user}
-		<Banner {user} isCurrentUser={isResult(user) ? false : user.id === currentUserId} />
-		<UserAvatar {user} isCurrentUser={isResult(user) ? false : user.id === currentUserId} />
+		<Banner {user} isCurrentUser={isResult(user) ? false : user.id === data.user?.id} />
+		<UserAvatar {user} isCurrentUser={isResult(user) ? false : user.id === data.user?.id} />
 
 		<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
 			<Rank {user} />
@@ -31,11 +29,11 @@
 				<PowerCards
 					{powerCards}
 					{user}
-					isCurrentUser={isResult(user) ? false : user.id === currentUserId}
+					isCurrentUser={isResult(user) ? false : user.id === data.user?.id}
 				/>
 			{/if}
 
-			<Badges {badges} />
+			<Badges {badges} {user} currentUser={data.user} />
 		</div>
 
 		<Dialog.Root closeOnOutsideClick={false}>
@@ -51,7 +49,7 @@
 			</Dialog.Trigger>
 
 			<Dialog.Overlay class="z-[70]" />
-			<Dialog.Content class="max-h-[90svh] overflow-y-auto z-[100]">
+			<Dialog.Content class="max-h-[90svh] h-full overflow-y-auto z-[100]">
 				<Dialog.Header>
 					<Dialog.Title>Edit user information</Dialog.Title>
 					<Dialog.Description>

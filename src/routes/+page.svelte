@@ -30,7 +30,7 @@
 			<UpcomingMatch {matches} userId={user.id} {opponentDetails} />
 			<PowerCards {powerCards} isCurrentUser={true} {user} {matches} />
 			<MatchHistory {matches} userId={user.id} {ogMatches} />
-			<Badges {badges} />
+			<Badges {badges} currentUser={user} {user} />
 		{/await}
 	</div>
 {:else}
