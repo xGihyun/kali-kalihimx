@@ -69,6 +69,7 @@ export type Matchmake = {
 	user2_des_count: number;
 	user1_ap_count: number;
 	user2_ap_count: number;
+	comment: string;
 };
 
 export type LatestOpponent = {
@@ -199,8 +200,15 @@ export type HttpResult<T> = {
 	data?: T;
 };
 
+export type ActionData<T> = {
+	message: string;
+	data?: T;
+};
+
+export type RequestType = 'success' | 'failure' | 'pending' | 'none' | 'unknown';
+
 export type RequestStatus2 = {
-	type: 'success' | 'failure' | 'pending' | 'none' | 'unknown';
+	type: RequestType;
 	message: string;
 };
 

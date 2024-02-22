@@ -75,7 +75,7 @@
 >
 	<Dialog.Content class="max-w-6xl z-[250] overflow-y-auto max-h-[90svh]">
 		<Dialog.Header>
-			<Dialog.Title class="text-2xl">Arnis</Dialog.Title>
+			<Dialog.Title class="text-2xl font-jost-semibold">Arnis</Dialog.Title>
 		</Dialog.Header>
 
 		{#if $page.state.selected}

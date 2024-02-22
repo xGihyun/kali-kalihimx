@@ -21,5 +21,5 @@ export const POST: RequestHandler = async ({ request, fetch, url }) => {
 		error(toErrorCode(response.status), await response.text());
 	}
 
-	return new Response();
+	return new Response('Successfully updated badges.');
 };

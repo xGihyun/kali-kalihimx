@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 			.from('users')
 			.select('first_name, last_name, id, score, section, sex, rank_overall, rank_section')
 			.order('score', { ascending: false })
+			.eq('role', 'user')
 			.range(skip, skip + limit - 1);
 
 		const { data, error: err } = sections

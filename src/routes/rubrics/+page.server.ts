@@ -3,7 +3,8 @@ import type { HttpResult, Rubric } from '$lib/types';
 import { superValidate } from 'sveltekit-superforms/server';
 import type { PageServerLoad } from './$types';
 import { rubricSchema } from '$lib/schemas';
-import { fail, type Actions } from '@sveltejs/kit';
+import { fail, type Actions, error } from '@sveltejs/kit';
+import { toErrorCode } from '$lib/helpers';
 
 export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const response = await fetch(`${BACKEND_URL}/rubrics`, { method: 'GET' });
@@ -50,10 +51,7 @@ export const actions: Actions = {
 		};
 
 		if (!result.success) {
-			return fail(response.status, {
-				form,
-				result
-			});
+			error(toErrorCode(result.code), result.message);
 		}
 
 		return {
