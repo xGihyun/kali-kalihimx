@@ -12,7 +12,7 @@ declare global {
 			supabase: SupabaseClient;
 			supabaseAdmin: SupabaseClient;
 			getSession: () => Promise<Session | null>;
-			getUserData: () => Promise<User | undefined>;
+			getUserData: () => Promise<User>;
 		}
 		// interface PageData {}
 		interface PageState {

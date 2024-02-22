@@ -1,7 +1,7 @@
 import { BACKEND_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
 import type { PowerCard, Result, Section, User, Badge } from '$lib/types';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate } from 'sveltekit-superforms';
 import { UpdateUserSchema } from '$lib/schemas';
 import { fail, type Actions } from '@sveltejs/kit';
 

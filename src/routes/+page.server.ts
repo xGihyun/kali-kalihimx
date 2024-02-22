@@ -10,11 +10,12 @@ import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
 import { LoginSchema } from '$lib/schemas';
-import { superValidate } from 'sveltekit-superforms/server';
-import { AuthApiError } from '@supabase/supabase-js';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { isAuthApiError } from '@supabase/supabase-js';
 
-export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends }) => {
+export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 	const session = await locals.getSession();
 	const user_id = session?.user.id;
 
@@ -162,7 +163,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 		lazy: {
 			data
 		},
-		form: await superValidate(LoginSchema)
+		form: await superValidate(zod(LoginSchema))
 	};
 };
 
@@ -235,7 +236,7 @@ export const actions: Actions = {
 		});
 
 		if (error) {
-			if (error instanceof AuthApiError && error.status === 400) {
+			if (isAuthApiError(error) && error.status === 400) {
 				return fail(400, {
 					form,
 					success: false,

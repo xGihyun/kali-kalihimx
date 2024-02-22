@@ -1,3 +1,7 @@
-// import { IP_ADDRESS, PORT } from '$env/static/private';
+import type { PostgrestError } from '@supabase/supabase-js';
 
-// export const BACKEND_URL = `http://${IP_ADDRESS}:${PORT}`;
+export function displaySupabaseError(error: PostgrestError): void {
+	console.error(
+		`ERROR ${error.code}:\nMESSAGE: ${error.message}\nHINT: ${error.hint}\nDETAILS: ${error.details}`
+	);
+}
