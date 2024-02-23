@@ -37,7 +37,7 @@
 	<div class="flex w-full h-full">
 		<!-- <div class="w-1/2 bg-card"></div> -->
 		<div class="max-w-sm w-full m-auto">
-			<LoginForm form={data.form} />
+			<LoginForm data={data.form} />
 		</div>
 	</div>
 {/if}

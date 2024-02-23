@@ -30,12 +30,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const session = await event.locals.getSession();
 
-	if (!session) {
-		console.log('Session not found.');
-		redirect(307, '/');
-	}
+	// if (!session) {
+	// 	console.log('Session not found.');
+	// 	redirect(307, '/');
+	// }
 
 	event.locals.getUserData = async () => {
+		if (!session) {
+			console.log('Session not found.');
+			return;
+		}
+
 		const { data, error } = await event.locals.supabase
 			.from('users')
 			.select('*')
@@ -45,7 +50,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (error) {
 			displaySupabaseError(error);
 
-			redirect(307, '/');
+			return;
+			// redirect(307, '/');
 		}
 
 		return data as User;
@@ -56,7 +62,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (
 		event.route.id?.startsWith('/(admin)') &&
 		event.url.pathname !== '/' &&
-		user.role === 'user'
+		user?.role === 'user'
 	) {
 		console.log('Route for admins only. Access denied.');
 		redirect(307, '/');

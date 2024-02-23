@@ -6,7 +6,7 @@ import z from 'zod';
 // 	password: string()
 // });
 
-export const LoginSchema = z.object({
+export const loginSchema = z.object({
 	email: z.string().email(),
 	password: z.string().min(5)
 });

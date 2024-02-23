@@ -9,18 +9,21 @@ import type {
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
-import { LoginSchema } from '$lib/schemas';
+import { loginSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { isAuthApiError } from '@supabase/supabase-js';
+import { displaySupabaseError } from '$lib/server';
+import { error } from '@sveltejs/kit';
+import { toErrorCode } from '$lib/helpers';
 
 export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 	const session = await locals.getSession();
-	const user_id = session?.user.id;
+	const userId = session?.user.id;
 
 	const getLatestMatches = async () => {
-		if (!user_id) {
+		if (!userId) {
 			return {
 				code: 404,
 				message: 'User not found',
@@ -31,7 +34,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 		const response = await fetch(`${BACKEND_URL}/matches/latest`, {
 			method: 'POST',
 			body: JSON.stringify({
-				user_id
+				userId
 			}),
 			headers: {
 				'Content-Type': 'application/json'
@@ -52,7 +55,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 	};
 
 	const getOriginalMatches = async () => {
-		if (!user_id) {
+		if (!userId) {
 			return {
 				code: 404,
 				message: 'User not found',
@@ -63,7 +66,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 		const response = await fetch(`${BACKEND_URL}/matches/original`, {
 			method: 'POST',
 			body: JSON.stringify({
-				user_id
+				user_id: userId
 			}),
 			headers: {
 				'Content-Type': 'application/json'
@@ -83,37 +86,22 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 		return matches;
 	};
 
-	const getPowerCards = async () => {
-		if (!user_id) {
-			return {
-				code: 404,
-				message: 'User not found',
-				success: false
-			} satisfies Result;
+	const getPowerCards = async (): Promise<Omit<PowerCard[], 'user_id'>> => {
+		const { data, error: err } = await locals.supabase
+			.from('power_cards')
+			.select('id, name, is_used, is_active')
+			.eq('user_id', userId);
+
+		if (err) {
+			displaySupabaseError(err);
+			error(toErrorCode(+err.code), err.message);
 		}
 
-		const response = await fetch(`${BACKEND_URL}/power_cards?user_id=${user_id}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-
-		if (!response.ok) {
-			return {
-				code: response.status,
-				message: await response.text(),
-				success: false
-			} satisfies Result;
-		}
-
-		const powerCards: PowerCard[] = await response.json();
-
-		return powerCards;
+		return data as Omit<PowerCard[], 'user_id'>;
 	};
 
 	const getLatestOpponentDetails = async (): Promise<Result | LatestOpponent | null> => {
-		if (!user_id) {
+		if (!userId) {
 			return {
 				code: 404,
 				message: 'User not found',
@@ -121,7 +109,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 			} satisfies Result;
 		}
 
-		const response = await fetch(`${BACKEND_URL}/matches/latest/${user_id}`, {
+		const response = await fetch(`${BACKEND_URL}/matches/latest/${userId}`, {
 			method: 'GET'
 		});
 
@@ -138,15 +126,20 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 		return latestOpponent;
 	};
 
-	// TODO: Handle errors better
 	const getBadges = async (): Promise<Badge[]> => {
-		if (!user_id) return [];
+		if (!userId) return [];
 
-		const response = await fetch(`${BACKEND_URL}/users/${user_id}/badges`, { method: 'GET' });
+		const { data, error: err } = await locals.supabase
+			.from('badges')
+			.select('*')
+			.eq('user_id', userId);
 
-		const badges = await response.json();
+		if (err) {
+			displaySupabaseError(err);
+			error(toErrorCode(+err.code), err.message);
+		}
 
-		return badges;
+		return data as Badge[];
 	};
 
 	const data = Promise.all([
@@ -163,7 +156,7 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 		lazy: {
 			data
 		},
-		form: await superValidate(zod(LoginSchema))
+		form: await superValidate(zod(loginSchema))
 	};
 };
 
@@ -219,13 +212,12 @@ export const actions: Actions = {
 		};
 	},
 	login: async (event) => {
-		const form = await superValidate(event, LoginSchema);
-
-		console.log(form.data);
+		const form = await superValidate(event, zod(loginSchema));
 
 		if (!form.valid) {
 			return fail(400, {
 				form,
+				success: false,
 				message: 'Invalid form data.'
 			});
 		}
@@ -251,8 +243,7 @@ export const actions: Actions = {
 			});
 		}
 
-		console.log('->> LOGIN');
-		console.log(data);
+		console.log('->> LOGIN: ', data.user.email);
 
 		throw redirect(303, '/');
 	},
