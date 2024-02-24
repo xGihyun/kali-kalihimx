@@ -6,17 +6,21 @@ import { rubricSchema } from '$lib/schemas';
 import { fail, type Actions, error } from '@sveltejs/kit';
 import { toErrorCode } from '$lib/helpers';
 
-export const load: PageServerLoad = async ({ fetch, depends }) => {
-	const response = await fetch(`${BACKEND_URL}/rubrics`, { method: 'GET' });
-	const rubrics: Rubric[] = await response.json();
+export const load: PageServerLoad = async ({ fetch, depends, setHeaders }) => {
+	const getRubrics = async (): Promise<Rubric[]> => {
+		const response = await fetch(`${BACKEND_URL}/rubrics`, { method: 'GET' });
+		const rubrics: Rubric[] = await response.json();
 
-	console.log(rubrics);
+		return rubrics;
+	};
 
 	depends('admin:rubrics');
 
+	setHeaders({ 'cache-control': `max-age=5, must-revalidate` });
+
 	return {
 		form: await superValidate(rubricSchema),
-		rubrics
+		rubrics: getRubrics()
 	};
 };
 

@@ -7,6 +7,7 @@
 	import type { HttpResult } from '$lib/types';
 	import { toast } from 'svelte-sonner';
 	import { invalidate } from '$app/navigation';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	export let data;
 
@@ -61,4 +62,17 @@
 	</Dialog.Content>
 </Dialog.Root>
 
-<RubricsTable rubrics={data.rubrics} {selectedRubrics} />
+{#await data.rubrics}
+	<div class="grid grid-cols-5 gap-2">
+		<Skeleton class="h-10 col-span-2" />
+		<Skeleton class="h-10 col-span-2" />
+		<Skeleton class="h-10 col-span-1" />
+		{#each Array(10) as _}
+			<Skeleton class="h-8 col-span-2" />
+			<Skeleton class="h-8 col-span-2" />
+			<Skeleton class="h-8 col-span-1" />
+		{/each}
+	</div>
+{:then rubrics}
+	<RubricsTable {rubrics} {selectedRubrics} />
+{/await}
