@@ -6,14 +6,14 @@
 	import * as Table from '$lib/components/ui/table';
 	import { RubricsTableCheckbox } from '.';
 
-	export let rubrics: Rubric[];
+	export let rubrics: Rubric[] = [];
 	export let selectedRubrics: Writable<number[]>;
 
-	$: table = createTable(readable(rubrics), {
+	const table = createTable(readable(rubrics), {
 		select: addSelectedRows()
 	});
 
-	$: columns = table.createColumns([
+	const columns = table.createColumns([
 		table.column({
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
@@ -45,9 +45,9 @@
 		})
 	]);
 
-	$: ({ headerRows, pageRows, tableAttrs, tableBodyAttrs, rows, pluginStates } =
-		table.createViewModel(columns));
-	$: ({ selectedDataIds } = pluginStates.select);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, rows, pluginStates } =
+		table.createViewModel(columns);
+	const { selectedDataIds } = pluginStates.select;
 
 	function getSelectedRows(selectedDataIds: Record<string, boolean>): void {
 		const indices = Object.keys(selectedDataIds);
