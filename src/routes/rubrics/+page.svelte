@@ -10,8 +10,8 @@
 
 	export let data;
 
-	const isDialogOpen = writable<boolean>(false);
-	const selectedRubrics = writable<number[]>([]);
+	$: isDialogOpen = writable<boolean>(false);
+	$: selectedRubrics = writable<number[]>([]);
 
 	async function deleteRubrics(): Promise<void> {
 		if ($selectedRubrics.length < 1) return;

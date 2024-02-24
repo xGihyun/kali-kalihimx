@@ -10,6 +10,8 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const response = await fetch(`${BACKEND_URL}/rubrics`, { method: 'GET' });
 	const rubrics: Rubric[] = await response.json();
 
+	console.log(rubrics);
+
 	depends('admin:rubrics');
 
 	return {
