@@ -1,12 +1,5 @@
-import type {
-	Matchmake,
-	PowerCard,
-	UpdatePowerCard,
-	LatestOpponent,
-	Result,
-	Badge
-} from '$lib/types';
-import { redirect, type Actions, fail } from '@sveltejs/kit';
+import type { PowerCard, UpdatePowerCard, Badge, HttpResult } from '$lib/types';
+import { type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
 import { loginSchema } from '$lib/schemas';
@@ -14,102 +7,23 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { isAuthApiError } from '@supabase/supabase-js';
+import type { MatchClient, Opponent } from '$lib/types/matches';
 import { displaySupabaseError } from '$lib/server';
-import { error } from '@sveltejs/kit';
-import { toErrorCode } from '$lib/helpers';
 
 export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 	const session = await locals.getSession();
 	const userId = session?.user.id;
 
-	const getLatestMatches = async () => {
+	const getMatches = async (): Promise<HttpResult<MatchClient[]>> => {
 		if (!userId) {
 			return {
 				code: 404,
-				message: 'User not found',
+				message: 'User not found.',
 				success: false
-			} satisfies Result;
+			};
 		}
 
-		const response = await fetch(`${BACKEND_URL}/matches/latest`, {
-			method: 'POST',
-			body: JSON.stringify({
-				userId
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-
-		if (!response.ok) {
-			return {
-				code: response.status,
-				message: await response.text(),
-				success: false
-			} satisfies Result;
-		}
-
-		const matches: Matchmake[] = await response.json();
-
-		return matches;
-	};
-
-	const getOriginalMatches = async () => {
-		if (!userId) {
-			return {
-				code: 404,
-				message: 'User not found',
-				success: false
-			} satisfies Result;
-		}
-
-		const response = await fetch(`${BACKEND_URL}/matches/original`, {
-			method: 'POST',
-			body: JSON.stringify({
-				user_id: userId
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-
-		if (!response.ok) {
-			return {
-				code: response.status,
-				message: await response.text(),
-				success: false
-			} satisfies Result;
-		}
-
-		const matches: Matchmake[] = await response.json();
-
-		return matches;
-	};
-
-	const getPowerCards = async (): Promise<Omit<PowerCard[], 'user_id'>> => {
-		const { data, error: err } = await locals.supabase
-			.from('power_cards')
-			.select('id, name, is_used, is_active')
-			.eq('user_id', userId);
-
-		if (err) {
-			displaySupabaseError(err);
-			error(toErrorCode(+err.code), err.message);
-		}
-
-		return data as Omit<PowerCard[], 'user_id'>;
-	};
-
-	const getLatestOpponentDetails = async (): Promise<Result | LatestOpponent | null> => {
-		if (!userId) {
-			return {
-				code: 404,
-				message: 'User not found',
-				success: false
-			} satisfies Result;
-		}
-
-		const response = await fetch(`${BACKEND_URL}/matches/latest/${userId}`, {
+		const response = await fetch(`${BACKEND_URL}/users/${userId}/matches`, {
 			method: 'GET'
 		});
 
@@ -118,16 +32,86 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 				code: response.status,
 				message: await response.text(),
 				success: false
-			} satisfies Result;
+			};
 		}
 
-		const latestOpponent: LatestOpponent | null = await response.json();
+		const matches: MatchClient[] = await response.json();
 
-		return latestOpponent;
+		console.log(matches);
+
+		return {
+			code: response.status,
+			message: 'Successfully fetched matches.',
+			success: true,
+			data: matches
+		};
 	};
 
-	const getBadges = async (): Promise<Badge[]> => {
-		if (!userId) return [];
+	const getPowerCards = async (): Promise<HttpResult<PowerCard[]>> => {
+		const { data, error: err } = await locals.supabase
+			.from('power_cards')
+			.select('*')
+			.eq('user_id', userId);
+
+		if (err) {
+			displaySupabaseError(err);
+
+			return {
+				code: +err.code,
+				message: err.message,
+				success: false
+			};
+		}
+
+		return {
+			code: 200,
+			message: 'Successfully fetched Power Cards.',
+			success: true,
+			data
+		};
+	};
+
+	const getOpponent = async (): Promise<HttpResult<Opponent>> => {
+		if (!userId) {
+			return {
+				code: 404,
+				message: 'User not found.',
+				success: false
+			};
+		}
+
+		const response = await fetch(`${BACKEND_URL}/users/${userId}/matches/opponent`, {
+			method: 'GET'
+		});
+
+		if (!response.ok) {
+			return {
+				code: response.status,
+				message: await response.text(),
+				success: false
+			};
+		}
+
+		const opponent: Opponent = await response.json();
+
+		console.log(opponent);
+
+		return {
+			code: response.status,
+			message: 'Successfully fetched opponent.',
+			success: true,
+			data: opponent
+		};
+	};
+
+	const getBadges = async (): Promise<HttpResult<Badge[]>> => {
+		if (!userId) {
+			return {
+				code: 404,
+				message: 'User not found.',
+				success: false
+			};
+		}
 
 		const { data, error: err } = await locals.supabase
 			.from('badges')
@@ -135,26 +119,31 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 			.eq('user_id', userId);
 
 		if (err) {
-			displaySupabaseError(err);
-			error(toErrorCode(+err.code), err.message);
+			// displaySupabaseError(err);
+			// error(toErrorCode(+err.code), err.message);
+			return {
+				code: +err.code,
+				message: err.message,
+				success: false
+			};
 		}
 
-		return data as Badge[];
+		return {
+			code: 200,
+			message: 'Successfully fetched badges.',
+			success: true,
+			data
+		};
 	};
-
-	const data = Promise.all([
-		getPowerCards(),
-		getLatestMatches(),
-		getLatestOpponentDetails(),
-		getOriginalMatches(),
-		getBadges()
-	]);
 
 	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
 
 	return {
 		lazy: {
-			data
+			matches: getMatches(),
+			badges: getBadges(),
+			powerCards: getPowerCards(),
+			opponent: getOpponent()
 		},
 		form: await superValidate(zod(loginSchema))
 	};
@@ -214,11 +203,19 @@ export const actions: Actions = {
 	login: async (event) => {
 		const form = await superValidate(event, zod(loginSchema));
 
+		let result: HttpResult<undefined> = {
+			message: 'Server error. Try again later.',
+			success: false,
+			code: 500
+		};
+
 		if (!form.valid) {
+			result.message = 'Invalid form data.';
+			result.code = 400;
+
 			return fail(400, {
 				form,
-				success: false,
-				message: 'Invalid form data.'
+				result
 			});
 		}
 
@@ -229,23 +226,33 @@ export const actions: Actions = {
 
 		if (error) {
 			if (isAuthApiError(error) && error.status === 400) {
+				result.message = 'Invalid credentials.';
+				result.code = 400;
+
 				return fail(400, {
 					form,
-					success: false,
-					message: 'Invalid credentials.'
+					result
 				});
 			}
 
 			return fail(500, {
 				form,
-				success: false,
-				message: 'Server error. Try again later.'
+				result
 			});
 		}
 
+		result = {
+			message: 'Successfully logged in.',
+			success: true,
+			code: 200
+		};
+
 		console.log('->> LOGIN: ', data.user.email);
 
-		throw redirect(303, '/');
+		return {
+			form,
+			result
+		};
 	},
 	image: async ({ locals, request }) => {
 		const session = await locals.getSession();
@@ -336,11 +343,11 @@ async function twistOfFate(
 
 	console.log('Switching opponent...');
 
-	const response = await fetch(`${BACKEND_URL}/power_cards/twist_of_fate`, {
+	const response = await fetch(`${BACKEND_URL}/power-cards/twist-of-fate`, {
 		method: 'PATCH',
 		body: JSON.stringify({
 			user_id,
-			selected_opponent_id: opponent_id
+			selected_user_id: opponent_id
 		}),
 		headers: {
 			'Content-Type': 'application/json'

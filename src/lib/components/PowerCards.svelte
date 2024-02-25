@@ -1,46 +1,51 @@
 <script lang="ts">
 	import { POWER_CARDS, SKILLS } from '$lib';
-	import type { LoadingStatus, Matchmake, PowerCard, Result, User } from '$lib/types';
+	import type { PowerCard, User } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { enhance } from '$app/forms';
 	import { invalidate } from '$app/navigation';
-	import { CardStackPlus, CheckCircled, CrossCircled, Reload } from 'radix-icons-svelte';
+	import { CardStackPlus } from 'radix-icons-svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { onDestroy, onMount } from 'svelte';
-	import { isResult } from '$lib/helpers';
-	import * as Alert from '$lib/components/ui/alert';
-	import { AlertCircle } from 'lucide-svelte';
+	import { getContext, onDestroy, onMount } from 'svelte';
+	import type { MatchClient } from '$lib/types/matches';
+	import { toast } from 'svelte-sonner';
 
-	export let powerCards: PowerCard[] | Result;
-	export let isCurrentUser: boolean = false;
-	export let user: User | Result;
-	export let matches: Matchmake[] | Result = [];
+	export let powerCards: PowerCard[];
+	export let user: User | undefined;
+	export let matches: MatchClient[];
+
+	const currentUser = getContext<User>('user');
 
 	let selectedUser: string | undefined;
 	let selectedCard: string | undefined;
 	let selectedSkill: string | undefined;
 
-	let loadingStatus = Array.from({ length: isResult(powerCards) ? 0 : powerCards.length }).fill(
-		'none'
-	) as LoadingStatus[];
+	$: hasNoMatch = matches.length < 1;
 
-	$: hasNoCurrentMatch = isResult(matches)
-		? false
-		: (matches.length > 0 && matches[0].status === 'done') || matches.length < 1;
+	function isCurrentUser(userId: string | undefined): boolean {
+		if (!userId) return false;
+
+		return currentUser.id === userId;
+	}
 
 	async function getUsersInSection(): Promise<User[] | undefined> {
-		if (isResult(user)) return;
+		if (!isCurrentUser(user?.id)) return;
 
-		const response = await fetch(`/api/users?section=${user.section}`, {
+		const response = await fetch(`/api/users?section=${currentUser.section}`, {
 			method: 'GET'
 		});
 
+		if (!response.ok) {
+			console.error('Failed to fetch users in section: ', await response.text());
+			return;
+		}
+
 		const users: User[] = await response.json();
 
-		return users.filter(({ id }) => id !== user.id);
+		return users.filter(({ id }) => id !== currentUser.id);
 	}
 
 	let timerInterval: NodeJS.Timeout;
@@ -52,12 +57,12 @@
 	};
 
 	$: isPowerCardDisabled = (card: PowerCard) => {
-		return card.is_used || card.is_active || hasNoCurrentMatch || difference > 0;
+		return card.is_used || card.is_active || hasNoMatch || difference > 0;
 	};
 
 	onMount(() => {
 		timerInterval = setInterval(() => {
-			if (isResult(matches) || matches.length < 1) return;
+			if (matches.length < 1) return;
 
 			const currentTime = new Date().getTime();
 			const deadline = new Date(matches[0].card_deadline).getTime();
@@ -89,6 +94,7 @@
 		>
 			Power Cards
 
+			<!--NOTE: Put the timer at the bottom of the card instead-->
 			{#if difference > 0}
 				<div class="bg-card px-4 py-2 border border-border rounded-full">
 					<p class="text-base font-jost-medium">
@@ -120,7 +126,7 @@
 		</Card.Title>
 	</Card.Header>
 
-	{#if hasNoCurrentMatch && isCurrentUser}
+	{#if hasNoMatch && isCurrentUser(user?.id)}
 		<p class="text-muted-foreground italic col-span-2 px-6 pb-6">
 			Please wait for the admin to queue a new match.
 		</p>
@@ -134,40 +140,13 @@
 	{/if}
 
 	<Card.Content class="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-4">
-		{#if isResult(user)}
-			<Alert.Root variant="destructive">
-				<AlertCircle class="h-4 w-4" />
-				<Alert.Title>Error</Alert.Title>
-				<Alert.Description>
-					<p>Failed to fetch user.</p>
-					<p>{user.message}</p>
-				</Alert.Description>
-			</Alert.Root>
-		{:else if isResult(powerCards)}
-			<Alert.Root variant="destructive">
-				<AlertCircle class="h-4 w-4" />
-				<Alert.Title>Error</Alert.Title>
-				<Alert.Description>
-					<p>Failed to fetch Power Cards.</p>
-					<p>{powerCards.message}</p>
-				</Alert.Description>
-			</Alert.Root>
-		{:else if isResult(matches)}
-			<Alert.Root variant="destructive">
-				<AlertCircle class="h-4 w-4" />
-				<Alert.Title>Error</Alert.Title>
-				<Alert.Description>
-					<p>Failed to fetch matches.</p>
-					<p>{matches.message}</p>
-				</Alert.Description>
-			</Alert.Root>
-		{:else if user && user.is_private && !isCurrentUser}
+		{#if user?.is_private && !isCurrentUser(user?.id)}
 			<p class="text-muted-foreground italic">Power cards are hidden...</p>
 		{:else}
 			{#each powerCards as card, idx (idx)}
 				{@const powerCardDetails = POWER_CARDS.get(card.name)}
 
-				{#if isCurrentUser}
+				{#if isCurrentUser(user?.id)}
 					<Dialog.Root closeOnOutsideClick={false}>
 						<Dialog.Trigger disabled={isPowerCardDisabled(card)}>
 							<img
@@ -284,7 +263,7 @@
 											selectedUser = undefined;
 										}
 
-										loadingStatus[idx] = 'pending';
+										toast.info('Activating power card...');
 
 										if (selectedUser) {
 											formData.append('new_opponent_id', selectedUser);
@@ -299,14 +278,13 @@
 
 										return async ({ result, update }) => {
 											if (result.type === 'success') {
-												loadingStatus[idx] = 'success';
+												toast.success('Successfully activated power card.');
 												console.log('Successfully activated power card.');
+												await update();
 											} else {
-												loadingStatus[idx] = 'error';
+												toast.error('Failed to activate power card.');
 												console.error('Failed to activate power card.');
 											}
-
-											await update();
 										};
 									}}
 								>
@@ -314,31 +292,12 @@
 
 									<Button
 										type="submit"
-										class={`text-base md:text-lg ${
-											loadingStatus[idx] === 'success'
-												? 'bg-green-500 pointer-events-none'
-												: loadingStatus[idx] === 'error'
-													? 'bg-red-500 hover:bg-red-600'
-													: loadingStatus[idx] === 'pending'
-														? 'bg-yellow-500 pointer-events-none'
-														: 'bg-primary'
-										}`}
+										class="text-base md:text-lg bg-primary"
 										disabled={isPowerCardDisabled(card)}
 									>
 										<div class="flex items-center gap-1">
-											{#if loadingStatus[idx] === 'pending'}
-												<Reload class="h-5 w-5 animate-spin" />
-												<span class="text-base md:text-lg">Activating...</span>
-											{:else if loadingStatus[idx] === 'success'}
-												<CheckCircled class="h-5 w-5" />
-												<span class="text-base md:text-lg">Success</span>
-											{:else if loadingStatus[idx] === 'error'}
-												<CrossCircled class="h-5 w-5" />
-												<span class="text-base md:text-lg">Error, please try again.</span>
-											{:else}
-												<CardStackPlus class="h-5 w-5" />
-												<span class="text-base md:text-lg">Activate</span>
-											{/if}
+											<CardStackPlus class="h-5 w-5" />
+											<span class="text-base md:text-lg">Activate</span>
 										</div>
 									</Button>
 								</form>

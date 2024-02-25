@@ -6,7 +6,6 @@
 		getUserVerdict,
 		snakeCaseToTitleCase
 	} from '$lib';
-	import type { Matchmake, Result } from '$lib/types';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Table from '$lib/components/ui/table';
 	import * as Card from '$lib/components/ui/card';
@@ -18,31 +17,41 @@
 	import { AlertCircle } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { isResult } from '$lib/helpers';
+	import type { MatchClient } from '$lib/types/matches';
+	import type { User } from '$lib/types';
+	import { getContext } from 'svelte';
 
-	export let matches: Matchmake[] | Result;
-	export let ogMatches: Matchmake[] | Result;
-	export let userId: string;
+	export let matches: MatchClient[];
+	export let user: User | undefined;
+
+  const currentUser = getContext<User>('user');
 
 	let cardBattleIsOpen = false;
 	let arnisMatchIsOpen = false;
 
-	async function showModal(e: MouseEvent, match: Matchmake, type: 'arnis' | 'card_battle') {
-		const { href } = e.currentTarget as HTMLAnchorElement;
+	async function showModal(matchId: string, type: 'arnis' | 'card_battle'): void {
+    if (type === 'arnis') {
+      arnisMatchIsOpen = true;
+      return
+    } 
 
-		const result = await preloadData(href);
-
-		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { selected: { turns: result.data.turns, user: result.data.user, match } });
-
-			if (type === 'arnis') {
-				arnisMatchIsOpen = true;
-			} else {
-				cardBattleIsOpen = true;
-			}
-		} else {
-			goto(href);
-		}
+    cardBattleIsOpen = true;
 	}
+
+  async function getArnisResults(matchId: string): void {
+    if(matches.length < 1) return
+  }
+
+	async function getCardBattleResults(matchId: string): void {
+    if(matches.length < 1) return
+
+    const response = await fetch(`/api/card-battle/results?match-id=${matchid}`, {method: 'GET'});
+    const result = await response.json();
+  }
+
+  function getOpponent() {
+    const response = await fetch(`/api/users/${}`)
+  }
 </script>
 
 <Dialog.Root
@@ -77,10 +86,6 @@
 		<Dialog.Header>
 			<Dialog.Title class="text-2xl font-jost-semibold">Arnis</Dialog.Title>
 		</Dialog.Header>
-
-		{#if $page.state.selected}
-			<ArnisMatch data={$page.state.selected} />
-		{/if}
 	</Dialog.Content>
 </Dialog.Root>
 
@@ -115,25 +120,7 @@
 		</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		{#if isResult(matches)}
-			<Alert.Root variant="destructive">
-				<AlertCircle class="h-4 w-4" />
-				<Alert.Title>Error</Alert.Title>
-				<Alert.Description>
-					<p>Failed to fetch matches.</p>
-					<p>{matches.message}</p>
-				</Alert.Description>
-			</Alert.Root>
-		{:else if isResult(ogMatches)}
-			<Alert.Root variant="destructive">
-				<AlertCircle class="h-4 w-4" />
-				<Alert.Title>Error</Alert.Title>
-				<Alert.Description>
-					<p>Failed to fetch matches.</p>
-					<p>{ogMatches.message}</p>
-				</Alert.Description>
-			</Alert.Root>
-		{:else if matches.length < 1}
+		{#if matches.length < 1}
 			<p class="text-muted-foreground italic">
 				History is empty. You will see your previous matches here.
 			</p>
@@ -154,29 +141,22 @@
 						</Table.Header>
 						<Table.Body>
 							{#each matches as match (match.id)}
-								<a
-									class="contents"
-									href={`/arnis/${match.id}`}
-									on:click|preventDefault={(e) => showModal(e, match, 'arnis')}
-								>
+								<button on:click|preventDefault={() => showModal(match.id, 'arnis')}>
 									<Table.Row class="text-sm sm:text-base md:text-lg">
 										<Table.Cell
 											class={`w-1/3 bg-gradient-to-r  to-50% border-l-8 ${
-												getUserVerdict(userId, match) === 'win'
+												getUserVerdict(currentUser.id, match.users) === 'win'
 													? 'border-l-green-500 from-green-900'
-													: getUserVerdict(userId, match) === 'lose'
+													: getUserVerdict(currentUser.id, match.users) === 'lose'
 														? 'border-l-red-600 from-red-950'
-														: getUserVerdict(userId, match) === 'draw'
+														: getUserVerdict(currentUser.id, match.users) === 'draw'
 															? 'border-l-yellow-500 from-yellow-900'
 															: 'border-l-muted-foreground from-muted'
-											}`}>{getOpponent(userId, match).name}</Table.Cell
+											}`}>{match.users}</Table.Cell
 										>
 										<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
-										<Table.Cell class="w-1/4"
-											>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
-										>
 									</Table.Row>
-								</a>
+								</button>
 							{/each}
 						</Table.Body>
 					</Table.Root>

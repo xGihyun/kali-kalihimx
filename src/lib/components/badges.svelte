@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { BADGES } from '$lib';
 	import * as Card from '$lib/components/ui/card';
-	import type { Badge, User } from '$lib/types';
+	import type { Badge, HttpResult, User } from '$lib/types';
 	import { Button } from '$lib/components/ui/button';
 	import { Check } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-	import { invalidateAll } from '$app/navigation';
+	import { getContext } from 'svelte';
 
-	export let badges: Badge[];
+	export let badges: HttpResult<Badge[]>;
 	export let user: User | undefined;
-	export let currentUser: User | undefined;
 
-	let selectedBadges: string[] = badges.map(({ name }) => name);
+	const currentUser = getContext<User>('user');
+
+	let selectedBadges: string[] = badges.data?.map(({ name }) => name) || [];
 
 	console.log(badges);
 	console.log(selectedBadges);
@@ -49,7 +50,6 @@
 		}
 
 		toast.success(message);
-		// await invalidateAll();
 	}
 
 	function arraysAreEqual(arr1: string[], arr2: string[]) {
@@ -75,10 +75,7 @@
 				variant="ghost"
 				class="space-x-1"
 				on:click={updateBadges}
-				disabled={arraysAreEqual(
-					badges.map(({ name }) => name),
-					selectedBadges
-				)}
+				disabled={arraysAreEqual(badges.data?.map(({ name }) => name) || [], selectedBadges)}
 			>
 				<Check class="w-4 h-4" />
 				<span> Apply </span>
@@ -86,17 +83,23 @@
 		{/if}
 	</Card.Header>
 
-	<Card.Content class="flex gap-4 flex-wrap">
-		{#each BADGES as badge (badge.name)}
-			<button
-				class={`p-4 rounded-md border-4 border-white transition-[filter] duration-100 ${
-					selectedBadges.some((name) => badge.name === name) ? 'brightness-100' : 'brightness-25'
-				}`}
-				disabled={currentUser?.role === 'user'}
-				on:click={() => toggleBadge(badge.name)}
-			>
-				<svelte:component this={badge.icon} class="w-10 h-10" />
-			</button>
-		{/each}
-	</Card.Content>
+	{#if !badges.success || badges.data === undefined}
+		<p>
+			{badges.code}: {badges.message}
+		</p>
+	{:else}
+		<Card.Content class="flex gap-4 flex-wrap">
+			{#each BADGES as badge (badge.name)}
+				<button
+					class={`p-4 rounded-md border-4 border-white transition-[filter] duration-100 ${
+						selectedBadges.some((name) => badge.name === name) ? 'brightness-100' : 'brightness-25'
+					}`}
+					disabled={currentUser?.role === 'user'}
+					on:click={() => toggleBadge(badge.name)}
+				>
+					<svelte:component this={badge.icon} class="w-10 h-10" />
+				</button>
+			{/each}
+		</Card.Content>
+	{/if}
 </Card.Root>

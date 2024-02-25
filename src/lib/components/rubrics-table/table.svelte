@@ -94,7 +94,7 @@
 				<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
 					<Table.Row {...rowAttrs}>
 						{#each row.cells as cell (cell.id)}
-							{@const rubric = cell.row.original}
+							{@const rubric = cell.row?.original}
 
 							<Subscribe attrs={cell.attrs()} let:attrs>
 								<Table.Cell {...attrs}>

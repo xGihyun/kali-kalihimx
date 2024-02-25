@@ -35,7 +35,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// 	redirect(307, '/');
 	// }
 
-	event.locals.getUserData = async () => {
+	event.locals.getUserData = async (): Promise<User | undefined> => {
 		if (!session) {
 			console.log('Session not found.');
 			return;
@@ -48,7 +48,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.single();
 
 		if (error) {
-			displaySupabaseError(error);
+			// displaySupabaseError(error);
 
 			return;
 			// redirect(307, '/');

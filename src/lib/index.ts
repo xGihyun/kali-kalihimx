@@ -43,6 +43,7 @@ import {
 	SidewardSinawali,
 	Strikes
 } from './assets/images/thumbnails';
+import type { MatchUserClient, Verdict } from './types/matches';
 
 export const BADGES: BadgeIcon[] = [
 	{
@@ -440,10 +441,8 @@ export function getRankTitle(score: number): string | null {
 export function titleCaseToSnakeCase(input: string | null) {
 	if (!input) return;
 
-	// Split the string into words based on spaces and capital letters
 	const words = input.split(/(?=[A-Z])|\s+/);
 
-	// Convert each word to lowercase and join them with an underscore
 	const snakeCase = words.map((word) => word.toLowerCase()).join('_');
 
 	return snakeCase;
@@ -452,26 +451,21 @@ export function titleCaseToSnakeCase(input: string | null) {
 export function snakeCaseToTitleCase(input: string | null): string | undefined {
 	if (!input) return;
 
-	// Split the input string into words
 	const words = input.split('_');
 
-	// Capitalize the first letter of each word and join them with a space
 	const titleCase = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
 	return titleCase;
 }
 
-export function getUserVerdict(
-	userId: string,
-	match: Matchmake
-): 'win' | 'lose' | 'draw' | undefined {
-	if (userId === match.user1_id) {
-		return match.user1_arnis_verdict;
+export function getUserVerdict(userId: string, matchUsers: MatchUserClient[]): Verdict {
+	for (const mu of matchUsers) {
+		if (mu.user_id === userId) {
+			return mu.arnis_verdict;
+		}
 	}
 
-	if (userId === match.user2_id) {
-		return match.user2_arnis_verdict;
-	}
+	return 'pending';
 }
 
 export function getUserCardBattleVerdict(

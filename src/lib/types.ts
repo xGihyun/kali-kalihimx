@@ -72,14 +72,6 @@ export type Matchmake = {
 	comment: string;
 };
 
-export type LatestOpponent = {
-	first_name: string;
-	last_name: string;
-	score: number;
-	avatar_url: string;
-	banner_url: string;
-};
-
 export type MaxSet = {
 	section: string;
 	max_set: number;

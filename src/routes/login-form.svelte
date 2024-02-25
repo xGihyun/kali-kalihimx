@@ -27,10 +27,10 @@
 	</p>
 </div>
 
-<form method="POST" use:enhance>
+<form method="POST" action="?/login" use:enhance>
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
-			<Form.Label>Username</Form.Label>
+			<Form.Label>Email</Form.Label>
 			<Input {...attrs} bind:value={$formData.email} />
 		</Form.Control>
 		<Form.FieldErrors />
@@ -44,5 +44,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button>Log in</Form.Button>
+	<Form.Button class="w-full">Log in</Form.Button>
 </form>

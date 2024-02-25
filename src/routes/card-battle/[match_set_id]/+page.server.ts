@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	const { match_set_id } = params;
 
-	const response = await fetch(`${BACKEND_URL}/card_battle/${match_set_id}`, {
+	const response = await fetch(`${BACKEND_URL}/card-battle/${match_set_id}`, {
 		method: 'GET'
 	});
 

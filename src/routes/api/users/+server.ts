@@ -2,6 +2,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+// NOTE: Could use supabase sdk instead
 export const GET: RequestHandler = async ({ url, fetch, setHeaders }) => {
 	const section = url.searchParams.get('section');
 

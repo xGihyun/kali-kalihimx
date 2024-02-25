@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { Sidebar } from '$lib/components';
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import '../app.postcss';
 	import { invalidateAll } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
@@ -24,6 +24,10 @@
 
 		return () => subscription.unsubscribe();
 	});
+
+	$: if (data.user) {
+		setContext('user', data.user);
+	}
 </script>
 
 <Toaster closeButton richColors theme="dark" />
