@@ -8,6 +8,7 @@ import MatchHistory from './MatchHistory.svelte';
 import Banner from './Banner.svelte';
 import RankLogo from './RankLogo.svelte';
 import Badges from './badges.svelte';
+import ArnisResults from './arnis-results.svelte';
 
 export {
 	Navbar,
@@ -19,5 +20,6 @@ export {
 	MatchHistory,
 	Banner,
 	RankLogo,
-	Badges
+	Badges,
+	ArnisResults
 };

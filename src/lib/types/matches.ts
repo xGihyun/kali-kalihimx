@@ -5,6 +5,8 @@ export type MatchUserClient = {
 	id: string;
 
 	user_id: string;
+	first_name: string;
+	last_name: string;
 	match_id: string;
 	score: number;
 	card_damage: number;
@@ -24,6 +26,7 @@ export type MatchClient = {
 	status: Status;
 	arnis_skill: string;
 	users: MatchUserClient[];
+	comment?: string;
 };
 
 export type Opponent = {

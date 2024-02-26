@@ -3,75 +3,66 @@ import type { Section, User } from '$lib/types';
 import { fail, type Actions, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
-import { DeleteUsersSchema } from '$lib/schemas';
+import { deleteUsersSchema } from '$lib/schemas';
+import { displaySupabaseError } from '$lib/server';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 	const limit = Number(url.searchParams.get('limit')) || 50;
 	const skip = Number(url.searchParams.get('skip')) || 0;
 	const sections = url.searchParams.get('sections');
 
-	const getUsers = async () => {
+	const getUsers = async (): Promise<User[]> => {
 		const users = locals.supabase
 			.from('users')
-			.select('first_name, last_name, id, score, section, sex, rank_overall, rank_section')
+			.select('first_name, last_name, id, score, section, sex, rank_overall, rank_section', {
+				count: 'exact'
+			})
 			.order('score', { ascending: false })
 			.eq('role', 'user')
 			.range(skip, skip + limit - 1);
 
-		const { data, error: err } = sections
-			? await users.in('section', sections.split(','))
-			: await users;
+		const {
+			data,
+			count,
+			error: err
+		} = sections ? await users.in('section', sections.split(',')) : await users;
 
 		if (err) {
-			console.log(err.code);
-			error(500, err.message);
+			displaySupabaseError(err);
+			return [];
 		}
 
 		return data as User[];
 	};
 
-	const getUserCount = async () => {
-		const { count, error: err } = await locals.supabase
-			.from('users')
-			.select('', { count: 'exact' });
-
-		console.log(count);
-
-		if (err) {
-			console.log(err.code);
-			error(500, err.message);
-		}
-
-		return count || 0;
-	};
-
-	const getSections = async () => {
+	const getSections = async (): Promise<Section[]> => {
 		const { data, error: err } = await locals.supabase.from('sections').select('*').order('name');
 
 		if (err) {
-			console.log(err.code);
-			error(500, err.message);
+			displaySupabaseError(err);
+			return [];
 		}
+
 		return data as Section[];
 	};
-
-	const foo = Promise.all([getUsers(), getSections(), getUserCount()]);
 
 	setHeaders({ 'cache-control': `max-age=0, s-maxage=60, proxy-revalidate` });
 
 	return {
 		lazy: {
-			foo
+			users: getUsers(),
+			sections: getSections()
 		},
 		skip,
 		filteredSections: sections,
-		form: await superValidate(DeleteUsersSchema)
+		form: await superValidate(zod(deleteUsersSchema))
 	};
 };
 
 export const actions: Actions = {
 	delete: async (event) => {
-		const form = await superValidate(event, DeleteUsersSchema);
+		const form = await superValidate(event, deleteUsersSchema);
 
 		console.log('Forced: ', form.data.force);
 

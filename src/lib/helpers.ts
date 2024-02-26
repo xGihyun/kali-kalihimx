@@ -4,6 +4,7 @@ import type { ActionResult, NumericRange } from '@sveltejs/kit';
 import type { Dimensions, HttpResult, RequestType, Result } from './types';
 import z, { ZodSchema, type AnyZodObject, undefined, unknown } from 'zod';
 import { toast } from 'svelte-sonner';
+import type { MatchClient, MatchUserClient } from './types/matches';
 
 export async function upload(
 	photo: File | null,
@@ -108,4 +109,16 @@ export async function processActionResult(
 			toast.error('Unknown request type.');
 			break;
 	}
+}
+
+export function getOpponent(
+	userId: string,
+	match: MatchClient,
+	original: boolean = false
+): MatchUserClient {
+	const { users } = match;
+
+	const opponent = users.filter((user) => user.id !== userId && user.is_swapped === original);
+
+	return opponent[0];
 }

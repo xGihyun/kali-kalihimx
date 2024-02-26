@@ -37,8 +37,6 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 
 		const matches: MatchClient[] = await response.json();
 
-		console.log(matches);
-
 		return {
 			code: response.status,
 			message: 'Successfully fetched matches.',
@@ -94,8 +92,6 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 
 		const opponent: Opponent = await response.json();
 
-		console.log(opponent);
-
 		return {
 			code: response.status,
 			message: 'Successfully fetched opponent.',
@@ -119,8 +115,8 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders }) => {
 			.eq('user_id', userId);
 
 		if (err) {
-			// displaySupabaseError(err);
-			// error(toErrorCode(+err.code), err.message);
+			displaySupabaseError(err);
+
 			return {
 				code: +err.code,
 				message: err.message,
