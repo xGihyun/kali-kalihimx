@@ -80,9 +80,6 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 
 	depends('card-battle:damage');
 
-	// TODO: CACHE INVALIDATION
-	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
-
 	return {
 		lazy: {
 			data
@@ -98,6 +95,8 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 export const actions: Actions = {
 	submit_score: async (event) => {
 		const form = await superValidate(event, SubmitScoreSchema);
+
+		console.log(form.data);
 
 		if (!form.valid) {
 			return fail(400, {

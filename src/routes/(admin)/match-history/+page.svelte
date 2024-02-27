@@ -32,7 +32,7 @@
 
 		if (response.ok) {
 			console.log('Success card battle');
-			invalidate('card-battle:damage');
+			await invalidate('card-battle:damage');
 			requestStatus.type = 'success';
 		} else {
 			console.error('Failed to run card battle.');
