@@ -33,7 +33,7 @@
 				/>
 			{/if}
 
-			<Badges {badges} {user} currentUser={data.user} />
+			<Badges {badges} user={isResult(user) ? undefined : user} currentUser={data.user} />
 		</div>
 
 		<Dialog.Root closeOnOutsideClick={false}>

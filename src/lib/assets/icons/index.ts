@@ -19,6 +19,7 @@ import Plus from './Plus.svelte';
 import YouTube from './YouTube.svelte';
 import Close from './Close.svelte';
 import HandsHoldingCircle from './hands-holding-circle.svelte';
+import PeopleGroup from './people-group.svelte';
 
 export {
 	Bell,
@@ -41,5 +42,6 @@ export {
 	ArrowClockwise,
 	Close,
 	Arnis,
-	HandsHoldingCircle
+	HandsHoldingCircle,
+	PeopleGroup
 };

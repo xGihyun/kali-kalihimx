@@ -61,6 +61,9 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
 
 		const badges = await response.json();
 
+		console.log('BADGES');
+		console.log(badges);
+
 		return badges;
 	};
 

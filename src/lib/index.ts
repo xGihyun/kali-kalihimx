@@ -4,6 +4,7 @@ import {
 	HandsHoldingCircle,
 	History,
 	Home,
+	PeopleGroup,
 	Sword,
 	Trophy
 } from './assets/icons';
@@ -46,24 +47,29 @@ import {
 
 export const BADGES: BadgeIcon[] = [
 	{
-		name: 'Top 5',
+		name: 'Invincible Under the Sun',
+		description: 'Top 1 Player',
 		icon: Crown
 	},
 	{
-		name: 'Defensive Blocker',
+		name: 'Uncrowned Kings/Queens',
+		description: 'Top 2-10 Players',
+		icon: PeopleGroup
+	},
+	{
+		name: 'Defense Juggernaut',
+		description: 'Best in Blocks',
 		icon: ShieldPlus
 	},
 	{
-		name: 'Superior Striker',
+		name: 'Offensive Prodigy',
+		description: 'Best in Strikes',
 		icon: Swords
 	},
 	{
-		name: 'Forward Sinawali Specialist',
+		name: 'Weaving Master',
+		description: 'Best in Sinawali',
 		icon: ArrowBigRightDash
-	},
-	{
-		name: 'Sinawali Virtuoso',
-		icon: HandsHoldingCircle
 	}
 ];
 

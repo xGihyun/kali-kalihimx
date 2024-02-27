@@ -6,6 +6,7 @@
 	import { Check } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { invalidateAll } from '$app/navigation';
+	import * as HoverCard from '$lib/components/ui/hover-card';
 
 	export let badges: Badge[];
 	export let user: User | undefined;
@@ -27,10 +28,6 @@
 	}
 
 	async function updateBadges(): Promise<void> {
-		if (selectedBadges.length < 1) {
-			return;
-		}
-
 		const response = await fetch(`/api/badges?user_id=${user?.id}`, {
 			method: 'POST',
 			body: JSON.stringify(selectedBadges),
@@ -49,7 +46,7 @@
 		}
 
 		toast.success(message);
-		// await invalidateAll();
+		await invalidateAll();
 	}
 
 	function arraysAreEqual(arr1: string[], arr2: string[]) {
@@ -88,15 +85,35 @@
 
 	<Card.Content class="flex gap-4 flex-wrap">
 		{#each BADGES as badge (badge.name)}
-			<button
-				class={`p-4 rounded-md border-4 border-white transition-[filter] duration-100 ${
-					selectedBadges.some((name) => badge.name === name) ? 'brightness-100' : 'brightness-25'
-				}`}
-				disabled={currentUser?.role === 'user'}
-				on:click={() => toggleBadge(badge.name)}
-			>
-				<svelte:component this={badge.icon} class="w-10 h-10" />
-			</button>
+			<HoverCard.Root>
+				<HoverCard.Trigger>
+					<button
+						class={`p-4 rounded-md border-4 border-white transition-[filter] duration-100 ${
+							selectedBadges.some((name) => badge.name === name)
+								? 'brightness-100'
+								: 'brightness-25'
+						}`}
+						disabled={currentUser?.role === 'user'}
+						on:click={() => toggleBadge(badge.name)}
+					>
+						<svelte:component this={badge.icon} class="w-10 h-10" />
+					</button>
+				</HoverCard.Trigger>
+				<HoverCard.Content class="flex flex-col justify-center gap-5">
+					<div class="gap-2 flex flex-col w-full items-center">
+						<div class="p-4 rounded-md border-4 border-white w-20 h-20">
+							<svelte:component this={badge.icon} class="w-10 h-10" />
+						</div>
+
+						<p class="text-2xl text-center">
+							{badge.name}
+						</p>
+					</div>
+					<p class="text-sm text-center">
+						{badge.description}
+					</p>
+				</HoverCard.Content>
+			</HoverCard.Root>
 		{/each}
 	</Card.Content>
 </Card.Root>

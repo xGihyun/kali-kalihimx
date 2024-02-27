@@ -226,5 +226,6 @@ export type BadgeInfo = {
 
 export type BadgeIcon = {
 	name: string;
+	description?: string;
 	icon?: ComponentType<SvelteComponent>;
 };
