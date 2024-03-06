@@ -234,9 +234,8 @@ export const POWER_CARDS = new Map([
 export const SKILLS = new Map([
 	['strikes', 'Strikes'],
 	['blocks', 'Blocks'],
-	['forward_sinawali', 'Forward Sinawali'],
-	['sideward_sinawali', 'Sideward Sinawali'],
-	['reversed_sinawali', 'Reversed Sinawali']
+	['sinawali', 'Sinawali'],
+	['footwork', 'Footwork']
 ]);
 
 export const FOOTWORKS = new Map([
